@@ -6,6 +6,7 @@ import { ExerciseModule } from './exercise/exercise.module';
 import { LicenseModule } from './license/license.module';
 import { WorkoutDayModule } from './workout-day/workout-day.module';
 import { ExerciseRoutineModule } from './exercise-routine/exercise-routine.module';
+import { ExerciseWlSetModule } from './exercise-wl-set/exercise-wl-set.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ExerciseRoutineModule } from './exercise-routine/exercise-routine.modul
     LicenseModule,
     WorkoutDayModule,
     ExerciseRoutineModule,
+    ExerciseWlSetModule,
   ],
 })
 export class AppModule {}

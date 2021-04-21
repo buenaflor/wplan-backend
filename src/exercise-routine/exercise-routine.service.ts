@@ -12,7 +12,7 @@ export class ExerciseRoutineService {
 
   findAll() {
     return this.exerciseRoutineRepository.find({
-      relations: ['exercise', 'workoutDay'],
+      relations: ['exercise', 'workoutDay', 'wlSets'],
     });
   }
 }

@@ -16,6 +16,7 @@ export class WorkoutDayService {
         'workoutPlan',
         'exerciseRoutines',
         'exerciseRoutines.exercise',
+        'exerciseRoutines.sets'
       ],
     });
   }

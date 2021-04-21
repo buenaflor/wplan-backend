@@ -21,6 +21,7 @@ export class WorkoutPlanService {
         'workoutDays',
         'workoutDays.exerciseRoutines',
         'workoutDays.exerciseRoutines.exercise',
+        'workoutDays.exerciseRoutines.wlSets',
       ],
     });
   }
@@ -28,6 +29,12 @@ export class WorkoutPlanService {
   async paginate(
     options: IPaginationOptions,
   ): Promise<Pagination<Workoutplan>> {
-    return paginate<Workoutplan>(this.workoutPlanRepository, options);
+    const queryBuilder = await this.workoutPlanRepository
+      .createQueryBuilder('workoutPlan')
+      .leftJoinAndSelect('workoutPlan.workoutDays', 'workoutDays')
+      .leftJoinAndSelect('workoutDays.exerciseRoutines', 'exerciseRoutines')
+      .leftJoinAndSelect('exerciseRoutines.exercise', 'exercise')
+      .leftJoinAndSelect('exerciseRoutines.wlSets', 'wlSets');
+    return paginate<Workoutplan>(queryBuilder, options);
   }
 }

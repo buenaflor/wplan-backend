@@ -1,13 +1,9 @@
 // exercise-routine.entity.ts
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutDay } from '../workout-day/workout-day.entity';
+import { ExerciseWlSet } from '../exercise-wl-set/exercise-wl-set.entity';
 
 @Entity({ name: 'exercise_routine' })
 export class ExerciseRoutine {
@@ -21,4 +17,10 @@ export class ExerciseRoutine {
   @ManyToOne(() => WorkoutDay, (workoutDay) => workoutDay.id)
   @JoinColumn({ name: 'workout_day_id' })
   workoutDay: WorkoutDay;
+
+  @OneToMany(
+    () => ExerciseWlSet,
+    (exerciseWlSet) => exerciseWlSet.exerciseRoutine,
+  )
+  wlSets: ExerciseWlSet[];
 }
