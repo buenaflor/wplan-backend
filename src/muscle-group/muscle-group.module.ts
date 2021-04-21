@@ -1,4 +1,4 @@
-// workoutplan.module.ts
+// workout-plan.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MuscleGroupController } from './muscle-group.controller';

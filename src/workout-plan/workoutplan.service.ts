@@ -9,21 +9,25 @@ import {
 } from 'nestjs-typeorm-paginate';
 
 @Injectable()
-export class WorkoutplanService {
+export class WorkoutPlanService {
   constructor(
     @InjectRepository(Workoutplan)
-    private workoutplanRepository: Repository<Workoutplan>,
+    private workoutPlanRepository: Repository<Workoutplan>,
   ) {}
 
-  findOne(id: string): Promise<Workoutplan> {
-    return this.workoutplanRepository.findOne(id, {
-      relations: ['workoutDays'],
+  async findOne(id: string): Promise<Workoutplan> {
+    return this.workoutPlanRepository.findOne(id, {
+      relations: [
+        'workoutDays',
+        'workoutDays.exerciseRoutines',
+        'workoutDays.exerciseRoutines.exercise',
+      ],
     });
   }
 
   async paginate(
     options: IPaginationOptions,
   ): Promise<Pagination<Workoutplan>> {
-    return paginate<Workoutplan>(this.workoutplanRepository, options);
+    return paginate<Workoutplan>(this.workoutPlanRepository, options);
   }
 }

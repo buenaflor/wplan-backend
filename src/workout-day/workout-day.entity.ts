@@ -5,8 +5,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-import { Workoutplan } from '../workoutplan/workoutplan.entity';
+
+import { Workoutplan } from '../workout-plan/workoutplan.entity';
+import { ExerciseRoutine } from '../exercise-routine/exercise-routine.entity';
 
 @Entity({ name: 'workout_day' })
 export class WorkoutDay {
@@ -22,4 +25,10 @@ export class WorkoutDay {
   @ManyToOne(() => Workoutplan, (workoutPlan) => workoutPlan.id)
   @JoinColumn({ name: 'workout_plan_id' })
   workoutPlan: Workoutplan;
+
+  @OneToMany(
+    () => ExerciseRoutine,
+    (exerciseRoutine) => exerciseRoutine.workoutDay,
+  )
+  exerciseRoutines: ExerciseRoutine[];
 }

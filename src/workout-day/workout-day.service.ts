@@ -10,7 +10,13 @@ export class WorkoutDayService {
     private workoutDayRepository: Repository<WorkoutDay>,
   ) {}
 
-  findAll() {
-    return this.workoutDayRepository.find({ relations: ['workoutPlan'] });
+  async findAll() {
+    return this.workoutDayRepository.find({
+      relations: [
+        'workoutPlan',
+        'exerciseRoutines',
+        'exerciseRoutines.exercise',
+      ],
+    });
   }
 }

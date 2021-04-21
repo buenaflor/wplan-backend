@@ -1,11 +1,6 @@
-// workoutplan.entity.ts
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-} from 'typeorm';
-import { WorkoutDay } from '../workoutday/workout-day.entity';
+// workout-plan.entity.ts
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { WorkoutDay } from '../workout-day/workout-day.entity';
 
 @Entity({ name: 'workout_plan' })
 export class Workoutplan {

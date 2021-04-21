@@ -9,7 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { License } from '../license/license.entity';
-import { MuscleGroup } from '../musclegroup/muscle-group.entity';
+import { MuscleGroup } from '../muscle-group/muscle-group.entity';
 
 @Entity({ name: 'exercise' })
 export class Exercise {

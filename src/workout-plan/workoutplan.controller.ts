@@ -1,10 +1,10 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { WorkoutplanService } from './workoutplan.service';
+import { WorkoutPlanService } from './workoutplan.service';
 import { Workoutplan } from './workoutplan.entity';
 
 @Controller('workoutplans')
 export class WorkoutplanController {
-  constructor(private readonly workoutplanService: WorkoutplanService) {}
+  constructor(private readonly workoutplanService: WorkoutPlanService) {}
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Workoutplan> {
