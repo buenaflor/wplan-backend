@@ -1,5 +1,11 @@
 // workoutplan.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
+import { WorkoutDay } from '../workoutday/workout-day.entity';
 
 @Entity({ name: 'workout_plan' })
 export class Workoutplan {
@@ -20,4 +26,7 @@ export class Workoutplan {
 
   @Column({ type: 'date', name: 'end_date' })
   endDate: Date;
+
+  @OneToMany(() => WorkoutDay, (workoutDay) => workoutDay.workoutPlan)
+  workoutDays: WorkoutDay[];
 }

@@ -1,7 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { WorkoutplanService } from './workoutplan.service';
 import { Workoutplan } from './workoutplan.entity';
-import { Pagination } from 'nestjs-typeorm-paginate';
 
 @Controller('workoutplans')
 export class WorkoutplanController {
@@ -16,7 +15,7 @@ export class WorkoutplanController {
   async index(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
-  ): Promise<Pagination<Workoutplan>> {
+  ) {
     limit = limit > 20 ? 20 : limit;
     return this.workoutplanService.paginate({
       page,

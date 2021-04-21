@@ -16,7 +16,9 @@ export class WorkoutplanService {
   ) {}
 
   findOne(id: string): Promise<Workoutplan> {
-    return this.workoutplanRepository.findOne(id);
+    return this.workoutplanRepository.findOne(id, {
+      relations: ['workoutDays'],
+    });
   }
 
   async paginate(

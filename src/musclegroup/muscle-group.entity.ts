@@ -1,9 +1,9 @@
-// musclegroup.entity.ts
+// muscle-group.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 import { Exercise } from '../exercise/exercise.entity';
 
 @Entity({ name: 'muscle_group' })
-export class Musclegroup {
+export class MuscleGroup {
   @PrimaryGeneratedColumn()
   id: number;
 
