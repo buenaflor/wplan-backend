@@ -20,7 +20,7 @@ export class WorkoutplanController {
     return this.workoutplanService.paginate({
       page,
       limit,
-      route: 'http://localhost:4000/workoutplans',
+      route: 'http://localhost:4000/api/v1/workoutplans',
     });
   }
 }
