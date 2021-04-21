@@ -1,4 +1,4 @@
-// item.entity.ts
+// workoutplan.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'workout_plan' })
