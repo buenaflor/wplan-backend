@@ -4,9 +4,12 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
+  ManyToMany,
   JoinColumn,
+  JoinTable,
 } from 'typeorm';
 import { License } from '../license/license.entity';
+import { Musclegroup } from '../musclegroup/musclegroup.entity';
 
 @Entity({ name: 'exercise' })
 export class Exercise {
@@ -28,4 +31,12 @@ export class Exercise {
   @ManyToOne(() => License, (license) => license.id)
   @JoinColumn({ name: 'license_id' })
   license: License;
+
+  @ManyToMany(() => Musclegroup, (muscleGroup) => muscleGroup.id)
+  @JoinTable({
+    name: 'exercise_muscle',
+    joinColumn: { name: 'exercise_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'muscle_group_id', referencedColumnName: 'id' },
+  })
+  muscleGroups: Musclegroup[];
 }

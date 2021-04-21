@@ -11,6 +11,8 @@ export class ExerciseService {
   ) {}
 
   findAll() {
-    return this.exerciseRepository.find({ relations: ['license'] });
+    return this.exerciseRepository.find({
+      relations: ['license', 'muscleGroups'],
+    });
   }
 }
