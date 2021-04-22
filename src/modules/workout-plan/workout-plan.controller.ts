@@ -5,6 +5,7 @@ import {
   ParseIntPipe,
   Query,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { Workoutplan } from './workout-plan.entity';
@@ -16,7 +17,9 @@ export class WorkoutPlanController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Workoutplan> {
+  async findOne(@Request() req): Promise<Workoutplan> {
+    const { id } = req.params;
+    const userId = req.user.userId;
     return await this.workoutPlanService.findOne(id);
   }
 

@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserMapper } from './mapper/user.mapper';
-import { UserExistGuard } from '../../guards/user-exists.guard';
+import { UserExistsGuard } from '../../guards/user-exists.guard';
 
 @Controller('users')
 export class UserController {
@@ -18,7 +18,7 @@ export class UserController {
   }
 
   @Post()
-  @UseGuards(UserExistGuard)
+  @UseGuards(UserExistsGuard)
   async save(@Body() createUserDto: CreateUserDto): Promise<User> {
     const userEntity = await this.userMapper.dtoToEntity(createUserDto);
     return await this.userService.save(userEntity);
