@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserMapper } from './mapper/user.mapper';
-import { UserExistGuard } from '../../guards/user.guard';
+import { UserExistGuard } from '../../guards/user-exists.guard';
 
 @Controller('users')
 export class UserController {

@@ -5,10 +5,12 @@ import {
   UnprocessableEntityException,
   ValidationPipe,
 } from '@nestjs/common';
+import helmet from 'helmet';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.setGlobalPrefix('api/v1');
+  app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,7 +20,6 @@ async function bootstrap() {
       exceptionFactory: (errors) => new UnprocessableEntityException(errors),
     }),
   );
-
   await app.listen(4000);
 }
 bootstrap();
