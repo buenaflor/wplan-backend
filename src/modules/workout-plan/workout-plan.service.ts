@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Workoutplan } from './workoutplan.entity';
+import { Workoutplan } from './workout-plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {

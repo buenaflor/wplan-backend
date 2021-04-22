@@ -1,14 +1,14 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { WorkoutPlanService } from './workoutplan.service';
-import { Workoutplan } from './workoutplan.entity';
+import { WorkoutPlanService } from './workout-plan.service';
+import { Workoutplan } from './workout-plan.entity';
 
 @Controller('workoutplans')
-export class WorkoutplanController {
-  constructor(private readonly workoutplanService: WorkoutPlanService) {}
+export class WorkoutPlanController {
+  constructor(private readonly workoutPlanService: WorkoutPlanService) {}
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Workoutplan> {
-    return await this.workoutplanService.findOne(id);
+    return await this.workoutPlanService.findOne(id);
   }
 
   @Get()
@@ -17,7 +17,7 @@ export class WorkoutplanController {
     @Query('limit', ParseIntPipe) limit = 10,
   ) {
     limit = limit > 20 ? 20 : limit;
-    return this.workoutplanService.paginate({
+    return this.workoutPlanService.paginate({
       page,
       limit,
       route: 'http://localhost:4000/api/v1/workoutplans',

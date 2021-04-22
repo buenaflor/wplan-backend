@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Workoutplan } from '../workout-plan/workoutplan.entity';
+import { Workoutplan } from '../workout-plan/workout-plan.entity';
 import { ExerciseRoutine } from '../exercise-routine/exercise-routine.entity';
 
 @Entity({ name: 'workout_day' })
