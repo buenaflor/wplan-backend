@@ -1,3 +1,4 @@
+
 # wplan Backend
 
 ## Tech Stack
@@ -6,6 +7,12 @@
 - Redis caching
 - NestJS with Typescript
 - Docker for containerization
+
+## Database Model
+
+Current state as of 22.04.2021
+
+![alt text](https://i.imgur.com/tV3PQSH.png)
 
 ## Installation
 
