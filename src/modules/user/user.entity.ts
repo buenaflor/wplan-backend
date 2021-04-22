@@ -4,10 +4,16 @@ import * as argon2 from 'argon2';
 
 @Entity({ name: 'user' })
 export class User {
-  constructor(username: string, email: string, password: string) {
+  constructor(
+    username: string,
+    email: string,
+    password: string,
+    createdAt: Date,
+  ) {
     this.username = username;
     this.email = email;
     this.password = password;
+    this.createdAt = createdAt;
   }
 
   @PrimaryGeneratedColumn()
@@ -21,6 +27,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 128 })
   password: string;
+
+  @Column({ type: 'date', name: 'created_at' })
+  createdAt: Date;
 
   @BeforeInsert()
   async hashPassword() {

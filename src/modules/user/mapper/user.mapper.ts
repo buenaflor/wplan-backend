@@ -11,6 +11,7 @@ export class UserMapper {
       createUserDto.username,
       createUserDto.email,
       createUserDto.password,
+      new Date(),
     );
   }
 }
