@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import { CreateUserDto } from './dto/createUser.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UserMapper } from './mapper/user.mapper';
 import { UserExistGuard } from '../../guards/user.guard';
 
@@ -13,8 +13,8 @@ export class UserController {
   ) {}
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
-    return await this.userService.findOne(id);
+  async findOneById(@Param('id') id: string): Promise<User> {
+    return await this.userService.findOneById(id);
   }
 
   @Post()

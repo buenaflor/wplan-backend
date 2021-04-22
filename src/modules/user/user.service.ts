@@ -10,8 +10,14 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  findOne(id: string): Promise<User> {
+  findOneById(id: string): Promise<User> {
     return this.userRepository.findOne(id);
+  }
+
+  findOneByUsername(username: string): Promise<User> {
+    return this.userRepository.findOne({
+      username: username,
+    });
   }
 
   save(user: User) {

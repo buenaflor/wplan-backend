@@ -8,6 +8,8 @@ import { WorkoutDayModule } from './modules/workout-day/workout-day.module';
 import { ExerciseRoutineModule } from './modules/exercise-routine/exercise-routine.module';
 import { ExerciseWlSetModule } from './modules/exercise-wl-set/exercise-wl-set.module';
 import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { AuthController } from './modules/auth/auth.controller';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { UserModule } from './modules/user/user.module';
     ExerciseRoutineModule,
     ExerciseWlSetModule,
     UserModule,
+    AuthModule,
   ],
+  controllers: [AuthController],
 })
 export class AppModule {}

@@ -9,6 +9,6 @@ import { UserMapper } from './mapper/user.mapper';
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UserService, UserMapper],
   controllers: [UserController],
-  exports: [],
+  exports: [UserService],
 })
 export class UserModule {}

@@ -1,11 +1,20 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { Workoutplan } from './workout-plan.entity';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @Controller('workoutplans')
 export class WorkoutPlanController {
   constructor(private readonly workoutPlanService: WorkoutPlanService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Workoutplan> {
     return await this.workoutPlanService.findOne(id);
