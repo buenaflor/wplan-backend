@@ -1,5 +1,5 @@
 // user.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn } from "typeorm";
 import * as argon2 from 'argon2';
 
 @Entity({ name: 'user' })
@@ -28,8 +28,11 @@ export class User {
   @Column({ type: 'varchar', length: 128 })
   password: string;
 
-  @Column({ type: 'date', name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @Column({ type: 'timestamptz', name: 'last_login_at' })
+  lastLoginAt: Date;
 
   @BeforeInsert()
   async hashPassword() {

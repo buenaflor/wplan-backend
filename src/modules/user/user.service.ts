@@ -20,6 +20,23 @@ export class UserService {
     });
   }
 
+  updateLoginDate(id) {
+    const dateToday = new Date(
+      Date.now() + 1000 * 60 * -new Date().getTimezoneOffset(),
+    )
+      .toISOString()
+      .replace('T', ' ')
+      .replace('Z', '');
+
+    console.log(dateToday);
+    return this.userRepository
+      .createQueryBuilder()
+      .update()
+      .set({ lastLoginAt: dateToday })
+      .where('id=:id', { id: id })
+      .execute();
+  }
+
   save(user: User) {
     return this.userRepository.save(user);
   }
