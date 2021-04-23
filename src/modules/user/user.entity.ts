@@ -1,5 +1,11 @@
 // user.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BeforeInsert,
+  CreateDateColumn,
+} from 'typeorm';
 import * as argon2 from 'argon2';
 
 @Entity({ name: 'user' })
@@ -33,6 +39,9 @@ export class User {
 
   @Column({ type: 'timestamptz', name: 'last_login_at' })
   lastLoginAt: Date;
+
+  @Column({ type: 'boolean', name: 'email_confirmed' })
+  isEmailConfirmed: boolean;
 
   @BeforeInsert()
   async hashPassword() {

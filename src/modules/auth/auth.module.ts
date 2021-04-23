@@ -7,9 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MailModule } from '../../shared/mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     UserModule,
     PassportModule,
     JwtModule.register({
