@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Get } from "@nestjs/common";
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
@@ -25,5 +25,10 @@ export class AuthController {
       createUserDto.email,
     );
     return 'succ';
+  }
+
+  @Get('/mail/confirmation')
+  async confirmMail(@Request() req) {
+
   }
 }

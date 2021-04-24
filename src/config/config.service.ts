@@ -17,7 +17,6 @@ export class ConfigService {
   }
 
   public get(key: string): string {
-    console.log(process.env[key]);
     return process.env[key];
   }
 

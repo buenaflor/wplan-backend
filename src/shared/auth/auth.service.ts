@@ -5,6 +5,7 @@ import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '../../config/config.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,9 @@ export class AuthService {
   }
 
   async sendMail(user: string, email: string) {
-    await this.mailService.sendUserConfirmation(user, email, 'token');
+    const buffer = crypto.randomBytes(64);
+    const verificationToken = buffer.toString('hex');
+    await this.mailService.sendUserConfirmation(user, email, verificationToken);
   }
 
   createToken(user: User) {
