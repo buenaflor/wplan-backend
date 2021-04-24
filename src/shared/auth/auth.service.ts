@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.entity';
+import { UserService } from '../../modules/user/user.service';
+import { User } from '../../modules/user/user.entity';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
-import { MailService } from '../../shared/mail/mail.service';
+import { MailService } from '../mail/mail.service';
+import { ConfigService } from '../../config/config.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<User> {
@@ -32,7 +34,7 @@ export class AuthService {
   createToken(user: User) {
     const payload = { username: user.username, id: user.id };
     return {
-      expiresIn: 60,
+      expiresIn: this.configService.getNumber('JWT_EXPIRATION_DURATION'),
       accessToken: this.jwtService.sign(payload),
     };
   }

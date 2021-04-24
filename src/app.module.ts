@@ -8,12 +8,19 @@ import { WorkoutDayModule } from './modules/workout-day/workout-day.module';
 import { ExerciseRoutineModule } from './modules/exercise-routine/exercise-routine.module';
 import { ExerciseWlSetModule } from './modules/exercise-wl-set/exercise-wl-set.module';
 import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { AuthController } from './modules/auth/auth.controller';
+import { AuthModule } from './shared/auth/auth.module';
+import { AuthController } from './shared/auth/auth.controller';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
+import { databaseConfig } from './shared/database/database.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: databaseConfig,
+    }),
     WorkoutPlanModule,
     MuscleGroupModule,
     ExerciseModule,
