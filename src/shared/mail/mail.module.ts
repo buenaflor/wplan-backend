@@ -3,14 +3,14 @@ import { MailService } from './mail.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '../../config/config.module';
 import { ConfigService } from '../../config/config.service';
-import { emailConfig } from './email.config';
+import { mailConfig } from './mail.config';
 
 @Module({
   imports: [
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: emailConfig,
+      useFactory: mailConfig,
     }),
   ],
   providers: [MailService],

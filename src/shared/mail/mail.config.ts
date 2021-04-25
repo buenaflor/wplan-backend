@@ -1,7 +1,7 @@
 import { ConfigService } from '../../config/config.service';
 import { MailerOptions } from '@nestjs-modules/mailer';
 
-export const emailConfig = (configService: ConfigService) => {
+export const mailConfig = (configService: ConfigService) => {
   return {
     transport: {
       host: configService.get('EMAIL_HOST'),

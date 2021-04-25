@@ -1,4 +1,4 @@
-import { CreateUserDto } from '../../../shared/auth/dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../user.entity';
 
 /**

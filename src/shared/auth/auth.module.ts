@@ -10,19 +10,28 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailModule } from '../mail/mail.module';
 import { ConfigModule } from '../../config/config.module';
 import { ConfigService } from '../../config/config.service';
+import { EmailVerificationModule } from '../mail/verification/email-verification.module';
+import { UserMapper } from '../../modules/user/mapper/user.mapper';
 
 @Module({
   imports: [
     MailModule,
     UserModule,
     PassportModule,
+    EmailVerificationModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: jwtConfig,
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, ConfigService],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    ConfigService,
+    UserMapper,
+  ],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],
 })

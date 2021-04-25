@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '../../config/config.service';
 import * as crypto from 'crypto';
+import { EmailVerificationService } from '../mail/verification/email-verification.service';
+import { EmailVerification } from '../mail/verification/email-verification.entity';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private emailVerificationService: EmailVerificationService,
     private configService: ConfigService,
   ) {}
 
@@ -28,13 +31,18 @@ export class AuthService {
     await this.userService.updateLoginDate(user.id);
   }
 
-  async sendMail(user: string, email: string) {
+  async createEmailVerification() {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
-    await this.mailService.sendUserConfirmation(user, email, verificationToken);
+    const emailVerification = new EmailVerification(verificationToken);
+    return await this.emailVerificationService.save(emailVerification);
   }
 
-  createToken(user: User) {
+  async sendMail(user: User, emailVerification: EmailVerification) {
+    await this.mailService.sendUserConfirmation(user, emailVerification);
+  }
+
+  createJWT(user: User) {
     const payload = { username: user.username, id: user.id };
     return {
       expiresIn: this.configService.getNumber('JWT_EXPIRATION_DURATION'),

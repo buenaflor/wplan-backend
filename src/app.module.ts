@@ -9,10 +9,10 @@ import { ExerciseRoutineModule } from './modules/exercise-routine/exercise-routi
 import { ExerciseWlSetModule } from './modules/exercise-wl-set/exercise-wl-set.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './shared/auth/auth.module';
-import { AuthController } from './shared/auth/auth.controller';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { databaseConfig } from './shared/database/database.config';
+import { EmailVerificationModule } from './shared/mail/verification/email-verification.module';
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { databaseConfig } from './shared/database/database.config';
     ExerciseWlSetModule,
     UserModule,
     AuthModule,
+    EmailVerificationModule,
   ],
-  controllers: [AuthController],
 })
 export class AppModule {}
