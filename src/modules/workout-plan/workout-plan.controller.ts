@@ -1,11 +1,12 @@
 import {
   Controller,
   Get,
-  Param,
   ParseIntPipe,
   Query,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { Workoutplan } from './workout-plan.entity';
@@ -20,6 +21,13 @@ export class WorkoutPlanController {
   async findOne(@Request() req): Promise<Workoutplan> {
     const { id } = req.params;
     const userId = req.user.userId;
+    const workoutPlan = await this.workoutPlanService.findOne(id);
+    if (workoutPlan.userId !== userId) {
+      throw new HttpException(
+        'Unauthorized: Cannot access resource.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return await this.workoutPlanService.findOne(id);
   }
 

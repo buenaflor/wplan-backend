@@ -26,5 +26,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(8)
   @Matches('(?=.*[0-9])')
+  // TODO: throw appropriate error message
   readonly password: string;
 }

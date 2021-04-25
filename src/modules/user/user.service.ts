@@ -11,18 +11,23 @@ export class UserService {
   ) {}
 
   findOneById(id: string): Promise<User> {
-    return this.userRepository.findOne(id);
+    return this.userRepository.findOne({
+      where: [{ id }],
+      relations: ['userProfile'],
+    });
   }
 
   findOneByUsername(username: string): Promise<User> {
     return this.userRepository.findOne({
-      username,
+      where: [{ username }],
+      relations: ['userProfile'],
     });
   }
 
   findOneByEmail(email: string) {
     return this.userRepository.findOne({
-      email,
+      where: [{ email }],
+      relations: ['userProfile'],
     });
   }
 

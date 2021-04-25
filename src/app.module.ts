@@ -13,6 +13,7 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { databaseConfig } from './shared/database/database.config';
 import { EmailVerificationModule } from './shared/mail/verification/email-verification.module';
+import { UserProfileModule } from './modules/user-profile/user-profile.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { EmailVerificationModule } from './shared/mail/verification/email-verifi
     UserModule,
     AuthModule,
     EmailVerificationModule,
+    UserProfileModule,
   ],
 })
 export class AppModule {}

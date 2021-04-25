@@ -1,17 +1,20 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './user.entity';
-import { UserMapper } from './mapper/user.mapper';
+import { UserProfileDto } from '../user-profile/dto/user-profile.dto';
 
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly userMapper: UserMapper,
-  ) {}
+  constructor(private userService: UserService) {}
 
-  @Get(':id')
-  async findOneById(@Param('id') id: string): Promise<User> {
-    return await this.userService.findOneById(id);
+  /**
+   * User Profile GET endpoint that should be accessible without access token
+   *
+   * @param req
+   */
+  @Get('/profiles/:username')
+  async findUserProfileByUsername(@Request() req) {
+    const { username } = req.params;
+    const user = await this.userService.findOneByUsername(username);
+    return UserProfileDto.createFromUser(user);
   }
 }

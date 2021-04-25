@@ -5,8 +5,11 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as argon2 from 'argon2';
+import { UserProfile } from '../user-profile/user-profile.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -25,6 +28,13 @@ export class User {
 
   @PrimaryGeneratedColumn()
   id: bigint;
+
+  @Column({ type: 'bigint', name: 'user_profile_id' })
+  userProfileId: bigint;
+
+  @OneToOne(() => UserProfile)
+  @JoinColumn({ name: 'user_profile_id' })
+  userProfile: UserProfile;
 
   @Column({ type: 'varchar', length: 255 })
   username: string;

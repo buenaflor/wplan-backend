@@ -16,7 +16,8 @@ import { EmailVerificationService } from '../mail/verification/email-verificatio
 import { UserService } from '../../modules/user/user.service';
 import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { ResendEmailUserDto } from '../../modules/user/dto/resend-email-user.dto';
+import { UserProfile } from '../../modules/user-profile/user-profile.entity';
+import { UserProfileService } from '../../modules/user-profile/user-profile.service';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,7 @@ export class AuthController {
     private authService: AuthService,
     private emailVerificationService: EmailVerificationService,
     private userService: UserService,
+    private userProfileService: UserProfileService,
     private userMapper: UserMapper,
   ) {}
 
@@ -35,15 +37,24 @@ export class AuthController {
     return new LoginPayloadDto(req.user, accessToken);
   }
 
+  /**
+   * Post endpoint responsible for creating a user and sending an email verification
+   * Creating a user also creates a user profile
+   *
+   * @param createUserDto
+   */
   @Post('/register')
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.userMapper.dtoToEntity(createUserDto);
+    const userProfile = await this.userProfileService.save(new UserProfile());
+    user.userProfileId = userProfile.id;
     await this.userService.save(user);
     const emailVerification = await this.authService.createEmailVerification(
       user.id,
     );
     await this.authService.sendMail(user.email, emailVerification);
+    // TODO: maybe expiration time for email confirmation?
     // TODO: return a user DTO
     return 'succ';
   }
@@ -68,8 +79,11 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/mail/confirmation/resend/')
-  async resendMail(@Body() resendEmailUserDto: ResendEmailUserDto) {
-    await this.emailVerificationService.deleteByUserId(resendEmailUserDto.id);
+  async resendMail(@Request() req) {
+    const userId = req.user.userId;
+    const resendEmailUserDto = req.body;
+    await this.emailVerificationService.deleteByUserId(userId);
+
     const emailVerification = await this.authService.createEmailVerification(
       resendEmailUserDto.id,
     );
@@ -79,5 +93,6 @@ export class AuthController {
     );
     return 'email resend succ';
     // TODO: only resend a limited number of times -> danger of DOS attacks
+    // TODO: prevent resend, if the email is already confirmed, maybe with guard
   }
 }
