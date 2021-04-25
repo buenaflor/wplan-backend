@@ -8,10 +8,10 @@ import { User } from '../user.entity';
 export class UserMapper {
   async dtoToEntity(createUserDto: CreateUserDto): Promise<User> {
     return new User(
+      null,
       createUserDto.username,
       createUserDto.email,
       createUserDto.password,
-      new Date(),
     );
   }
 }

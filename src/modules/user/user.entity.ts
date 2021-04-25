@@ -11,15 +11,16 @@ import * as argon2 from 'argon2';
 @Entity({ name: 'user' })
 export class User {
   constructor(
-    username: string,
-    email: string,
-    password: string,
-    createdAt: Date,
+    id?: bigint,
+    username?: string,
+    email?: string,
+    password?: string,
   ) {
+    this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
-    this.createdAt = createdAt;
+    this.createdAt = new Date();
   }
 
   @PrimaryGeneratedColumn()

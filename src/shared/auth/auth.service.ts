@@ -27,19 +27,19 @@ export class AuthService {
     return null;
   }
 
-  async login(user: User) {
-    await this.userService.updateLoginDate(user.id);
+  async updateLoginDate(userId: bigint) {
+    await this.userService.updateLoginDate(userId);
   }
 
-  async createEmailVerification(user: User) {
+  async createEmailVerification(userId: bigint) {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
-    const emailVerification = new EmailVerification(verificationToken, user.id);
+    const emailVerification = new EmailVerification(verificationToken, userId);
     return await this.emailVerificationService.save(emailVerification);
   }
 
-  async sendMail(user: User, emailVerification: EmailVerification) {
-    await this.mailService.sendUserConfirmation(user, emailVerification);
+  async sendMail(email: string, emailVerification: EmailVerification) {
+    await this.mailService.sendUserConfirmation(email, emailVerification);
   }
 
   createJWT(user: User) {

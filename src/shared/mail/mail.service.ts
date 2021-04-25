@@ -7,16 +7,19 @@ import { EmailVerification } from './verification/email-verification.entity';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendUserConfirmation(user: User, emailVerification: EmailVerification) {
+  async sendUserConfirmation(
+    email: string,
+    emailVerification: EmailVerification,
+  ) {
     const url = `http://localhost:4000/api/v1/auth/mail/confirmation/${emailVerification.token}`;
 
     await this.mailerService.sendMail({
-      to: user.email,
+      to: email,
       from: 'noreply@wplan.com',
       // from: '"Support Team" <support@example.com>', // override default from
       subject: 'Welcome to Nice App! Confirm your Email',
       template: 'confirmation', // `.hbs` extension is appended automatically
-      text: 'Welcome' + user + ' click:     ' + url,
+      text: 'Welcome' + ' click:     ' + url,
     });
   }
 }

@@ -4,8 +4,6 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  Matches,
-  MinLength,
 } from 'class-validator';
 
 export class UserDto {
@@ -17,12 +15,6 @@ export class UserDto {
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(8)
-  @Matches('(?=.*[0-9])')
-  readonly password: string;
 
   @IsDate()
   @IsNotEmpty()

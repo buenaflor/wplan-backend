@@ -15,6 +15,8 @@ import { UserMapper } from '../../modules/user/mapper/user.mapper';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
 import { UserService } from '../../modules/user/user.service';
 import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { ResendEmailUserDto } from '../../modules/user/dto/resend-email-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,11 +27,11 @@ export class AuthController {
     private userMapper: UserMapper,
   ) {}
 
-  @UseGuards(LocalAuthGuard)
   @Post('/login')
+  @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
     const accessToken = this.authService.createJWT(req.user);
-    await this.authService.login(req.user);
+    await this.authService.updateLoginDate(req.user.id);
     return new LoginPayloadDto(req.user, accessToken);
   }
 
@@ -39,9 +41,9 @@ export class AuthController {
     const user = await this.userMapper.dtoToEntity(createUserDto);
     await this.userService.save(user);
     const emailVerification = await this.authService.createEmailVerification(
-      user,
+      user.id,
     );
-    await this.authService.sendMail(user, emailVerification);
+    await this.authService.sendMail(user.email, emailVerification);
     // TODO: return a user DTO
     return 'succ';
   }
@@ -62,5 +64,20 @@ export class AuthController {
     }
     return 'token expired';
     // TODO: return an email verification DTO
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/mail/confirmation/resend/')
+  async resendMail(@Body() resendEmailUserDto: ResendEmailUserDto) {
+    await this.emailVerificationService.deleteByUserId(resendEmailUserDto.id);
+    const emailVerification = await this.authService.createEmailVerification(
+      resendEmailUserDto.id,
+    );
+    await this.authService.sendMail(
+      resendEmailUserDto.email,
+      emailVerification,
+    );
+    return 'email resend succ';
+    // TODO: only resend a limited number of times -> danger of DOS attacks
   }
 }
