@@ -14,6 +14,7 @@ import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
 import { UserMapper } from '../../modules/user/mapper/user.mapper';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
 import { UserService } from '../../modules/user/user.service';
+import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -41,15 +42,14 @@ export class AuthController {
       user,
     );
     await this.authService.sendMail(user, emailVerification);
+    // TODO: return a user DTO
     return 'succ';
   }
 
   @Get('/mail/confirmation/:token')
+  @UseGuards(EmailConfirmationGuard)
   async confirmMail(@Request() req) {
-    const { token } = req.params;
-    const emailVerification = await this.emailVerificationService.findByToken(
-      token,
-    );
+    const emailVerification = req.emailVerification;
     const verified = await this.emailVerificationService.verifyThenDelete(
       emailVerification,
     );
@@ -61,5 +61,6 @@ export class AuthController {
       return 'verified';
     }
     return 'token expired';
+    // TODO: return an email verification DTO
   }
 }
