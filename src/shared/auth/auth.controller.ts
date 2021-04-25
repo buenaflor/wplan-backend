@@ -13,12 +13,14 @@ import { UserRegistrationGuard } from '../../guards/user-registration.guard';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
 import { UserMapper } from '../../modules/user/mapper/user.mapper';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
+import { UserService } from '../../modules/user/user.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private emailVerificationService: EmailVerificationService,
+    private userService: UserService,
     private userMapper: UserMapper,
   ) {}
 
@@ -33,9 +35,11 @@ export class AuthController {
   @Post('/register')
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
-    const emailVerification = await this.authService.createEmailVerification();
     const user = await this.userMapper.dtoToEntity(createUserDto);
-    console.log(user);
+    await this.userService.save(user);
+    const emailVerification = await this.authService.createEmailVerification(
+      user,
+    );
     await this.authService.sendMail(user, emailVerification);
     return 'succ';
   }
@@ -43,10 +47,17 @@ export class AuthController {
   @Get('/mail/confirmation/:token')
   async confirmMail(@Request() req) {
     const { token } = req.params;
-    const verified = await this.emailVerificationService.verifyThenDelete(
+    const emailVerification = await this.emailVerificationService.findByToken(
       token,
     );
+    const verified = await this.emailVerificationService.verifyThenDelete(
+      emailVerification,
+    );
+    // The email verification will be deleted regardless if it has expired or not
+    await this.emailVerificationService.deleteByToken(emailVerification.token);
     if (verified) {
+      const userId = emailVerification.userId;
+      await this.userService.updateEmailConfirmed(userId, true);
       return 'verified';
     }
     return 'token expired';

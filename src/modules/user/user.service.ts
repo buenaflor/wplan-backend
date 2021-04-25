@@ -34,12 +34,20 @@ export class UserService {
       .replace('T', ' ')
       .replace('Z', '');
 
-    console.log(dateToday);
     return this.userRepository
       .createQueryBuilder()
       .update()
       .set({ lastLoginAt: dateToday })
       .where('id=:id', { id: id })
+      .execute();
+  }
+
+  updateEmailConfirmed(id: bigint, value: boolean) {
+    return this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ isEmailConfirmed: value })
+      .where('id = :id', { id })
       .execute();
   }
 

@@ -23,7 +23,7 @@ export class User {
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: bigint;
 
   @Column({ type: 'varchar', length: 255 })
   username: string;

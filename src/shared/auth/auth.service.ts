@@ -31,10 +31,10 @@ export class AuthService {
     await this.userService.updateLoginDate(user.id);
   }
 
-  async createEmailVerification() {
+  async createEmailVerification(user: User) {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
-    const emailVerification = new EmailVerification(verificationToken);
+    const emailVerification = new EmailVerification(verificationToken, user.id);
     return await this.emailVerificationService.save(emailVerification);
   }
 

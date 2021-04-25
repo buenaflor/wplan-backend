@@ -17,12 +17,12 @@ export class UserRegistrationGuard implements CanActivate {
     const userWithUsername = await this.userService.findOneByUsername(
       checkUser.username,
     );
-    const userWithEmail = await this.userService.findOneByEmail(
-      checkUser.email,
-    );
     if (userWithUsername) {
       this.throwErr('Duplicate: username already exists.');
     }
+    const userWithEmail = await this.userService.findOneByEmail(
+      checkUser.email,
+    );
     if (userWithEmail) {
       this.throwErr('Duplicate: email already exists.');
     }

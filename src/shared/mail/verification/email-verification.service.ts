@@ -30,13 +30,15 @@ export class EmailVerificationService {
     });
   }
 
-  async verifyThenDelete(token: string) {
-    const emailVerification = await this.findByToken(token);
+  async verifyThenDelete(emailVerification: EmailVerification) {
+    if (!emailVerification) {
+      return false;
+    }
     const dateNow = Math.floor(Date.now() / 1000);
     const dateToCompare = emailVerification.createdAt.getTime() / 1000;
-    const verified = dateNow - dateToCompare > emailVerification.expirationTime;
+    const verified = dateNow - dateToCompare < emailVerification.expirationTime;
     // The email verification will be deleted regardless if it has expired or not
-    await this.deleteByToken(token);
+    await this.deleteByToken(emailVerification.token);
     return verified;
   }
 }
