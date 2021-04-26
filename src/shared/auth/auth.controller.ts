@@ -36,6 +36,7 @@ export class AuthController {
     await this.authService.updateLoginDate(req.user.id);
     return new LoginPayloadDto(req.user, accessToken);
   }
+  // TODO: sign out -> revoke access token
 
   /**
    * Post endpoint responsible for creating a user and sending an email verification

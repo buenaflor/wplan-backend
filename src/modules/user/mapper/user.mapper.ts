@@ -1,12 +1,13 @@
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../user.entity';
+import { PublicUserDto } from '../dto/public-user-dto';
 
 /**
  * UserMapper maps the user dto to the appropriate entity.
  *
  */
 export class UserMapper {
-  async dtoToEntity(createUserDto: CreateUserDto): Promise<User> {
+  dtoToEntity(createUserDto: CreateUserDto) {
     return new User(
       null,
       createUserDto.username,

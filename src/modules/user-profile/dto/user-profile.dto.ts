@@ -5,7 +5,7 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { User } from "../../user/user.entity";
+import { User } from '../../user/user.entity';
 
 export class UserProfileDto {
   constructor(id, username, email, firstName, lastName, isPublic) {

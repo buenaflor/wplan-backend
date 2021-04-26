@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Workoutplan } from './workout-plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,6 +24,24 @@ export class WorkoutPlanService {
         'workoutDays.exerciseRoutines.wlSets',
       ],
     });
+  }
+
+  async findOneByNameAndOwner(
+    workoutPlanName: string,
+    ownerName: string,
+  ): Promise<Workoutplan> {
+    const workoutPlan = await this.workoutPlanRepository.findOne({
+      where: [{ name: workoutPlanName }],
+      relations: ['owner'],
+    });
+    if (
+      workoutPlan &&
+      workoutPlan.owner.username === ownerName &&
+      !workoutPlan.isPrivate
+    ) {
+      return workoutPlan;
+    }
+    throw new NotFoundException('Could not find resource');
   }
 
   async paginate(

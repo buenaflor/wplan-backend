@@ -5,37 +5,43 @@ import {
   Query,
   UseGuards,
   Request,
-  HttpException,
-  HttpStatus,
+  Param,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
-import { Workoutplan } from './workout-plan.entity';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
 
 @Controller('workoutplans')
 export class WorkoutPlanController {
-  constructor(private readonly workoutPlanService: WorkoutPlanService) {}
+  constructor(
+    private readonly workoutPlanService: WorkoutPlanService,
+    private readonly workoutPlanMapper: WorkoutPlanMapper,
+  ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findOne(@Request() req): Promise<Workoutplan> {
-    const { id } = req.params;
-    const userId = req.user.userId;
-    const workoutPlan = await this.workoutPlanService.findOne(id);
-    if (workoutPlan.userId !== userId) {
-      throw new HttpException(
-        'Unauthorized: Cannot access resource.',
-        HttpStatus.CONFLICT,
+  @Get('/:ownerName/:workoutPlanName')
+  async findOne(@Param() params) {
+    const { ownerName, workoutPlanName } = params;
+    try {
+      const workoutPlan = await this.workoutPlanService.findOneByNameAndOwner(
+        workoutPlanName,
+        ownerName,
       );
+      const pL = this.workoutPlanMapper.workoutPlanEntityToDto(workoutPlan);
+      console.log(pL);
+      return pL;
+    } catch (e) {
+      throw e;
     }
-    return await this.workoutPlanService.findOne(id);
   }
 
-  @Get()
+  @UseGuards(JwtAuthGuard)
+  @Get('/users/:username')
   async index(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
+    @Request() req,
   ) {
+    console.log(req.params);
     limit = limit > 20 ? 20 : limit;
     return this.workoutPlanService.paginate({
       page,
