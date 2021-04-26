@@ -40,23 +40,4 @@ export class WorkoutPlanController {
       throw e;
     }
   }
-
-  /*
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/users/')
-  async index(
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
-    @Request() req,
-  ) {
-    limit = limit > 20 ? 20 : limit;
-    return this.workoutPlanService.paginate({
-      page,
-      limit,
-      route: 'http://localhost:4000/api/v1/workoutplans',
-    });
-  }
-
-   */
 }

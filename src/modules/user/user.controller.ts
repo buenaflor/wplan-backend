@@ -11,6 +11,7 @@ import { UserProfileDto } from '../user-profile/dto/user-profile.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from './decorator/auth-user.decorator';
+import { WorkoutPlanMapper } from '../workout-plan/mapper/workout-plan.mapper';
 
 /**
  * This controller provides publicly available information about someone
@@ -22,6 +23,7 @@ export class UserController {
   constructor(
     private userService: UserService,
     private workoutPlanService: WorkoutPlanService,
+    private workoutPlanMapper: WorkoutPlanMapper,
   ) {}
 
   /**
@@ -62,10 +64,18 @@ export class UserController {
     const { username } = params;
     try {
       const user = await this.userService.findOneByUsername(username);
-      return await this.workoutPlanService.findAllByOwner(user, authUser, {
-        page,
-        limit: perPage,
+      const workoutPlans = await this.workoutPlanService.findAllByOwner(
+        user,
+        authUser,
+        {
+          page,
+          limit: perPage,
+        },
+      );
+      workoutPlans.items = workoutPlans.items.map((elem) => {
+        return this.workoutPlanMapper.workoutPlanEntityToDto(elem);
       });
+      return workoutPlans;
     } catch (e) {
       throw e;
     }
