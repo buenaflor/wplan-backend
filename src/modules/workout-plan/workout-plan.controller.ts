@@ -1,47 +1,60 @@
 import {
   Controller,
   Get,
-  ParseIntPipe,
-  Query,
   UseGuards,
-  Request,
   Param,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
-import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
+import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
+import { UserService } from '../user/user.service';
+import { AuthUser } from '../user/decorator/auth-user.decorator';
 
 @Controller('workoutplans')
 export class WorkoutPlanController {
   constructor(
     private readonly workoutPlanService: WorkoutPlanService,
+    private readonly userService: UserService,
     private readonly workoutPlanMapper: WorkoutPlanMapper,
   ) {}
 
+  /**
+   * Finds one workout plan matching the parameters
+   * If the workout plan is private, the unauthenticated recipient
+   * will always receive a 404 Not Found error
+   *
+   * Otherwise, the authenticated owner of the workout plan, will be able
+   * to fetch the resource
+   *
+   * @param params
+   * @param authUser
+   */
   @Get('/:ownerName/:workoutPlanName')
-  async findOne(@Param() params) {
+  @UseGuards(AllowAnonymousJwtGuard)
+  async findOne(@Param() params, @AuthUser() authUser) {
     const { ownerName, workoutPlanName } = params;
     try {
-      const workoutPlan = await this.workoutPlanService.findOneByNameAndOwner(
+      const user = await this.userService.findOneByUsername(ownerName);
+      const workoutPlan = await this.workoutPlanService.findOneByNameAndOwnerId(
         workoutPlanName,
-        ownerName,
+        user.id,
       );
-      const pL = this.workoutPlanMapper.workoutPlanEntityToDto(workoutPlan);
-      console.log(pL);
-      return pL;
+      this.workoutPlanService.verifyAccess(workoutPlan, authUser);
+      return this.workoutPlanMapper.workoutPlanEntityToDto(workoutPlan);
     } catch (e) {
       throw e;
     }
   }
 
+  /*
+
   @UseGuards(JwtAuthGuard)
-  @Get('/users/:username')
+  @Get('/users/')
   async index(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
     @Request() req,
   ) {
-    console.log(req.params);
     limit = limit > 20 ? 20 : limit;
     return this.workoutPlanService.paginate({
       page,
@@ -49,4 +62,6 @@ export class WorkoutPlanController {
       route: 'http://localhost:4000/api/v1/workoutplans',
     });
   }
+
+   */
 }

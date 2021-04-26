@@ -7,6 +7,7 @@ import {
   Pagination,
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
+import { AuthUser } from '../user/decorator/auth-user.decorator';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -15,33 +16,22 @@ export class WorkoutPlanService {
     private workoutPlanRepository: Repository<Workoutplan>,
   ) {}
 
-  async findOne(id: string): Promise<Workoutplan> {
-    return this.workoutPlanRepository.findOne(id, {
-      relations: [
-        'workoutDays',
-        'workoutDays.exerciseRoutines',
-        'workoutDays.exerciseRoutines.exercise',
-        'workoutDays.exerciseRoutines.wlSets',
-      ],
-    });
-  }
-
-  async findOneByNameAndOwner(
-    workoutPlanName: string,
-    ownerName: string,
-  ): Promise<Workoutplan> {
+  async findOneByNameAndOwnerId(workoutPlanName: string, ownerId: bigint) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ name: workoutPlanName }],
+      where: [{ name: workoutPlanName, userId: ownerId }],
       relations: ['owner'],
     });
-    if (
-      workoutPlan &&
-      workoutPlan.owner.username === ownerName &&
-      !workoutPlan.isPrivate
-    ) {
-      return workoutPlan;
+    if (!workoutPlan) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException('Could not find resource');
+    return workoutPlan;
+  }
+
+  verifyAccess(workoutPlan: Workoutplan, @AuthUser() authUser) {
+    if (workoutPlan.isPrivate) {
+      if (!authUser || workoutPlan.owner.username !== authUser.username)
+        throw new NotFoundException();
+    }
   }
 
   async paginate(

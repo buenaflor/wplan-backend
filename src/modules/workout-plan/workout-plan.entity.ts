@@ -33,6 +33,9 @@ export class Workoutplan {
   @Column({ type: 'date', name: 'end_date' })
   endDate: Date;
 
+  @Column({ type: 'bigint', name: 'user_id' })
+  userId: bigint;
+
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   owner: User;
