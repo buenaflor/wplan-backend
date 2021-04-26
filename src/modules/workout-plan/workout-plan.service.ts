@@ -8,6 +8,7 @@ import {
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -32,6 +33,20 @@ export class WorkoutPlanService {
       if (!authUser || workoutPlan.owner.username !== authUser.username)
         throw new NotFoundException();
     }
+  }
+
+  findAllPublicByOwner(owner: User) {
+    return this.workoutPlanRepository.find({
+      where: [{ userId: owner.id, isPrivate: false }],
+      relations: ['owner'],
+    });
+  }
+
+  findAllPublicAndPrivateByOwner(owner: User) {
+    return this.workoutPlanRepository.find({
+      where: [{ userId: owner.id }],
+      relations: ['owner'],
+    });
   }
 
   async paginate(

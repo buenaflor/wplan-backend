@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Param } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
