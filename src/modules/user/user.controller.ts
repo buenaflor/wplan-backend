@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserProfileDto } from '../user-profile/dto/user-profile.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
@@ -18,7 +25,6 @@ export class UserController {
   ) {}
 
   /**
-   * User Profile GET endpoint that should be accessible without access token
    *
    * @param params
    */
@@ -34,22 +40,32 @@ export class UserController {
     }
   }
 
+  /**
+   * Finds all workout plans associated with an owner. If no authenticated owner
+   * can be found, it returns all public workout plans of the owner. Otherwise,
+   * also private and public workout plan will be returned.
+   *
+   * @param params
+   * @param authUser
+   * @param page
+   * @param perPage
+   */
   @Get('/:username/workoutplans')
   @UseGuards(AllowAnonymousJwtGuard)
-  async findUserWorkoutPlans(@Param() params, @AuthUser() authUser) {
+  async findUserWorkoutPlans(
+    @Param() params,
+    @AuthUser() authUser,
+    @Query('page') page = 1,
+    @Query('per_page') perPage = 30,
+  ) {
+    perPage = perPage > 100 ? 100 : perPage;
     const { username } = params;
-    console.log(authUser);
     try {
-      let workoutPlans;
       const user = await this.userService.findOneByUsername(username);
-      if (authUser && authUser.username === user.username) {
-        workoutPlans = await this.workoutPlanService.findAllPublicAndPrivateByOwner(
-          user,
-        );
-      } else {
-        workoutPlans = await this.workoutPlanService.findAllPublicByOwner(user);
-      }
-      return workoutPlans;
+      return await this.workoutPlanService.findAllByOwner(user, authUser, {
+        page,
+        limit: perPage,
+      });
     } catch (e) {
       throw e;
     }

@@ -9,6 +9,7 @@ import {
 } from 'nestjs-typeorm-paginate';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { User } from '../user/user.entity';
+import { log } from 'util';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -35,18 +36,43 @@ export class WorkoutPlanService {
     }
   }
 
-  findAllPublicByOwner(owner: User) {
-    return this.workoutPlanRepository.find({
+  findAllPublicByOwner(owner: User, options: IPaginationOptions) {
+    return paginate<Workoutplan>(this.workoutPlanRepository, options, {
       where: [{ userId: owner.id, isPrivate: false }],
       relations: ['owner'],
     });
   }
 
-  findAllPublicAndPrivateByOwner(owner: User) {
-    return this.workoutPlanRepository.find({
+  findAllPublicAndPrivateByOwner(owner: User, options: IPaginationOptions) {
+    return paginate<Workoutplan>(this.workoutPlanRepository, options, {
       where: [{ userId: owner.id }],
       relations: ['owner'],
     });
+  }
+
+  /**
+   * Finds all workoutplans associated with the owner, if the authenticated owner is
+   * available, private workout plans will also be shown
+   *
+   * @param owner
+   * @param authUser
+   * @param options
+   */
+  async findAllByOwner(
+    owner: User,
+    @AuthUser() authUser,
+    options: IPaginationOptions,
+  ) {
+    let paginatedWorkoutPlans;
+    if (authUser && authUser.username === owner.username) {
+      paginatedWorkoutPlans = await this.findAllPublicAndPrivateByOwner(
+        owner,
+        options,
+      );
+    } else {
+      paginatedWorkoutPlans = await this.findAllPublicByOwner(owner, options);
+    }
+    return paginatedWorkoutPlans;
   }
 
   async paginate(
