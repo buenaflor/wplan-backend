@@ -11,6 +11,7 @@
 - Reduce boilerplate of pagination -> maybe with decorators?
 - Default query parameters for GET endpoints that return lists? sort & order
 - Change email to not verified when updating an email address
+- Success response in controllers
 
 ## Tech Stack
 
