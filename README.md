@@ -2,6 +2,14 @@
 
 # wplan Backend
 
+## TODO
+
+- DTO architecture -> should service layer only return dtos i.e are DTOs allowed inside the service layer?
+- Limit request rates -> how much per hour?
+- Deny access if authentication failed too often in a short amount of time
+- Error handling -> error pipeline? which errors should be returned
+- Reduce boilerplate of pagination -> maybe with decorators?
+
 ## Tech Stack
 
 - PostgreSQL 
