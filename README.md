@@ -9,6 +9,8 @@
 - Deny access if authentication failed too often in a short amount of time
 - Error handling -> error pipeline? which errors should be returned
 - Reduce boilerplate of pagination -> maybe with decorators?
+- Default query parameters for GET endpoints that return lists? sort & order
+- Change email to not verified when updating an email address
 
 ## Tech Stack
 
