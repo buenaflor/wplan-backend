@@ -1,9 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
-  ParseIntPipe,
+  Post,
   Query,
+  Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -12,6 +15,8 @@ import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from './decorator/auth-user.decorator';
 import { WorkoutPlanMapper } from '../workout-plan/mapper/workout-plan.mapper';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
 
 /**
  * This controller provides publicly available information about someone
@@ -54,7 +59,7 @@ export class UserController {
    */
   @Get('/:username/workoutplans')
   @UseGuards(AllowAnonymousJwtGuard)
-  async findUserWorkoutPlans(
+  async findWorkoutPlansForUser(
     @Param() params,
     @AuthUser() authUser,
     @Query('page') page = 1,
@@ -79,5 +84,28 @@ export class UserController {
     } catch (e) {
       throw e;
     }
+  }
+
+  /**
+   * Creates a workout plan and assigns it to the specified user
+   * Workout plans can only be created and assigned by an authenticated user
+   *
+   * @param createWorkoutPlanDto
+   * @param req
+   */
+  @Post('/:ownerName/')
+  @UseGuards(JwtAuthGuard)
+  async createWorkoutPlanForUser(
+    @Body() createWorkoutPlanDto: CreateWorkoutPlanDto,
+    @Request() req,
+  ) {
+    if (req.user.userId !== createWorkoutPlanDto.userId) {
+      throw new UnauthorizedException();
+    }
+    try {
+    } catch (e) {
+      throw e;
+    }
+    console.log(createWorkoutPlanDto);
   }
 }

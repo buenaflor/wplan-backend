@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UserService {
@@ -9,6 +10,8 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+
+  // GET REQUESTS
 
   findOneById(id: string): Promise<User> {
     return this.userRepository.findOne({
@@ -30,6 +33,17 @@ export class UserService {
     return this.userRepository.findOne({
       where: [{ email }],
     });
+  }
+
+  // UPDATE REQUESTS
+
+  async update(user: UpdateUserDto, id: bigint) {
+    return await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set(user)
+      .where({ id })
+      .execute();
   }
 
   updateLoginDate(id) {
@@ -56,6 +70,8 @@ export class UserService {
       .where('id = :id', { id })
       .execute();
   }
+
+  // CREATE REQUESTS
 
   save(user: User) {
     return this.userRepository.save(user);

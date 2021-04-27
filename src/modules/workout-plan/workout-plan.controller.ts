@@ -1,9 +1,18 @@
-import { Controller, Get, UseGuards, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Param,
+  Patch,
+  Body,
+} from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { UserService } from '../user/user.service';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
+import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 
 @Controller('workoutplans')
 export class WorkoutPlanController {
@@ -26,7 +35,7 @@ export class WorkoutPlanController {
    */
   @Get('/:ownerName/:workoutPlanName')
   @UseGuards(AllowAnonymousJwtGuard)
-  async findOne(@Param() params, @AuthUser() authUser) {
+  async findOneForUser(@Param() params, @AuthUser() authUser) {
     const { ownerName, workoutPlanName } = params;
     try {
       const user = await this.userService.findOneByUsername(ownerName);
@@ -39,5 +48,13 @@ export class WorkoutPlanController {
     } catch (e) {
       throw e;
     }
+  }
+
+  @Patch('/:ownerName/:workoutPlanName')
+  @UseGuards(JwtAuthGuard)
+  async updateWorkoutPlanForUser(
+    @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
+  ) {
+    console.log(updateWorkoutPlanDto.name);
   }
 }

@@ -47,7 +47,7 @@ export class AuthController {
   @Post('/register')
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userMapper.dtoToEntity(createUserDto);
+    const user = await this.userMapper.createUserDtoToEntity(createUserDto);
     const userProfile = await this.userProfileService.save(new UserProfile());
     user.userProfileId = userProfile.id;
     await this.userService.save(user);
