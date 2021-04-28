@@ -36,43 +36,24 @@ export class WorkoutPlanService {
     }
   }
 
-  findAllPublicByOwner(owner: User, options: IPaginationOptions) {
-    return paginate<Workoutplan>(this.workoutPlanRepository, options, {
-      where: [{ userId: owner.id, isPrivate: false }],
-      relations: ['owner'],
-    });
-  }
-
-  findAllPublicAndPrivateByOwner(owner: User, options: IPaginationOptions) {
-    return paginate<Workoutplan>(this.workoutPlanRepository, options, {
-      where: [{ userId: owner.id }],
-      relations: ['owner'],
-    });
-  }
-
   /**
-   * Finds all workoutplans associated with the owner, if the authenticated owner is
-   * available, private workout plans will also be shown
+   * Finds all public workout plans associated with the owner
    *
-   * @param owner
-   * @param authUser
+   * @param ownerId
    * @param options
    */
-  async findAllByOwner(
-    owner: User,
-    @AuthUser() authUser,
-    options: IPaginationOptions,
-  ) {
-    let paginatedWorkoutPlans;
-    if (authUser && authUser.username === owner.username) {
-      paginatedWorkoutPlans = await this.findAllPublicAndPrivateByOwner(
-        owner,
-        options,
-      );
-    } else {
-      paginatedWorkoutPlans = await this.findAllPublicByOwner(owner, options);
-    }
-    return paginatedWorkoutPlans;
+  async findAllPublicByOwner(ownerId: bigint, options: IPaginationOptions) {
+    const paginatedWorkoutPlans = await paginate<Workoutplan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        where: [{ userId: ownerId, isPrivate: false }],
+        relations: ['owner'],
+      },
+    );
+    paginatedWorkoutPlans.items.map((elem) => {
+      return elem.createPublicWorkoutDto();
+    });
   }
 
   async paginate(

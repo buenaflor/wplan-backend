@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { WorkoutDay } from '../workout-day/workout-day.entity';
 import { User } from '../user/user.entity';
+import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
 
 @Entity({ name: 'workout_plan' })
 export class Workoutplan {
@@ -42,4 +43,21 @@ export class Workoutplan {
 
   @OneToMany(() => WorkoutDay, (workoutDay) => workoutDay.workoutPlan)
   workoutDays: WorkoutDay[];
+
+  //**************************
+  // DTO creation           //
+  //**************************
+
+  createPublicWorkoutDto(): PublicWorkoutPlanDto {
+    return new PublicWorkoutPlanDto(
+      this.id,
+      this.name,
+      this.description,
+      this.isCompleted,
+      this.isPrivate,
+      this.startDate,
+      this.endDate,
+      this.owner,
+    );
+  }
 }

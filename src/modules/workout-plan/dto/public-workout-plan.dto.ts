@@ -1,7 +1,7 @@
-import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsObject, IsString } from "class-validator";
 import { PublicUserDto } from '../../user/dto/public-user-dto';
 
-export class WorkoutPlanDto {
+export class PublicWorkoutPlanDto {
   constructor(
     id: number,
     name: string,
@@ -43,5 +43,6 @@ export class WorkoutPlanDto {
   @IsDate()
   endDate: Date;
 
+  @IsObject()
   owner: PublicUserDto;
 }

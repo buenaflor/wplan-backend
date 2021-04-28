@@ -14,7 +14,7 @@ export class UserRegistrationGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const checkUser: CreateUserDto = context.switchToHttp().getRequest().body;
-    const userWithUsername = await this.userService.findOneByUsername(
+    const userWithUsername = await this.userService.findPublicUserByUsername(
       checkUser.username,
     );
     if (userWithUsername) {

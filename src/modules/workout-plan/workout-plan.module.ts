@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutPlanService } from './workout-plan.service';
 import { WorkoutPlanController } from './workout-plan.controller';
 import { Workoutplan } from './workout-plan.entity';
-import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
 import { UserMapper } from '../user/mapper/user.mapper';
 import { UserModule } from '../user/user.module';
 
@@ -13,7 +12,7 @@ import { UserModule } from '../user/user.module';
     TypeOrmModule.forFeature([Workoutplan]),
     forwardRef(() => UserModule),
   ],
-  providers: [WorkoutPlanService, WorkoutPlanMapper, UserMapper],
+  providers: [WorkoutPlanService, UserMapper],
   controllers: [WorkoutPlanController],
   exports: [],
 })

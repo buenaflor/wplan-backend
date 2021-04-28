@@ -8,6 +8,7 @@ import { ConfigService } from '../../config/config.service';
 import * as crypto from 'crypto';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
 import { EmailVerification } from '../mail/verification/email-verification.entity';
+import { UserDto } from '../../modules/user/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +20,8 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<User> {
-    const user = await this.userService.findOneByUsername(username);
+  async validateUser(username: string, pass: string): Promise<UserDto> {
+    const user = await this.userService.findInternalUserByUsername(username);
     if (user && (await argon2.verify(user.password, pass))) {
       return user;
     }

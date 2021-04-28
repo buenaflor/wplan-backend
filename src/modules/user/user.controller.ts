@@ -10,16 +10,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserProfileDto } from '../user-profile/dto/user-profile.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from './decorator/auth-user.decorator';
-import { WorkoutPlanMapper } from '../workout-plan/mapper/workout-plan.mapper';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
 
 /**
- * This controller provides publicly available information about someone
+ * This controller provides endpoints for handling
+ * publicly available information about someone
  * with an account
  *
  */
@@ -28,10 +27,10 @@ export class UserController {
   constructor(
     private userService: UserService,
     private workoutPlanService: WorkoutPlanService,
-    private workoutPlanMapper: WorkoutPlanMapper,
   ) {}
 
   /**
+   * Returns the publicly available information of a user
    *
    * @param params
    */
@@ -39,12 +38,7 @@ export class UserController {
   @UseGuards(AllowAnonymousJwtGuard)
   async findUserByUsername(@Param() params) {
     const { username } = params;
-    try {
-      const user = await this.userService.findOneByUsername(username);
-      return UserProfileDto.createFromUser(user);
-    } catch (e) {
-      throw e;
-    }
+    return await this.userService.findPublicUserByUsername(username);
   }
 
   /**
@@ -68,19 +62,11 @@ export class UserController {
     perPage = perPage > 100 ? 100 : perPage;
     const { username } = params;
     try {
-      const user = await this.userService.findOneByUsername(username);
-      const workoutPlans = await this.workoutPlanService.findAllByOwner(
-        user,
-        authUser,
-        {
-          page,
-          limit: perPage,
-        },
-      );
-      workoutPlans.items = workoutPlans.items.map((elem) => {
-        return this.workoutPlanMapper.workoutPlanEntityToDto(elem);
+      const user = await this.userService.findPublicUserByUsername(username);
+      return await this.workoutPlanService.findAllPublicByOwner(user.id, {
+        page,
+        limit: perPage,
       });
-      return workoutPlans;
     } catch (e) {
       throw e;
     }

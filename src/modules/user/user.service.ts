@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateUserDto } from './dto/update-user.dto';
+import { PrivateUserDto } from './dto/private-user.dto';
+import { PublicUserDto } from './dto/public-user-dto';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -11,39 +14,78 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  // GET REQUESTS
+  //================================================================================
+  // Get resources
+  //================================================================================
 
-  findOneById(id: string): Promise<User> {
-    return this.userRepository.findOne({
-      where: [{ id }],
-    });
+  /**
+   * Finds a user and returns the internal representation
+   * Don't expose the internal DTO to the controller
+   *
+   * @param username
+   */
+  async findInternalUserByUsername(username: string): Promise<UserDto> {
+    const user = await this.userRepository.findOne({ username });
+    if (!user) {
+      throw new NotFoundException(
+        'Could not find a user with username: ' + username,
+      );
+    }
+    return user.createInternalUserDto();
   }
 
-  async findOneByUsername(username: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: [{ username }],
-    });
+  /**
+   * Finds a user and returns the publicly and privately available info of that user
+   *
+   * @param id
+   */
+  async findPrivateUserById(id: string): Promise<PrivateUserDto> {
+    const user = await this.userRepository.findOne(id);
     if (!user) {
-      throw new NotFoundException('Resource cannot be found');
+      throw new NotFoundException('Could not find a user with id: ' + id);
     }
-    return user;
+    return user.createPrivateUserDto();
+  }
+
+  /**
+   * Finds a user and returns the publicly and privately available info of that user
+   *
+   * @param username
+   */
+  async findPublicUserByUsername(username: string): Promise<PublicUserDto> {
+    const user = await this.userRepository.findOne({ username });
+    if (!user) {
+      throw new NotFoundException(
+        'Could not find a user with username: ' + username,
+      );
+    }
+    return user.createPublicUserDto();
+  }
+
+  findOneById(id: string): Promise<User> {
+    return this.userRepository.findOne(id);
   }
 
   findOneByEmail(email: string) {
     return this.userRepository.findOne({
-      where: [{ email }],
+      email,
     });
   }
 
-  // UPDATE REQUESTS
+  //================================================================================
+  // Update resources
+  //================================================================================
 
-  async update(user: UpdateUserDto, id: bigint) {
-    return await this.userRepository
+  async update(updateUserDto: UpdateUserDto, id: bigint) {
+    const user = await this.userRepository
       .createQueryBuilder()
       .update(User)
-      .set(user)
+      .set(updateUserDto)
       .where({ id })
       .execute();
+    if (!user) {
+      throw new NotFoundException('Could not find a user with id: ' + id);
+    }
   }
 
   updateLoginDate(id) {

@@ -2,54 +2,54 @@ import {
   Controller,
   Get,
   UseGuards,
-  Request,
   Patch,
   Body,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { UserMapper } from '../user/mapper/user.mapper';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { AuthUser } from '../user/decorator/auth-user.decorator';
+import { PrivateUserDto } from '../user/dto/private-user.dto';
 
 /**
  * This controller is responsible for handling authenticated user requests
+ * Requests to this controller are only possible with an access token
  *
  */
 @Controller('user')
 export class AuthUserController {
-  constructor(
-    private userService: UserService,
-    private userMapper: UserMapper,
-  ) {}
+  constructor(private userService: UserService) {}
 
   /**
    * Returns publicly and privately available information of the authenticated user
-   * Accessing this endpoint needs an access token
    *
-   * @param req
+   * @param authUser
    */
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getAuthenticatedUser(@Request() req) {
-    try {
-      const user = await this.userService.findOneById(req.user.userId);
-      return this.userMapper.entityToPrivateUserDto(user);
-    } catch (e) {
-      throw e;
-    }
+  async getAuthenticatedUser(@AuthUser() authUser): Promise<PrivateUserDto> {
+    return await this.userService.findPrivateUserById(authUser.userId);
   }
 
+  /**
+   * Updates the user based on UpdateUserDto
+   *
+   * @param authUser
+   * @param updateUserDto
+   */
   @Patch()
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async updateAuthenticatedUser(
-    @Request() req,
+    @AuthUser() authUser,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    try {
-      await this.userService.update(updateUserDto, req.user.userId);
-      // TODO: if changing email, verified changes to false
-    } catch (e) {
-      throw e;
-    }
+    await this.userService.update(updateUserDto, authUser.userId);
+    // TODO: if changing email, verified changes to false, maybe with trigger?
+  }
+
+  async getWorkoutPlans() {
+
   }
 }

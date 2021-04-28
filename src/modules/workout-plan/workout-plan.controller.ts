@@ -7,7 +7,6 @@ import {
   Body,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
-import { WorkoutPlanMapper } from './mapper/workout-plan.mapper';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { UserService } from '../user/user.service';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
@@ -19,7 +18,6 @@ export class WorkoutPlanController {
   constructor(
     private readonly workoutPlanService: WorkoutPlanService,
     private readonly userService: UserService,
-    private readonly workoutPlanMapper: WorkoutPlanMapper,
   ) {}
 
   /**
@@ -38,13 +36,13 @@ export class WorkoutPlanController {
   async findOneForUser(@Param() params, @AuthUser() authUser) {
     const { ownerName, workoutPlanName } = params;
     try {
-      const user = await this.userService.findOneByUsername(ownerName);
+      const user = await this.userService.findPublicUserByUsername(ownerName);
       const workoutPlan = await this.workoutPlanService.findOneByNameAndOwnerId(
         workoutPlanName,
         user.id,
       );
       this.workoutPlanService.verifyAccess(workoutPlan, authUser);
-      return this.workoutPlanMapper.workoutPlanEntityToDto(workoutPlan);
+      return workoutPlan.createPublicWorkoutDto();
     } catch (e) {
       throw e;
     }

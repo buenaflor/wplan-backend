@@ -7,14 +7,13 @@ import { UserMapper } from './mapper/user.mapper';
 import { WorkoutPlanModule } from '../workout-plan/workout-plan.module';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { Workoutplan } from '../workout-plan/workout-plan.entity';
-import { WorkoutPlanMapper } from '../workout-plan/mapper/workout-plan.mapper';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Workoutplan]),
     forwardRef(() => WorkoutPlanModule),
   ],
-  providers: [UserService, UserMapper, WorkoutPlanService, WorkoutPlanMapper],
+  providers: [UserService, UserMapper, WorkoutPlanService],
   controllers: [UserController],
   exports: [UserService],
 })
