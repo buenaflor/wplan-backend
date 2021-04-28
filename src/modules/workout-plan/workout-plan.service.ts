@@ -8,8 +8,6 @@ import {
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
-import { User } from '../user/user.entity';
-import { log } from 'util';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -34,6 +32,31 @@ export class WorkoutPlanService {
       if (!authUser || workoutPlan.owner.username !== authUser.username)
         throw new NotFoundException();
     }
+  }
+
+  /**
+   * Finds all private and public workout plans of an authenticated user.
+   * Only call this service function if the user has been successfully authenticated
+   *
+   * @param ownerId
+   * @param options
+   */
+  async findAllByAuthenticatedOwner(
+    ownerId: bigint,
+    options: IPaginationOptions,
+  ) {
+    const paginatedWorkoutPlans = await paginate<Workoutplan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        where: [{ userId: ownerId }],
+        relations: ['owner'],
+      },
+    );
+    paginatedWorkoutPlans.items.map((elem) => {
+      return elem.createPrivateWorkoutDto();
+    });
+    return paginatedWorkoutPlans;
   }
 
   /**

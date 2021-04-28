@@ -5,12 +5,14 @@ import {
   Patch,
   Body,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { PrivateUserDto } from '../user/dto/private-user.dto';
+import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 
 /**
  * This controller is responsible for handling authenticated user requests
@@ -19,7 +21,10 @@ import { PrivateUserDto } from '../user/dto/private-user.dto';
  */
 @Controller('user')
 export class AuthUserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private workoutPlanService: WorkoutPlanService,
+  ) {}
 
   /**
    * Returns publicly and privately available information of the authenticated user
@@ -49,7 +54,26 @@ export class AuthUserController {
     // TODO: if changing email, verified changes to false, maybe with trigger?
   }
 
-  async getWorkoutPlans() {
-
+  /**
+   * Returns public and private workout plans for the authenticated user
+   *
+   * @param authUser
+   * @param page
+   * @param perPage
+   */
+  @Get('workout_plans')
+  @UseGuards(JwtAuthGuard)
+  async getWorkoutPlans(
+    @AuthUser() authUser,
+    @Query('page') page = 1,
+    @Query('per_page') perPage = 30,
+  ) {
+    return await this.workoutPlanService.findAllByAuthenticatedOwner(
+      authUser.userId,
+      {
+        page,
+        limit: perPage,
+      },
+    );
   }
 }

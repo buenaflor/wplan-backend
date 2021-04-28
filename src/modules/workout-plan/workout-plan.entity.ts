@@ -10,6 +10,7 @@ import {
 import { WorkoutDay } from '../workout-day/workout-day.entity';
 import { User } from '../user/user.entity';
 import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
+import { PrivateWorkoutPlanDto } from './dto/private-workout-plan.dto';
 
 @Entity({ name: 'workout_plan' })
 export class Workoutplan {
@@ -50,6 +51,19 @@ export class Workoutplan {
 
   createPublicWorkoutDto(): PublicWorkoutPlanDto {
     return new PublicWorkoutPlanDto(
+      this.id,
+      this.name,
+      this.description,
+      this.isCompleted,
+      this.isPrivate,
+      this.startDate,
+      this.endDate,
+      this.owner,
+    );
+  }
+
+  createPrivateWorkoutDto(): PrivateWorkoutPlanDto {
+    return new PrivateWorkoutPlanDto(
       this.id,
       this.name,
       this.description,

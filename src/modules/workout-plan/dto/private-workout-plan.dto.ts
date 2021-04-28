@@ -5,9 +5,9 @@ import {
   IsObject,
   IsString,
 } from 'class-validator';
-import { PublicUserDto } from '../../user/dto/public-user-dto';
+import { PrivateUserDto } from '../../user/dto/private-user.dto';
 
-export class PublicWorkoutPlanDto {
+export class PrivateWorkoutPlanDto {
   constructor(
     id: number,
     name: string,
@@ -16,7 +16,7 @@ export class PublicWorkoutPlanDto {
     isPrivate: boolean,
     startDate: Date,
     endDate: Date,
-    owner: PublicUserDto,
+    owner: PrivateUserDto,
   ) {
     this.id = id;
     this.name = name;
@@ -50,5 +50,5 @@ export class PublicWorkoutPlanDto {
   endDate: Date;
 
   @IsObject()
-  owner: PublicUserDto;
+  owner: PrivateUserDto;
 }

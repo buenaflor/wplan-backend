@@ -14,6 +14,6 @@ import { UserModule } from '../user/user.module';
   ],
   providers: [WorkoutPlanService, UserMapper],
   controllers: [WorkoutPlanController],
-  exports: [],
+  exports: [WorkoutPlanService],
 })
 export class WorkoutPlanModule {}
