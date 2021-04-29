@@ -21,12 +21,6 @@
 - JSON Web Tokens for authentication and authorization
 - Docker for containerization
 
-## Database Model
-
-Current state as of 22.04.2021
-
-![alt text](https://i.imgur.com/tV3PQSH.png)
-
 ## Environment
 
 ### Development
