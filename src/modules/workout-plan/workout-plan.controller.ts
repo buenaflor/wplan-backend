@@ -66,6 +66,15 @@ export class WorkoutPlanController {
     return workoutPlanDto;
   }
 
+  /**
+   * Returns the collaborators of a workout plan
+   * Requires an authenticated user and if the auth user is not
+   * a collaborator then deny access to the resource
+   *
+   * @param params
+   * @param authUser
+   * @param paginated
+   */
   @Get(Routes.workoutPlan.get.collaborators)
   @UseGuards(JwtAuthGuard)
   async findCollaborators(
