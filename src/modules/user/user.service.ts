@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -6,7 +10,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrivateUserDto } from './dto/private-user.dto';
 import { PublicUserDto } from './dto/public-user-dto';
 import { UserDto } from './dto/user.dto';
-import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import { raw } from "express";
+import { camelCase } from "typeorm/util/StringUtils";
 
 @Injectable()
 export class UserService {
@@ -79,6 +89,21 @@ export class UserService {
     return user.createPublicUserDto();
   }
 
+  /**
+   * Finds a user and returns the publicly and privately available info of that user
+   *
+   * @param username
+   */
+  async findPrivateUserByUsername(username: string): Promise<PublicUserDto> {
+    const user = await this.userRepository.findOne({ username });
+    if (!user) {
+      throw new NotFoundException(
+        'Could not find a user with username: ' + username,
+      );
+    }
+    return user.createPrivateUserDto();
+  }
+
   findOneById(id: string): Promise<User> {
     return this.userRepository.findOne(id);
   }
@@ -94,15 +119,20 @@ export class UserService {
   //================================================================================
 
   async update(updateUserDto: UpdateUserDto, id: bigint) {
-    const user = await this.userRepository
+    const queryRes = await this.userRepository
       .createQueryBuilder()
       .update(User)
       .set(updateUserDto)
       .where({ id })
+      .returning('*')
       .execute();
-    if (!user) {
-      throw new NotFoundException('Could not find a user with id: ' + id);
+    if (queryRes.raw.isEmpty) {
+      throw new NotFoundException('Could not update user');
     }
+    if (queryRes.raw.length > 1) {
+      throw new InternalServerErrorException();
+    }
+    // TODO: map queryRes.raw snake case?
   }
 
   updateLoginDate(id) {

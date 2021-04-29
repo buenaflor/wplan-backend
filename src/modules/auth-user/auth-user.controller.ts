@@ -11,7 +11,7 @@ import {
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
-import { AuthUser } from '../user/decorator/auth-user.decorator';
+import { AuthUser } from './decorator/auth-user.decorator';
 import { PrivateUserDto } from '../user/dto/private-user.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
@@ -52,7 +52,7 @@ export class AuthUserController {
     @AuthUser() authUser,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return await this.userService.update(updateUserDto, authUser.userId);
+    await this.userService.update(updateUserDto, authUser.userId);
     // TODO: if changing email, verified changes to false, maybe with trigger?
   }
 
@@ -98,6 +98,7 @@ export class AuthUserController {
     @AuthUser() authUser,
     @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
   ) {
-    await this.workoutPlanService.save(createWorkoutPlanDTO);
+    // TODO: dont allow duplicate workout plan names
+    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
   }
 }

@@ -11,11 +11,10 @@ import {
   IPaginationOptions,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
-import { PrivateWorkoutPlanDto } from './dto/private-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
+import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -24,6 +23,11 @@ export class WorkoutPlanService {
     private workoutPlanRepository: Repository<WorkoutPlan>,
   ) {}
 
+  /**
+   * Finds all public workout plans
+   *
+   * @param options
+   */
   async findAllPublic(options: IPaginationOptions) {
     const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
@@ -41,22 +45,20 @@ export class WorkoutPlanService {
     );
   }
 
-  async findOneByNameAndOwnerId(workoutPlanName: string, ownerId: bigint) {
+  /**
+   * Finds the workout plan according to plan name and returns it
+   *
+   * @param workoutPlanName
+   */
+  async findOneByName(workoutPlanName: string) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ name: workoutPlanName, userId: ownerId }],
+      where: [{ name: workoutPlanName }],
       relations: ['owner'],
     });
     if (!workoutPlan) {
       throw new NotFoundException();
     }
-    return workoutPlan;
-  }
-
-  verifyAccess(workoutPlan: WorkoutPlan, @AuthUser() authUser) {
-    if (workoutPlan.isPrivate) {
-      if (!authUser || workoutPlan.owner.username !== authUser.username)
-        throw new NotFoundException();
-    }
+    return workoutPlan.createPublicWorkoutDto();
   }
 
   /**
@@ -115,9 +117,13 @@ export class WorkoutPlanService {
    * Saves a workout plan with an owner to the database
    *
    * @param createWorkoutPlanDto
+   * @param id
    */
-  async save(createWorkoutPlanDto: CreateWorkoutPlanDto) {
-    await this.workoutPlanRepository.save(createWorkoutPlanDto);
+  async save(createWorkoutPlanDto: CreateWorkoutPlanDto, id: string) {
+    const user = this.workoutPlanRepository.create(createWorkoutPlanDto);
+    user.userId = BigInt(id);
+    console.log(user);
+    await this.workoutPlanRepository.save(user);
   }
 
   /**
@@ -146,14 +152,12 @@ export class WorkoutPlanService {
       .execute();
     if (queryRes.raw.isEmpty) {
       throw new NotFoundException(
-        'Could not find a workoutplan with name: ' + workoutPlanName,
+        'Could not find a workout plan with name: ' + workoutPlanName,
       );
     }
     if (queryRes.raw.length > 1) {
       throw new InternalServerErrorException();
     }
-    const workoutPlan: PrivateWorkoutPlanDto = queryRes.raw[0];
-    return workoutPlan;
   }
 
   async delete(criteria: FindConditions<WorkoutPlan>) {

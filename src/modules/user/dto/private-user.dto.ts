@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
+import { User } from '../user.entity';
 
 /**
  * DTO that encapsulates user data that is privately available
@@ -51,4 +52,15 @@ export class PrivateUserDto {
   @IsBoolean()
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
+
+  static createFromUser(user: User) {
+    return new PrivateUserDto(
+      user.id,
+      user.username,
+      user.email,
+      user.createdAt,
+      user.lastLoginAt,
+      user.isEmailConfirmed,
+    );
+  }
 }

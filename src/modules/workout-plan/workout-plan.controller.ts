@@ -9,20 +9,18 @@ import {
   Delete,
   HttpCode,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
-import { UserService } from '../user/user.service';
-import { AuthUser } from '../user/decorator/auth-user.decorator';
+import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
+import { Routes } from '../../config/constants';
 
-@Controller('workoutplans')
+@Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
-  constructor(
-    private readonly workoutPlanService: WorkoutPlanService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly workoutPlanService: WorkoutPlanService) {}
 
   @Get()
   async findAllPublic(
@@ -46,21 +44,23 @@ export class WorkoutPlanController {
    * @param params
    * @param authUser
    */
-  @Get('/:ownerName/:workoutPlanName')
+  @Get(Routes.workoutPlan.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
   async findOneForUser(@Param() params, @AuthUser() authUser) {
     const { ownerName, workoutPlanName } = params;
-    try {
-      const user = await this.userService.findPublicUserByUsername(ownerName);
-      const workoutPlan = await this.workoutPlanService.findOneByNameAndOwnerId(
-        workoutPlanName,
-        user.id,
-      );
-      this.workoutPlanService.verifyAccess(workoutPlan, authUser);
-      return workoutPlan.createPublicWorkoutDto();
-    } catch (e) {
-      throw e;
+    const workoutPlanDto = await this.workoutPlanService.findOneByName(
+      workoutPlanName,
+    );
+    if (authUser && authUser.userId === workoutPlanDto.owner.id) {
+      return workoutPlanDto;
     }
+    if (
+      workoutPlanDto.owner.username !== ownerName ||
+      workoutPlanDto.isPrivate
+    ) {
+      throw new NotFoundException();
+    }
+    return workoutPlanDto;
   }
 
   /**
@@ -72,7 +72,8 @@ export class WorkoutPlanController {
    * @param params
    * @param updateWorkoutPlanDto
    */
-  @Patch('/:ownerName/:workoutPlanName')
+  @Patch(Routes.workoutPlan.patch.one)
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async updateWorkoutPlanForUser(
     @AuthUser() authUser,
@@ -84,7 +85,7 @@ export class WorkoutPlanController {
     if (ownerName !== username) {
       throw new UnauthorizedException();
     }
-    return await this.workoutPlanService.update(
+    await this.workoutPlanService.update(
       updateWorkoutPlanDto,
       workoutPlanName,
       userId,
@@ -100,7 +101,7 @@ export class WorkoutPlanController {
    * @param authUser
    * @param params
    */
-  @Delete('/:ownerName/:workoutPlanName')
+  @Delete(Routes.workoutPlan.delete.one)
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async deleteWorkoutPlanForUser(@AuthUser() authUser, @Param() params) {
