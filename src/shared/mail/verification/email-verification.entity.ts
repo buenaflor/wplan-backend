@@ -8,7 +8,7 @@ import {
 
 @Entity({ name: 'email_verification' })
 export class EmailVerification {
-  constructor(token: string, userId: bigint) {
+  constructor(token: string, userId: number) {
     this.token = token;
     this.userId = userId;
     this.expirationTime = 120;
@@ -24,7 +24,7 @@ export class EmailVerification {
   expirationTime: number;
 
   @Column({ type: 'integer', name: 'user_id' })
-  userId: bigint;
+  userId: number;
 
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt: Date;

@@ -8,27 +8,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
  *
  */
 export class UserMapper {
-  createUserDtoToEntity(createUserDto: CreateUserDto) {
-    return new User(
-      null,
-      createUserDto.username,
-      createUserDto.email,
-      createUserDto.password,
-    );
-  }
-
   updateUserDtoToEntity(updateUserDto: UpdateUserDto) {
     return new User(null, null, updateUserDto.email, null);
-  }
-
-  entityToPrivateUserDto(user: User) {
-    return new PrivateUserDto(
-      user.id,
-      user.username,
-      user.email,
-      user.createdAt,
-      user.lastLoginAt,
-      user.isEmailConfirmed,
-    );
   }
 }

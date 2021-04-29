@@ -13,7 +13,7 @@ import {
  */
 export class UserDto {
   constructor(
-    id: bigint,
+    id: number,
     username: string,
     email: string,
     password: string,
@@ -32,7 +32,7 @@ export class UserDto {
 
   @IsNumber()
   @IsNotEmpty()
-  readonly id: bigint;
+  readonly id: number;
 
   @IsString()
   @IsNotEmpty()

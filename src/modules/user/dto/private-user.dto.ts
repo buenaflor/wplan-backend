@@ -14,7 +14,7 @@ import { User } from '../user.entity';
  */
 export class PrivateUserDto {
   constructor(
-    id: bigint,
+    id: number,
     username: string,
     email: string,
     createdAt: Date,
@@ -31,7 +31,7 @@ export class PrivateUserDto {
 
   @IsNotEmpty()
   @IsNumber()
-  readonly id: bigint;
+  readonly id: number;
 
   @IsString()
   @IsNotEmpty()

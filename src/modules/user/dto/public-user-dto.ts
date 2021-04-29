@@ -12,7 +12,7 @@ import {
  */
 export class PublicUserDto {
   constructor(
-    id: bigint,
+    id: number,
     username: string,
     email: string,
     createdAt: Date,
@@ -27,7 +27,7 @@ export class PublicUserDto {
 
   @IsNotEmpty()
   @IsNumber()
-  readonly id: bigint;
+  readonly id: number;
 
   @IsString()
   @IsNotEmpty()

@@ -5,11 +5,8 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   CreateDateColumn,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import * as argon2 from 'argon2';
-import { UserProfile } from '../user-profile/user-profile.entity';
 import { PrivateUserDto } from './dto/private-user.dto';
 import { PublicUserDto } from './dto/public-user-dto';
 import { UserDto } from './dto/user.dto';
@@ -17,7 +14,7 @@ import { UserDto } from './dto/user.dto';
 @Entity({ name: 'user' })
 export class User {
   constructor(
-    id?: bigint,
+    id?: number,
     username?: string,
     email?: string,
     password?: string,
@@ -30,7 +27,7 @@ export class User {
   }
 
   @PrimaryGeneratedColumn()
-  id: bigint;
+  id: number;
 
   @Column({ type: 'varchar', length: 255 })
   username: string;

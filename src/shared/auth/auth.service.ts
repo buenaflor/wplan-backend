@@ -39,7 +39,7 @@ export class AuthService {
     await this.userService.updateLoginDate(userId);
   }
 
-  async createEmailVerification(userId: bigint) {
+  async createEmailVerification(userId: number) {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
     const emailVerification = new EmailVerification(verificationToken, userId);

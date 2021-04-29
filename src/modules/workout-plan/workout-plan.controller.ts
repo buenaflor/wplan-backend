@@ -57,6 +57,13 @@ export class WorkoutPlanController {
     if (authUser && authUser.userId === workoutPlanDto.owner.id) {
       return workoutPlanDto;
     }
+    if (authUser) {
+      const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
+        workoutPlanDto.id,
+        authUser.userId,
+      );
+      if (isCollaborator) return workoutPlanDto;
+    }
     if (
       workoutPlanDto.owner.username !== ownerName ||
       workoutPlanDto.isPrivate

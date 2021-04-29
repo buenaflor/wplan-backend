@@ -76,7 +76,7 @@ export class WorkoutPlanService {
    * @param userId
    * @param options
    */
-  async findAllPublicByUser(userId: bigint, options: IPaginationOptions) {
+  async findAllPublicByUser(userId: number, options: IPaginationOptions) {
     const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
       options,
