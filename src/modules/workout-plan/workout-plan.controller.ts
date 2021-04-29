@@ -5,8 +5,9 @@ import {
   Param,
   Patch,
   Body,
-  HttpCode,
   UnauthorizedException,
+  Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -76,5 +77,17 @@ export class WorkoutPlanController {
       workoutPlanName,
       userId,
     );
+  }
+
+  @Delete('/:ownerName/:workoutPlanName')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async deleteWorkoutPlanForUser(@AuthUser() authUser, @Param() params) {
+    const { ownerName, workoutPlanName } = params;
+    const { username } = authUser;
+    if (ownerName !== username) {
+      throw new UnauthorizedException();
+    }
+    await this.workoutPlanService.delete({ name: workoutPlanName });
   }
 }

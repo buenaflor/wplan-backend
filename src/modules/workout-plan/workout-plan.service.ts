@@ -1,17 +1,18 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { WorkoutPlan } from './workout-plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  paginate,
-  Pagination,
-  IPaginationOptions,
-} from 'nestjs-typeorm-paginate';
+import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
-import { User } from '../user/user.entity';
-import { PrivateWorkoutPlanDto } from "./dto/private-workout-plan.dto";
+import { PrivateWorkoutPlanDto } from './dto/private-workout-plan.dto';
+import { ObjectID } from "typeorm/driver/mongodb/typings";
+import { FindConditions } from "typeorm/find-options/FindConditions";
 
 @Injectable()
 export class WorkoutPlanService {
@@ -126,5 +127,15 @@ export class WorkoutPlanService {
     }
     const workoutPlan: PrivateWorkoutPlanDto = queryRes.raw[0];
     return workoutPlan;
+  }
+
+  async delete(criteria: FindConditions<WorkoutPlan>) {
+    const res = await this.workoutPlanRepository.delete(criteria);
+    if (res.affected === 0) {
+      throw new NotFoundException('Could not find workout plan');
+    }
+    if (res.affected > 1) {
+      throw new InternalServerErrorException();
+    }
   }
 }
