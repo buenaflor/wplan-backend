@@ -79,6 +79,15 @@ export class WorkoutPlanController {
     );
   }
 
+  /**
+   * Deletes the workout plan according to the given params
+   * An authenticated user and a valid workout plan name is required
+   *
+   * If the user does not have permission, a not authorized error will be thrown
+   *
+   * @param authUser
+   * @param params
+   */
   @Delete('/:ownerName/:workoutPlanName')
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
