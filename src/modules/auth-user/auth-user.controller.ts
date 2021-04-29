@@ -57,7 +57,13 @@ export class AuthUserController {
   }
 
   /**
-   * Returns public and private workout plans for the authenticated user
+   * Finds all workout plans that the authenticated user has permission to access
+   *
+   * The authenticated user has explicit permission to access workout plans they own or
+   * where they are a collaborator
+   *
+   * -> Currently only workout plans where the user is the owner will be returned
+   * TODO: implement collaboration / coaching
    *
    * @param authUser
    * @param page
@@ -79,6 +85,12 @@ export class AuthUserController {
     );
   }
 
+  /**
+   * Creates a workout plan where the authenticated user is the owner
+   *
+   * @param authUser
+   * @param createWorkoutPlanDTO
+   */
   @Post('workout_plans')
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)

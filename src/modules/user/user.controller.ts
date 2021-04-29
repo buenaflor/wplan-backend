@@ -29,6 +29,11 @@ export class UserController {
     private workoutPlanService: WorkoutPlanService,
   ) {}
 
+  @Get()
+  async findAll(@Query('page') page = 1, @Query('per_page') perPage = 30) {
+    return await this.userService.findAllPublicUsers({ page, limit: perPage });
+  }
+
   /**
    * Returns the publicly available information of a user
    *
@@ -42,9 +47,7 @@ export class UserController {
   }
 
   /**
-   * Finds all workout plans associated with an owner. If no authenticated owner
-   * can be found, it returns all public workout plans of the owner. Otherwise,
-   * also private and public workout plan will be returned.
+   * Finds all workout plans associated with an owner.
    *
    * @param params
    * @param authUser
@@ -52,7 +55,6 @@ export class UserController {
    * @param perPage
    */
   @Get('/:username/workoutplans')
-  @UseGuards(AllowAnonymousJwtGuard)
   async findWorkoutPlansForUser(
     @Param() params,
     @AuthUser() authUser,
@@ -70,28 +72,5 @@ export class UserController {
     } catch (e) {
       throw e;
     }
-  }
-
-  /**
-   * Creates a workout plan and assigns it to the specified user
-   * Workout plans can only be created and assigned by an authenticated user
-   *
-   * @param createWorkoutPlanDto
-   * @param req
-   */
-  @Post('/:ownerName/')
-  @UseGuards(JwtAuthGuard)
-  async createWorkoutPlanForUser(
-    @Body() createWorkoutPlanDto: CreateWorkoutPlanDto,
-    @Request() req,
-  ) {
-    if (req.user.userId !== createWorkoutPlanDto.userId) {
-      throw new UnauthorizedException();
-    }
-    try {
-    } catch (e) {
-      throw e;
-    }
-    console.log(createWorkoutPlanDto);
   }
 }

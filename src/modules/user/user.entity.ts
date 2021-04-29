@@ -78,7 +78,13 @@ export class User {
   }
 
   createPublicUserDto() {
-    return new PublicUserDto(this.id, this.username, this.email);
+    return new PublicUserDto(
+      this.id,
+      this.username,
+      this.email,
+      this.createdAt,
+      this.lastLoginAt,
+    );
   }
 
   createInternalUserDto() {

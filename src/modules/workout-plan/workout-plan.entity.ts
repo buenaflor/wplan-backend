@@ -76,7 +76,7 @@ export class WorkoutPlan {
       this.isPrivate,
       this.startDate,
       this.endDate,
-      this.owner,
+      this.owner.createPublicUserDto(),
     );
   }
 
@@ -89,7 +89,7 @@ export class WorkoutPlan {
       this.isPrivate,
       this.startDate,
       this.endDate,
-      this.owner,
+      this.owner.createPrivateUserDto(),
     );
   }
 }

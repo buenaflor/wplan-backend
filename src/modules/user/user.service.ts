@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrivateUserDto } from './dto/private-user.dto';
 import { PublicUserDto } from './dto/public-user-dto';
 import { UserDto } from './dto/user.dto';
+import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,22 @@ export class UserService {
   //================================================================================
   // Get resources
   //================================================================================
+
+  /**
+   * Returns all public users paginated
+   *
+   * @param options
+   */
+  async findAllPublicUsers(options: IPaginationOptions) {
+    const res = await paginate<User>(this.userRepository, options);
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPublicUserDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
 
   /**
    * Finds a user and returns the internal representation

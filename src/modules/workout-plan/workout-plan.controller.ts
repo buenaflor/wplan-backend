@@ -8,6 +8,7 @@ import {
   UnauthorizedException,
   Delete,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -22,6 +23,17 @@ export class WorkoutPlanController {
     private readonly workoutPlanService: WorkoutPlanService,
     private readonly userService: UserService,
   ) {}
+
+  @Get()
+  async findAllPublic(
+    @Query('page') page = 1,
+    @Query('per_page') perPage = 30,
+  ) {
+    return await this.workoutPlanService.findAllPublic({
+      page,
+      limit: perPage,
+    });
+  }
 
   /**
    * Finds one workout plan matching the parameters

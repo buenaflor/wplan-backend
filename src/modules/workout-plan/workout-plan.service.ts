@@ -6,13 +6,16 @@ import {
 import { WorkoutPlan } from './workout-plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import {
+  paginate,
+  IPaginationOptions,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { PrivateWorkoutPlanDto } from './dto/private-workout-plan.dto';
-import { ObjectID } from "typeorm/driver/mongodb/typings";
-import { FindConditions } from "typeorm/find-options/FindConditions";
+import { FindConditions } from 'typeorm/find-options/FindConditions';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -20,6 +23,23 @@ export class WorkoutPlanService {
     @InjectRepository(WorkoutPlan)
     private workoutPlanRepository: Repository<WorkoutPlan>,
   ) {}
+
+  async findAllPublic(options: IPaginationOptions) {
+    const res = await paginate<WorkoutPlan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        relations: ['owner'],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPublicWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
 
   async findOneByNameAndOwnerId(workoutPlanName: string, ownerId: bigint) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
@@ -50,7 +70,7 @@ export class WorkoutPlanService {
     ownerId: bigint,
     options: IPaginationOptions,
   ) {
-    const paginatedWorkoutPlans = await paginate<WorkoutPlan>(
+    const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
       options,
       {
@@ -58,10 +78,13 @@ export class WorkoutPlanService {
         relations: ['owner'],
       },
     );
-    paginatedWorkoutPlans.items.map((elem) => {
-      return elem.createPrivateWorkoutDto();
-    });
-    return paginatedWorkoutPlans;
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPrivateWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
   }
 
   /**
@@ -71,7 +94,7 @@ export class WorkoutPlanService {
    * @param options
    */
   async findAllPublicByOwner(ownerId: bigint, options: IPaginationOptions) {
-    const paginatedWorkoutPlans = await paginate<WorkoutPlan>(
+    const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
       options,
       {
@@ -79,9 +102,13 @@ export class WorkoutPlanService {
         relations: ['owner'],
       },
     );
-    paginatedWorkoutPlans.items.map((elem) => {
-      return elem.createPublicWorkoutDto();
-    });
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPublicWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
   }
 
   /**

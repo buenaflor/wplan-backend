@@ -7,6 +7,12 @@ import {
 } from 'class-validator';
 import { PrivateUserDto } from '../../user/dto/private-user.dto';
 
+/**
+ * Private Workout Plan Dto represents the workout plan that an authenticated owner
+ * receives. It includes data that should not be accessible from anyone other than
+ * the authenticated owner
+ *
+ */
 export class PrivateWorkoutPlanDto {
   constructor(
     id: number,
