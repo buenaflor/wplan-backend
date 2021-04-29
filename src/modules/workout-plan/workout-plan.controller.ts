@@ -50,6 +50,15 @@ export class WorkoutPlanController {
     }
   }
 
+  /**
+   * Updates the workout plan according to updateWorkoutPlanDto and
+   * the given params. An authenticated user and a valid workout plan name
+   * is required.
+   *
+   * @param authUser
+   * @param params
+   * @param updateWorkoutPlanDto
+   */
   @Patch('/:ownerName/:workoutPlanName')
   @UseGuards(JwtAuthGuard)
   async updateWorkoutPlanForUser(
