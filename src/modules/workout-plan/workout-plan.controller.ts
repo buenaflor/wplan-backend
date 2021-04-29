@@ -17,20 +17,15 @@ import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
+import { Paginated } from '../../utils/decorators/paginated.decorator';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
   constructor(private readonly workoutPlanService: WorkoutPlanService) {}
 
   @Get()
-  async findAllPublic(
-    @Query('page') page = 1,
-    @Query('per_page') perPage = 30,
-  ) {
-    return await this.workoutPlanService.findAllPublic({
-      page,
-      limit: perPage,
-    });
+  async findAllPublic(@Paginated() paginated) {
+    return await this.workoutPlanService.findAllPublic(paginated);
   }
 
   /**

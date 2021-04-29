@@ -32,13 +32,6 @@ export class User {
   @PrimaryGeneratedColumn()
   id: bigint;
 
-  @Column({ type: 'bigint', name: 'user_profile_id' })
-  userProfileId: bigint;
-
-  @OneToOne(() => UserProfile)
-  @JoinColumn({ name: 'user_profile_id' })
-  userProfile: UserProfile;
-
   @Column({ type: 'varchar', length: 255 })
   username: string;
 
