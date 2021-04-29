@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { PermissionEntity } from './permission.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PermissionService {
-  constructor(private permissionRepository: Repository<PermissionEntity>) {}
+  constructor(
+    @InjectRepository(PermissionEntity)
+    private permissionRepository: Repository<PermissionEntity>,
+  ) {}
 
   async findOneById(id: number) {
-    return this.permissionRepository.find({ id });
+    return await this.permissionRepository.find({ id });
   }
 }

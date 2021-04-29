@@ -8,6 +8,8 @@ export const Paginated = createParamDecorator(
     let perPage = query.per_page;
     if (!page) page = 1;
     if (!perPage) perPage = 30;
+    if (page < 1) page = 1;
+    if (perPage > 100) perPage = 100;
     return {
       page,
       limit: perPage,

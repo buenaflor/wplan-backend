@@ -17,10 +17,14 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
+import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
-  constructor(private readonly workoutPlanService: WorkoutPlanService) {}
+  constructor(
+    private readonly workoutPlanService: WorkoutPlanService,
+    private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
+  ) {}
 
   /**
    * Returns all public workout plans
@@ -60,6 +64,32 @@ export class WorkoutPlanController {
       throw new NotFoundException();
     }
     return workoutPlanDto;
+  }
+
+  @Get(Routes.workoutPlan.get.collaborators)
+  @UseGuards(JwtAuthGuard)
+  async findCollaborators(
+    @Param() params,
+    @AuthUser() authUser,
+    @Paginated() paginated,
+  ) {
+    const { workoutPlanName } = params;
+    const workoutPlan = await this.workoutPlanService.findOneByName(
+      workoutPlanName,
+    );
+    const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
+      workoutPlan.id,
+      authUser.userId,
+    );
+    // If the authenticated user is not a collaborator, deny access
+    if (isCollaborator) {
+      return await this.workoutPlanCollaboratorService.findAll(
+        workoutPlan.id,
+        paginated,
+      );
+    } else {
+      throw new NotFoundException();
+    }
   }
 
   /**

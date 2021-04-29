@@ -4,15 +4,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutPlanService } from './workout-plan.service';
 import { WorkoutPlanController } from './workout-plan.controller';
 import { WorkoutPlan } from './workout-plan.entity';
-import { UserMapper } from '../user/mapper/user.mapper';
 import { UserModule } from '../user/user.module';
+import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WorkoutPlan]),
     forwardRef(() => UserModule),
+    WorkoutPlanCollaboratorModule,
   ],
-  providers: [WorkoutPlanService, UserMapper],
+  providers: [WorkoutPlanService],
   controllers: [WorkoutPlanController],
   exports: [WorkoutPlanService],
 })

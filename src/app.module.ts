@@ -16,7 +16,8 @@ import { EmailVerificationModule } from './shared/mail/verification/email-verifi
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { AuthUserModule } from './modules/auth-user/auth-user.module';
 import { PermissionModule } from './modules/permission/permission.module';
-import { PermissionService } from './modules/permission/permission.service';
+import { RoleModule } from './modules/role/role.module';
+import { WorkoutPlanCollaboratorModule } from './modules/workout-plan-collaborator/workout-plan-collaborator.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { PermissionService } from './modules/permission/permission.service';
     UserProfileModule,
     AuthUserModule,
     PermissionModule,
+    RoleModule,
+    WorkoutPlanCollaboratorModule,
   ],
-  providers: [PermissionService],
 })
 export class AppModule {}
