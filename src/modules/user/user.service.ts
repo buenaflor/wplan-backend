@@ -17,6 +17,7 @@ import {
 } from 'nestjs-typeorm-paginate';
 import { raw } from "express";
 import { camelCase } from "typeorm/util/StringUtils";
+import { CreateUserDto } from "./dto/create-user.dto";
 
 @Injectable()
 export class UserService {
@@ -34,7 +35,9 @@ export class UserService {
    *
    * @param options
    */
-  async findAllPublicUsers(options: IPaginationOptions) {
+  async findAllUsers(
+    options: IPaginationOptions,
+  ): Promise<Pagination<PublicUserDto>> {
     const res = await paginate<User>(this.userRepository, options);
     return new Pagination(
       res.items.map((elem) => {
@@ -46,27 +49,11 @@ export class UserService {
   }
 
   /**
-   * Finds a user and returns the internal representation
-   * Don't expose the internal DTO to the controller
-   *
-   * @param username
-   */
-  async findInternalUserByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ username });
-    if (!user) {
-      throw new NotFoundException(
-        'Could not find a user with username: ' + username,
-      );
-    }
-    return user.createInternalUserDto();
-  }
-
-  /**
    * Finds a user and returns the publicly and privately available info of that user
    *
    * @param id
    */
-  async findPrivateUserById(id: string): Promise<PrivateUserDto> {
+  async findOnePrivateUserById(id: string): Promise<PrivateUserDto> {
     const user = await this.userRepository.findOne(id);
     if (!user) {
       throw new NotFoundException('Could not find a user with id: ' + id);
@@ -79,7 +66,7 @@ export class UserService {
    *
    * @param username
    */
-  async findPublicUserByUsername(username: string): Promise<PublicUserDto> {
+  async findOnePublicUserByUsername(username: string): Promise<PublicUserDto> {
     const user = await this.userRepository.findOne({ username });
     if (!user) {
       throw new NotFoundException(
@@ -94,7 +81,7 @@ export class UserService {
    *
    * @param username
    */
-  async findPrivateUserByUsername(username: string): Promise<PublicUserDto> {
+  async findOnePrivateUserByUsername(username: string): Promise<PublicUserDto> {
     const user = await this.userRepository.findOne({ username });
     if (!user) {
       throw new NotFoundException(
@@ -104,14 +91,26 @@ export class UserService {
     return user.createPrivateUserDto();
   }
 
-  findOneById(id: string): Promise<User> {
-    return this.userRepository.findOne(id);
-  }
-
   findOneByEmail(email: string) {
     return this.userRepository.findOne({
       email,
     });
+  }
+
+  /**
+   * Finds a user and returns the internal representation
+   * Don't expose the internal DTO to the controller
+   *
+   * @param username
+   */
+  async findOneInternalUserByUsername(username: string): Promise<UserDto> {
+    const user = await this.userRepository.findOne({ username });
+    if (!user) {
+      throw new NotFoundException(
+        'Could not find a user with username: ' + username,
+      );
+    }
+    return user.createInternalUserDto();
   }
 
   //================================================================================
@@ -147,7 +146,7 @@ export class UserService {
       .createQueryBuilder()
       .update()
       .set({ lastLoginAt: dateToday })
-      .where('id=:id', { id: id })
+      .where({ id: id })
       .execute();
   }
 
@@ -156,13 +155,13 @@ export class UserService {
       .createQueryBuilder()
       .update(User)
       .set({ isEmailConfirmed: value })
-      .where('id = :id', { id })
+      .where({ id })
       .execute();
   }
 
   // CREATE REQUESTS
 
-  save(user: User) {
+  save(user: CreateUserDto) {
     return this.userRepository.save(user);
   }
 }

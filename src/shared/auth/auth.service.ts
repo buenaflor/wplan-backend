@@ -8,7 +8,7 @@ import { ConfigService } from '../../config/config.service';
 import * as crypto from 'crypto';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
 import { EmailVerification } from '../mail/verification/email-verification.entity';
-import { UserDto } from '../../modules/user/dto/user.dto';
+import { PrivateUserDto } from '../../modules/user/dto/private-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,10 +20,17 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<UserDto> {
-    const user = await this.userService.findInternalUserByUsername(username);
+  async validateUser(username: string, pass: string): Promise<PrivateUserDto> {
+    const user = await this.userService.findOneInternalUserByUsername(username);
     if (user && (await argon2.verify(user.password, pass))) {
-      return user;
+      return new PrivateUserDto(
+        user.id,
+        user.username,
+        user.email,
+        user.createdAt,
+        user.lastLoginAt,
+        user.isEmailConfirmed,
+      );
     }
     return null;
   }

@@ -5,7 +5,6 @@ import {
   Patch,
   Body,
   HttpCode,
-  Query,
   Post,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
@@ -15,13 +14,15 @@ import { AuthUser } from './decorator/auth-user.decorator';
 import { PrivateUserDto } from '../user/dto/private-user.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
+import { Paginated } from '../../utils/decorators/paginated.decorator';
+import { Routes } from '../../config/constants';
 
 /**
  * This controller is responsible for handling authenticated user requests
  * Requests to this controller are only possible with an access token
  *
  */
-@Controller('user')
+@Controller(Routes.authUser.controller)
 export class AuthUserController {
   constructor(
     private userService: UserService,
@@ -36,7 +37,7 @@ export class AuthUserController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async getAuthenticatedUser(@AuthUser() authUser): Promise<PrivateUserDto> {
-    return await this.userService.findPrivateUserById(authUser.userId);
+    return await this.userService.findOnePrivateUserById(authUser.userId);
   }
 
   /**
@@ -66,22 +67,14 @@ export class AuthUserController {
    * TODO: implement collaboration / coaching
    *
    * @param authUser
-   * @param page
-   * @param perPage
+   * @param paginated
    */
-  @Get('workout_plans')
+  @Get(Routes.authUser.get.workoutPlans)
   @UseGuards(JwtAuthGuard)
-  async getWorkoutPlans(
-    @AuthUser() authUser,
-    @Query('page') page = 1,
-    @Query('per_page') perPage = 30,
-  ) {
-    return await this.workoutPlanService.findAllByAuthenticatedOwner(
+  async getWorkoutPlans(@AuthUser() authUser, @Paginated() paginated) {
+    return await this.workoutPlanService.findAllAccessibleByUser(
       authUser.userId,
-      {
-        page,
-        limit: perPage,
-      },
+      paginated,
     );
   }
 
@@ -91,7 +84,7 @@ export class AuthUserController {
    * @param authUser
    * @param createWorkoutPlanDTO
    */
-  @Post('workout_plans')
+  @Post(Routes.authUser.post.workoutPlans)
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async createWorkoutPlan(

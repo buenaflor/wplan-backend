@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
+import { Paginated } from '../../utils/decorators/paginated.decorator';
+import { Routes } from '../../config/constants';
 
 /**
  * This controller provides endpoints for handling
@@ -10,7 +12,7 @@ import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
  * with an account
  *
  */
-@Controller('users')
+@Controller(Routes.user.controller)
 export class UserController {
   constructor(
     private userService: UserService,
@@ -18,24 +20,24 @@ export class UserController {
   ) {}
 
   @Get()
-  async findAllUsers(@Query('page') page = 1, @Query('per_page') perPage = 30) {
-    return await this.userService.findAllPublicUsers({ page, limit: perPage });
+  async findAllUsers(@Paginated() paginated) {
+    return await this.userService.findAllUsers(paginated);
   }
 
   /**
-   * Returns the publicly available information of a user
+   * Returns the publicly or privately available information of a user
    *
    * @param params
    * @param authUser
    */
-  @Get('/:username')
+  @Get(Routes.user.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
   async findUserByUsername(@Param() params, @AuthUser() authUser) {
     const { username } = params;
     if (authUser.username === username) {
-      return await this.userService.findPrivateUserByUsername(username);
+      return await this.userService.findOnePrivateUserByUsername(username);
     } else {
-      return await this.userService.findPublicUserByUsername(username);
+      return await this.userService.findOnePublicUserByUsername(username);
     }
   }
 
@@ -44,33 +46,27 @@ export class UserController {
    *
    * @param params
    * @param authUser
-   * @param page
-   * @param perPage
+   * @param paginated
    */
-  @Get('/:username/workout_plans')
+  @Get(Routes.user.get.workoutPlansByOne)
   @UseGuards(AllowAnonymousJwtGuard)
   async findWorkoutPlansForUser(
     @Param() params,
     @AuthUser() authUser,
-    @Query('page') page = 1,
-    @Query('per_page') perPage = 30,
+    @Paginated() paginated,
   ) {
-    perPage = perPage > 100 ? 100 : perPage;
     const { username } = params;
     if (authUser && authUser.username === username) {
-      return await this.workoutPlanService.findAllByAuthenticatedOwner(
+      return await this.workoutPlanService.findAllAccessibleByUser(
         authUser.userId,
-        {
-          page,
-          limit: perPage,
-        },
+        paginated,
       );
     } else {
-      const user = await this.userService.findPublicUserByUsername(username);
-      return await this.workoutPlanService.findAllPublicByOwner(user.id, {
-        page,
-        limit: perPage,
-      });
+      const user = await this.userService.findOnePublicUserByUsername(username);
+      return await this.workoutPlanService.findAllPublicByUser(
+        user.id,
+        paginated,
+      );
     }
   }
 }

@@ -11,33 +11,30 @@ import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
 import { UserRegistrationGuard } from '../../guards/user-registration.guard';
 import { CreateUserDto } from '../../modules/user/dto/create-user.dto';
-import { UserMapper } from '../../modules/user/mapper/user.mapper';
 import { EmailVerificationService } from '../mail/verification/email-verification.service';
 import { UserService } from '../../modules/user/user.service';
 import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { UserProfileService } from '../../modules/user-profile/user-profile.service';
 import { Routes } from '../../config/constants';
+import { AuthUser } from '../../modules/auth-user/decorator/auth-user.decorator';
 
+//TODO: limit exposure? -> client secret maybe
 @Controller(Routes.auth.controller)
 export class AuthController {
   constructor(
     private authService: AuthService,
     private emailVerificationService: EmailVerificationService,
     private userService: UserService,
-    private userProfileService: UserProfileService,
-    private userMapper: UserMapper,
   ) {}
 
   @Post(Routes.auth.post.login)
   @UseGuards(LocalAuthGuard)
-  async login(@Request() req) {
-    const accessToken = this.authService.createJWT(req.user);
-    await this.authService.updateLoginDate(req.user.id);
-    return new LoginPayloadDto(req.user, accessToken);
+  async login(@AuthUser() authUser) {
+    const accessToken = this.authService.createJWT(authUser);
+    await this.authService.updateLoginDate(authUser.id);
+    return new LoginPayloadDto(authUser, accessToken);
   }
-  // TODO: sign out -> revoke access token
-
+  // TODO: sign out -> revoke access token; refresh token
   /**
    * Post endpoint responsible for creating a user and sending an email verification
    * Creating a user also creates a user profile
@@ -47,8 +44,7 @@ export class AuthController {
   @Post(Routes.auth.post.register)
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userMapper.createUserDtoToEntity(createUserDto);
-    await this.userService.save(user);
+    const user = await this.userService.save(createUserDto);
     const emailVerification = await this.authService.createEmailVerification(
       user.id,
     );

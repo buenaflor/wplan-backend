@@ -8,7 +8,6 @@ import {
   UnauthorizedException,
   Delete,
   HttpCode,
-  Query,
   NotFoundException,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
@@ -23,13 +22,18 @@ import { Paginated } from '../../utils/decorators/paginated.decorator';
 export class WorkoutPlanController {
   constructor(private readonly workoutPlanService: WorkoutPlanService) {}
 
+  /**
+   * Returns all public workout plans
+   *
+   * @param paginated
+   */
   @Get()
   async findAllPublic(@Paginated() paginated) {
     return await this.workoutPlanService.findAllPublic(paginated);
   }
 
   /**
-   * Finds one workout plan matching the parameters
+   * Finds one workout plan matching a user and workout plan name
    * If the workout plan is private, the unauthenticated recipient
    * will always receive a 404 Not Found error
    *

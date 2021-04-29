@@ -14,7 +14,6 @@ import {
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
-import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -46,6 +45,56 @@ export class WorkoutPlanService {
   }
 
   /**
+   * Finds all private and public workout plans of an authenticated user or
+   * workout plans that the user has explicit access to.
+   * Only call this service function if the user has been successfully authenticated
+   *
+   * @param userId
+   * @param options
+   */
+  async findAllAccessibleByUser(userId: bigint, options: IPaginationOptions) {
+    const res = await paginate<WorkoutPlan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        where: [{ userId }],
+        relations: ['owner'],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPrivateWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
+
+  /**
+   * Finds all public workout plans where the user id is the owner
+   *
+   * @param userId
+   * @param options
+   */
+  async findAllPublicByUser(userId: bigint, options: IPaginationOptions) {
+    const res = await paginate<WorkoutPlan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        where: [{ userId, isPrivate: false }],
+        relations: ['owner'],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPublicWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
+
+  /**
    * Finds the workout plan according to plan name and returns it
    *
    * @param workoutPlanName
@@ -62,67 +111,14 @@ export class WorkoutPlanService {
   }
 
   /**
-   * Finds all private and public workout plans of an authenticated user.
-   * Only call this service function if the user has been successfully authenticated
-   *
-   * @param ownerId
-   * @param options
-   */
-  async findAllByAuthenticatedOwner(
-    ownerId: bigint,
-    options: IPaginationOptions,
-  ) {
-    const res = await paginate<WorkoutPlan>(
-      this.workoutPlanRepository,
-      options,
-      {
-        where: [{ userId: ownerId }],
-        relations: ['owner'],
-      },
-    );
-    return new Pagination(
-      res.items.map((elem) => {
-        return elem.createPrivateWorkoutDto();
-      }),
-      res.meta,
-      res.links,
-    );
-  }
-
-  /**
-   * Finds all public workout plans associated with the owner
-   *
-   * @param ownerId
-   * @param options
-   */
-  async findAllPublicByOwner(ownerId: bigint, options: IPaginationOptions) {
-    const res = await paginate<WorkoutPlan>(
-      this.workoutPlanRepository,
-      options,
-      {
-        where: [{ userId: ownerId, isPrivate: false }],
-        relations: ['owner'],
-      },
-    );
-    return new Pagination(
-      res.items.map((elem) => {
-        return elem.createPublicWorkoutDto();
-      }),
-      res.meta,
-      res.links,
-    );
-  }
-
-  /**
    * Saves a workout plan with an owner to the database
    *
    * @param createWorkoutPlanDto
-   * @param id
+   * @param userId
    */
-  async save(createWorkoutPlanDto: CreateWorkoutPlanDto, id: string) {
+  async save(createWorkoutPlanDto: CreateWorkoutPlanDto, userId: bigint) {
     const user = this.workoutPlanRepository.create(createWorkoutPlanDto);
-    user.userId = BigInt(id);
-    console.log(user);
+    user.userId = userId;
     await this.workoutPlanRepository.save(user);
   }
 

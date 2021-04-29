@@ -1,4 +1,20 @@
 export const Routes = {
+  user: {
+    controller: '/users',
+    get: {
+      one: '/:username',
+      workoutPlansByOne: '/:username/workout_plans',
+    },
+  },
+  authUser: {
+    controller: '/user',
+    get: {
+      workoutPlans: '/workout_plans',
+    },
+    post: {
+      workoutPlans: '/workout_plans',
+    },
+  },
   workoutPlan: {
     controller: 'workout_plans',
     get: {

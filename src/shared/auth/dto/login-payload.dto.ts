@@ -1,12 +1,12 @@
-import { UserDto } from '../../../modules/user/dto/user.dto';
 import { TokenPayloadDto } from './token-payload.dto';
+import { PrivateUserDto } from '../../../modules/user/dto/private-user.dto';
 
 export class LoginPayloadDto {
-  user: UserDto;
+  user: PrivateUserDto;
 
   token: TokenPayloadDto;
 
-  constructor(user: UserDto, token: TokenPayloadDto) {
+  constructor(user: PrivateUserDto, token: TokenPayloadDto) {
     this.user = user;
     this.token = token;
   }
