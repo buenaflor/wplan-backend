@@ -11,4 +11,15 @@ export const Routes = {
       one: '/:ownerName/:workoutPlanName',
     },
   },
+  auth: {
+    controller: 'auth',
+    post: {
+      login: '/login',
+      register: '/register',
+      resendEmail: '/mail/confirmation/resend/',
+    },
+    get: {
+      emailConfirmationToken: '/mail/confirmation/:token',
+    },
+  },
 };

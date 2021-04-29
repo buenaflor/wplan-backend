@@ -16,10 +16,10 @@ import { EmailVerificationService } from '../mail/verification/email-verificatio
 import { UserService } from '../../modules/user/user.service';
 import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { UserProfile } from '../../modules/user-profile/user-profile.entity';
 import { UserProfileService } from '../../modules/user-profile/user-profile.service';
+import { Routes } from '../../config/constants';
 
-@Controller('auth')
+@Controller(Routes.auth.controller)
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -29,7 +29,7 @@ export class AuthController {
     private userMapper: UserMapper,
   ) {}
 
-  @Post('/login')
+  @Post(Routes.auth.post.login)
   @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
     const accessToken = this.authService.createJWT(req.user);
@@ -44,7 +44,7 @@ export class AuthController {
    *
    * @param createUserDto
    */
-  @Post('/register')
+  @Post(Routes.auth.post.register)
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.userMapper.createUserDtoToEntity(createUserDto);
@@ -58,7 +58,7 @@ export class AuthController {
     return 'succ';
   }
 
-  @Get('/mail/confirmation/:token')
+  @Get(Routes.auth.get.emailConfirmationToken)
   @UseGuards(EmailConfirmationGuard)
   async confirmMail(@Request() req) {
     const emailVerification = req.emailVerification;
@@ -77,7 +77,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/mail/confirmation/resend/')
+  @Post(Routes.auth.post.resendEmail)
   async resendMail(@Request() req) {
     const userId = req.user.userId;
     const resendEmailUserDto = req.body;
