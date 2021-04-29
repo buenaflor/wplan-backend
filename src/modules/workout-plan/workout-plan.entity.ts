@@ -13,7 +13,25 @@ import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
 import { PrivateWorkoutPlanDto } from './dto/private-workout-plan.dto';
 
 @Entity({ name: 'workout_plan' })
-export class Workoutplan {
+export class WorkoutPlan {
+  constructor(
+    name: string,
+    description: string,
+    isCompleted: boolean,
+    isPrivate: boolean,
+    startDate: Date,
+    endDate: Date,
+    userId: bigint,
+  ) {
+    this.name = name;
+    this.description = description;
+    this.isCompleted = isCompleted;
+    this.isPrivate = isPrivate;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.userId = userId;
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 

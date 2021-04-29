@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
 
 export class CreateWorkoutPlanDto {
   @IsString()

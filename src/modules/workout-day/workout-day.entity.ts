@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Workoutplan } from '../workout-plan/workout-plan.entity';
+import { WorkoutPlan } from '../workout-plan/workout-plan.entity';
 import { ExerciseRoutine } from '../exercise-routine/exercise-routine.entity';
 
 @Entity({ name: 'workout_day' })
@@ -22,9 +22,9 @@ export class WorkoutDay {
   @Column({ type: 'varchar', length: 500 })
   description: string;
 
-  @ManyToOne(() => Workoutplan, (workoutPlan) => workoutPlan.id)
+  @ManyToOne(() => WorkoutPlan, (workoutPlan) => workoutPlan.id)
   @JoinColumn({ name: 'workout_plan_id' })
-  workoutPlan: Workoutplan;
+  workoutPlan: WorkoutPlan;
 
   @OneToMany(
     () => ExerciseRoutine,

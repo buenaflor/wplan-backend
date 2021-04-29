@@ -5,6 +5,8 @@ import {
   Param,
   Patch,
   Body,
+  HttpCode,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -51,8 +53,19 @@ export class WorkoutPlanController {
   @Patch('/:ownerName/:workoutPlanName')
   @UseGuards(JwtAuthGuard)
   async updateWorkoutPlanForUser(
+    @AuthUser() authUser,
+    @Param() params,
     @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
   ) {
-    console.log(updateWorkoutPlanDto.name);
+    const { ownerName, workoutPlanName } = params;
+    const { username, userId } = authUser;
+    if (ownerName !== username) {
+      throw new UnauthorizedException();
+    }
+    return await this.workoutPlanService.update(
+      updateWorkoutPlanDto,
+      workoutPlanName,
+      userId,
+    );
   }
 }

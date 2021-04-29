@@ -6,6 +6,7 @@ import {
   Body,
   HttpCode,
   Query,
+  Post,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -13,6 +14,7 @@ import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { AuthUser } from '../user/decorator/auth-user.decorator';
 import { PrivateUserDto } from '../user/dto/private-user.dto';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
+import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
 
 /**
  * This controller is responsible for handling authenticated user requests
@@ -50,7 +52,7 @@ export class AuthUserController {
     @AuthUser() authUser,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    await this.userService.update(updateUserDto, authUser.userId);
+    return await this.userService.update(updateUserDto, authUser.userId);
     // TODO: if changing email, verified changes to false, maybe with trigger?
   }
 
@@ -75,5 +77,15 @@ export class AuthUserController {
         limit: perPage,
       },
     );
+  }
+
+  @Post('workout_plans')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async createWorkoutPlan(
+    @AuthUser() authUser,
+    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
+  ) {
+    await this.workoutPlanService.save(createWorkoutPlanDTO);
   }
 }
