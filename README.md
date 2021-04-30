@@ -51,17 +51,28 @@
 - Invite collaborators to a specific workout plan
     - The owner or a collaborator with admin access can invite other collaborators
 
-### Workout Exercises
-
 ### Workout Day
+- Assigned to exactly one Workout Plan
+- Has many exercise routines
+
+### Exercise Routine
+- Exercise routines consist of the exercise and the array of workout sets
 
 ### Exercise Weightlifting Set
+- To differentiate from other types of sets, this weightlifting sets has: repetitions, weight, and a weight unit (kg, lbs)
+- In the future there could be duration sets for planks for example. You cannot track planks with a weightlifting set.
+
+### Exercise
+- Exercises have a name, license, author since users will be able to add new exercises.
+- Adding new exercises will have to go through a review procedure before being committed to the public exercise database (not yet implemented)
 
 ### License 
-
-### Exercises
-
-
+- licenes can be: 
+    - "Open Data Commons Open Database License"
+    - "Creative Commons Attribution 4"
+    - "Creative Commons Attribution Share Alike 3"
+    - "Creative Commons Attribution Share Alike 4"
+    - "Creative Commons Public Domain 1.0"
     
 ### Roles & Permissions
 #### Permission levels:
