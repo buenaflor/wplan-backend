@@ -91,7 +91,7 @@ export class AuthUserController {
     @AuthUser() authUser,
     @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
   ) {
-    // TODO: dont allow duplicate workout plan names
+    // TODO: dont allow duplicate workout plan names for a user
     await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
   }
 

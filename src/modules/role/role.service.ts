@@ -11,6 +11,10 @@ export class RoleService {
   ) {}
 
   async findOneById(id: number) {
-    return await this.roleRepository.find({ id });
+    return this.roleRepository.findOne({ id });
+  }
+
+  async findOneByName(name: string) {
+    return this.roleRepository.findOne({ name });
   }
 }

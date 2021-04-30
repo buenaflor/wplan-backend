@@ -1,8 +1,13 @@
+import { RoleEnum } from '../../role/role.enum';
+import { PermissionEnum } from '../../permission/permission.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { Permission } from '../../permission/permission.enum';
 
 export class InviteCollaboratorDto {
   @IsNotEmpty()
-  @IsEnum(Permission, { each: true })
-  readonly permission: Permission;
+  @IsEnum(PermissionEnum)
+  readonly permission: PermissionEnum;
+
+  @IsNotEmpty()
+  @IsEnum(RoleEnum)
+  readonly role: RoleEnum;
 }

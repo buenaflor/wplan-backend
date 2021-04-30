@@ -6,12 +6,16 @@ import { WorkoutPlanController } from './workout-plan.controller';
 import { WorkoutPlan } from './workout-plan.entity';
 import { UserModule } from '../user/user.module';
 import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
+import { PermissionModule } from '../permission/permission.module';
+import { RoleModule } from '../role/role.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WorkoutPlan]),
     forwardRef(() => UserModule),
     WorkoutPlanCollaboratorModule,
+    PermissionModule,
+    RoleModule,
   ],
   providers: [WorkoutPlanService],
   controllers: [WorkoutPlanController],

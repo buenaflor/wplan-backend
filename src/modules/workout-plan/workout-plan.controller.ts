@@ -10,7 +10,9 @@ import {
   HttpCode,
   NotFoundException,
   Put,
-} from '@nestjs/common';
+  Res, HttpStatus
+} from "@nestjs/common";
+import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
@@ -19,13 +21,20 @@ import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
+import { WorkoutPlanAccessGuard } from '../../guards/workout-plan-access.guard';
+import { UserService } from '../user/user.service';
 import { InviteCollaboratorDto } from '../workout-plan-collaborator/dto/invite-collaborator.dto';
+import { RoleService } from '../role/role.service';
+import { PermissionService } from '../permission/permission.service';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
   constructor(
     private readonly workoutPlanService: WorkoutPlanService,
     private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
+    private readonly userService: UserService,
+    private readonly roleService: RoleService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   /**
@@ -110,16 +119,48 @@ export class WorkoutPlanController {
     }
   }
 
+  /**
+   * Invites a user to be a collaborator to the
+   *
+   * @param params
+   * @param authUser
+   * @param inviteCollaboratorDto
+   * @param res
+   */
   @Put(Routes.workoutPlan.put.inviteCollaborator)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WorkoutPlanAccessGuard) //ToDo: workout exists guard
   async inviteCollaborator(
     @Param() params,
+    @AuthUser() authUser,
     @Body() inviteCollaboratorDto: InviteCollaboratorDto,
+    @Res() res: Response,
   ) {
-    const { ownerName, workoutPlanName, username } = params;
-
-    console.log(params);
-    // Send invitation
+    const { workoutPlanName, username } = params;
+    const inviterUserId = authUser.userId;
+    const invitee = await this.userService.findOnePublicUserByUsername(
+      username,
+    );
+    const workoutPlan = await this.workoutPlanService.findOneByName(
+      workoutPlanName,
+    );
+    const role = await this.roleService.findOneByName(
+      inviteCollaboratorDto.role,
+    );
+    const permission = await this.permissionService.findOneByName(
+      inviteCollaboratorDto.permission,
+    );
+    const invitation = await this.workoutPlanCollaboratorService.inviteCollaborator(
+      invitee.id,
+      workoutPlan.id,
+      role.id,
+      permission.id,
+      inviterUserId,
+    );
+    if (invitation) {
+      res.status(HttpStatus.OK).send(invitation);
+    } else {
+      res.status(HttpStatus.NO_CONTENT).send();
+    }
   }
 
   /**

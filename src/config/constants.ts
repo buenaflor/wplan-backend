@@ -35,7 +35,8 @@ export const Routes = {
       one: '/:ownerName/:workoutPlanName',
     },
     put: {
-      inviteCollaborator: '/:ownerName/:workoutPlanName/collaborators/:username',
+      inviteCollaborator:
+        '/:ownerName/:workoutPlanName/collaborators/:username',
     },
   },
   auth: {

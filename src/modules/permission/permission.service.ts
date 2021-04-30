@@ -11,6 +11,10 @@ export class PermissionService {
   ) {}
 
   async findOneById(id: number) {
-    return await this.permissionRepository.find({ id });
+    return this.permissionRepository.findOne({ id });
+  }
+
+  async findOneByName(name: string) {
+    return this.permissionRepository.findOne({ name });
   }
 }
