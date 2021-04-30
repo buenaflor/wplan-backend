@@ -27,6 +27,12 @@ import { UserService } from '../user/user.service';
 import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/invite-collaborator-request.dto';
 import { RoleService } from '../role/role.service';
 import { PermissionService } from '../permission/permission.service';
+import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
+import { PublicUserDto } from "../user/dto/public-user-dto";
+import { PublicWorkoutPlanDto } from "./dto/public-workout-plan.dto";
+import { WorkoutPlan } from "./decorator/workout-plan.decorator";
+import { Owner } from "../user/decorator/owner.decorator";
+import { PrivateUserDto } from "../user/dto/private-user.dto";
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -179,36 +185,23 @@ export class WorkoutPlanController {
    * is required.
    *
    * @param authUser
-   * @param params
+   * @param owner
+   * @param workoutPlan
    * @param updateWorkoutPlanDto
    */
   @Patch(Routes.workoutPlan.patch.one)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WorkoutPlanCollaboratorGuard)
   async updateWorkoutPlanForUser(
     @AuthUser() authUser,
-    @Param() params,
+    @Owner() owner: PublicUserDto,
+    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
     @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
   ) {
-    const { ownerName, workoutPlanName } = params;
-    const owner = await this.userService.findOnePublicUserByUsername(ownerName);
-    const workoutPlan = await this.workoutPlanService.findOneByNameAndUserId(
-      workoutPlanName,
+    return await this.workoutPlanService.update(
+      updateWorkoutPlanDto,
+      workoutPlan.id,
       owner.id,
     );
-    // TODO: make sure owner is also part of the collaborators
-    const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
-      workoutPlan.id,
-      authUser.userId,
-    );
-    if (isCollaborator) {
-      return await this.workoutPlanService.update(
-        updateWorkoutPlanDto,
-        workoutPlan.id,
-        owner.id,
-      );
-    } else {
-      throw new UnauthorizedException();
-    }
   }
 
   /**
