@@ -5,8 +5,8 @@ import {
   Patch,
   Body,
   HttpCode,
-  Post,
-} from '@nestjs/common';
+  Post, Delete, Param
+} from "@nestjs/common";
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
@@ -93,5 +93,20 @@ export class AuthUserController {
   ) {
     // TODO: dont allow duplicate workout plan names
     await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
+  }
+
+  @Get(Routes.authUser.get.workoutPlanInvitations)
+  async getWorkoutPlanInvitations(@Param() params) {
+
+  }
+
+  @Patch(Routes.authUser.patch.acceptWorkoutPlanInvitation)
+  async acceptWorkoutPlanInvitation() {
+
+  }
+
+  @Delete(Routes.authUser.delete.declineWorkoutPlanInvitation)
+  async declineWorkoutPlanInvitation() {
+
   }
 }

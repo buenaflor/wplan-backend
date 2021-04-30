@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { WorkoutPlanCollaboratorEntity } from './workout-plan-collaborator.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate, Pagination } from "nestjs-typeorm-paginate";
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class WorkoutPlanCollaboratorService {
@@ -27,6 +31,14 @@ export class WorkoutPlanCollaboratorService {
       res.meta,
       res.links,
     );
+  }
+
+  async inviteCollaborator(
+    workoutPlanId: number,
+    inviterId: number,
+    userId: number,
+  ) {
+
   }
 
   async isCollaborator(workoutPlanId: number, userId: bigint) {

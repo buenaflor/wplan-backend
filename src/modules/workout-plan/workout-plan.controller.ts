@@ -9,6 +9,7 @@ import {
   Delete,
   HttpCode,
   NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -18,6 +19,7 @@ import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
+import { InviteCollaboratorDto } from '../workout-plan-collaborator/dto/invite-collaborator.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -106,6 +108,18 @@ export class WorkoutPlanController {
     } else {
       throw new NotFoundException();
     }
+  }
+
+  @Put(Routes.workoutPlan.put.inviteCollaborator)
+  @UseGuards(JwtAuthGuard)
+  async inviteCollaborator(
+    @Param() params,
+    @Body() inviteCollaboratorDto: InviteCollaboratorDto,
+  ) {
+    const { ownerName, workoutPlanName, username } = params;
+
+    console.log(params);
+    // Send invitation
   }
 
   /**

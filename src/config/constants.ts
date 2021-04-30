@@ -10,9 +10,16 @@ export const Routes = {
     controller: '/user',
     get: {
       workoutPlans: '/workout_plans',
+      workoutPlanInvitations: '/workout_plan_invitations',
     },
     post: {
       workoutPlans: '/workout_plans',
+    },
+    patch: {
+      acceptWorkoutPlanInvitation: '/workout_plan_invitations/:invitationId',
+    },
+    delete: {
+      declineWorkoutPlanInvitation: '/workout_plan_invitations/:invitationId',
     },
   },
   workoutPlan: {
@@ -26,6 +33,9 @@ export const Routes = {
     },
     delete: {
       one: '/:ownerName/:workoutPlanName',
+    },
+    put: {
+      inviteCollaborator: '/:ownerName/:workoutPlanName/collaborators/:username',
     },
   },
   auth: {
