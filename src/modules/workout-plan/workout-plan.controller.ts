@@ -34,6 +34,8 @@ import { WorkoutPlan } from './decorator/workout-plan.decorator';
 import { Owner } from '../user/decorator/owner.decorator';
 import { PrivateUserDto } from '../user/dto/private-user.dto';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
+import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
+import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -102,7 +104,11 @@ export class WorkoutPlanController {
    * @param paginated
    */
   @Get(Routes.workoutPlan.get.collaborators)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorReadAccessGuard,
+  )
   async findCollaborators(
     @Param() params,
     @AuthUser() authUser,
@@ -145,7 +151,11 @@ export class WorkoutPlanController {
    * @param res
    */
   @Put(Routes.workoutPlan.put.inviteCollaborator)
-  @UseGuards(JwtAuthGuard, WorkoutPlanAccessGuard) //ToDo: workout exists guard
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
   async inviteCollaborator(
     @Param() params,
     @AuthUser() authUser,
@@ -213,7 +223,7 @@ export class WorkoutPlanController {
    * Deletes the workout plan according to the given params
    * An authenticated user and a valid workout plan name is required
    *
-   * If the user does not have permission, a not authorized error will be thrown
+   * The authenticated user has to be the owner of the workout plan
    *
    * @param authUser
    * @param params
