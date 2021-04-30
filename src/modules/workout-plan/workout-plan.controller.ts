@@ -113,14 +113,14 @@ export class WorkoutPlanController {
     );
     // If the authenticated user is the owner of the workout plan, grant access
     if (workoutPlan.owner.username === authUser.username) {
-      return await this.workoutPlanCollaboratorService.findAll(
+      return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
         workoutPlan.id,
         paginated,
       );
     }
     // If the authenticated user is not a collaborator, deny access
     if (isCollaborator) {
-      return await this.workoutPlanCollaboratorService.findAll(
+      return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
         workoutPlan.id,
         paginated,
       );

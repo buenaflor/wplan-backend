@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { WorkoutPlanCollaboratorEntity } from './workout-plan-collaborator.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,7 +29,10 @@ export class WorkoutPlanCollaboratorService {
    * @param workoutPlanId
    * @param options
    */
-  async findAll(workoutPlanId: number, options: IPaginationOptions) {
+  async findAllCollaboratorsByWorkoutPlanId(
+    workoutPlanId: number,
+    options: IPaginationOptions,
+  ) {
     const res = await paginate<WorkoutPlanCollaboratorEntity>(
       this.workoutPlanCollaboratorRepository,
       options,
@@ -41,6 +48,70 @@ export class WorkoutPlanCollaboratorService {
       res.meta,
       res.links,
     );
+  }
+
+  async findAllInvitationsByUserId(
+    userId: number,
+    options: IPaginationOptions,
+  ) {
+    const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
+      this.workoutPlanCollaboratorInvitationEntityRepository,
+      options,
+      {
+        where: [{ inviteeUserId: userId }],
+        relations: [
+          'workoutPlan',
+          'workoutPlan.owner',
+          'inviter',
+          'invitee',
+          'role',
+          'permission',
+        ],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createWorkoutPlanCollaboratorDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
+
+  /**
+   * Accepts a collaboration invitation
+   *
+   * @param invitationId
+   * @param userId
+   */
+  async acceptInvitation(invitationId: number, userId: number) {
+    const invitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
+      {
+        id: invitationId,
+        inviteeUserId: userId,
+      },
+    );
+    if (!invitation) {
+      throw new NotFoundException();
+    }
+    const collaborator = this.workoutPlanCollaboratorRepository.create();
+    collaborator.userId = invitation.inviteeUserId;
+    collaborator.workoutPlanId = invitation.workoutPlanId;
+    collaborator.roleId = invitation.roleId;
+    collaborator.permissionId = invitation.permissionId;
+    await this.workoutPlanCollaboratorRepository.save(collaborator);
+    const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
+      {
+        id: invitationId,
+        inviteeUserId: userId,
+      },
+    );
+    if (deleteResult.affected === 0) {
+      throw new NotFoundException();
+    }
+    if (deleteResult.affected > 1) {
+      throw new InternalServerErrorException();
+    }
   }
 
   /**

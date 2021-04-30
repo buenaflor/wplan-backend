@@ -5,8 +5,10 @@ import {
   Patch,
   Body,
   HttpCode,
-  Post, Delete, Param
-} from "@nestjs/common";
+  Post,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
@@ -16,6 +18,7 @@ import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
 import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
+import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 
 /**
  * This controller is responsible for handling authenticated user requests
@@ -27,6 +30,7 @@ export class AuthUserController {
   constructor(
     private userService: UserService,
     private workoutPlanService: WorkoutPlanService,
+    private workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
   ) {}
 
   /**
@@ -96,17 +100,29 @@ export class AuthUserController {
   }
 
   @Get(Routes.authUser.get.workoutPlanInvitations)
-  async getWorkoutPlanInvitations(@Param() params) {
-
+  @UseGuards(JwtAuthGuard)
+  async getWorkoutPlanInvitations(
+    @Paginated() paginated,
+    @AuthUser() authUser,
+  ) {
+    return await this.workoutPlanCollaboratorService.findAllInvitationsByUserId(
+      authUser.userId,
+      paginated,
+    );
   }
 
   @Patch(Routes.authUser.patch.acceptWorkoutPlanInvitation)
-  async acceptWorkoutPlanInvitation() {
-
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async acceptWorkoutPlanInvitation(@Param() params, @AuthUser() authUser) {
+    const { invitationId } = params;
+    console.log(invitationId + ' ' + authUser.userId);
+    return await this.workoutPlanCollaboratorService.acceptInvitation(
+      invitationId,
+      authUser.userId,
+    );
   }
 
   @Delete(Routes.authUser.delete.declineWorkoutPlanInvitation)
-  async declineWorkoutPlanInvitation() {
-
-  }
+  async declineWorkoutPlanInvitation() {}
 }
