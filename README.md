@@ -53,7 +53,7 @@
 
 ### Workout Day
 - Assigned to exactly one Workout Plan
-- Has many exercise routines
+- Can have multiple exercise routines
 
 ### Exercise Routine
 - Exercise routines consist of the exercise and the array of workout sets
@@ -67,7 +67,7 @@
 - Adding new exercises will have to go through a review procedure before being committed to the public exercise database (not yet implemented)
 
 ### License 
-- licenes can be: 
+- Licenses can be:
     - "Open Data Commons Open Database License"
     - "Creative Commons Attribution 4"
     - "Creative Commons Attribution Share Alike 3"
