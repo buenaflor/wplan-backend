@@ -16,7 +16,6 @@ export class WorkoutPlanCollaboratorDto {
     this.permission = permission;
   }
 
-  @IsEmpty()
   @IsNotEmpty()
   readonly id: number;
 

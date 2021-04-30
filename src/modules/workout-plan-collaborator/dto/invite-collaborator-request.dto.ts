@@ -2,7 +2,7 @@ import { RoleEnum } from '../../role/role.enum';
 import { PermissionEnum } from '../../permission/permission.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
-export class InviteCollaboratorDto {
+export class InviteCollaboratorRequestDto {
   @IsNotEmpty()
   @IsEnum(PermissionEnum)
   readonly permission: PermissionEnum;

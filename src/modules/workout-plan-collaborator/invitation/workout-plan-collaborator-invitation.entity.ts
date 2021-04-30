@@ -8,7 +8,8 @@ import {
 import { User } from '../../user/user.entity';
 import { RoleEntity } from '../../role/role.entity';
 import { PermissionEntity } from '../../permission/permission.entity';
-import { WorkoutPlanCollaboratorDto } from '../dto/workout-plan-collaborator.dto';
+import { WorkoutPlanCollaboratorInvitationDto } from '../dto/workout-plan-collaborator-invitation.dto';
+import { WorkoutPlan } from "../../workout-plan/workout-plan.entity";
 
 @Entity({ name: 'workout_plan_collaborator_invitation' })
 export class WorkoutPlanCollaboratorInvitationEntity {
@@ -30,9 +31,17 @@ export class WorkoutPlanCollaboratorInvitationEntity {
   @Column({ type: 'smallint', name: 'permission_id' })
   permissionId: number;
 
+  @ManyToOne(() => WorkoutPlan, (wPlan) => wPlan.id)
+  @JoinColumn({ name: 'workout_plan_id' })
+  workoutPlan: WorkoutPlan;
+
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'invitee_user_id' })
-  user: User;
+  invitee: User;
+
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'inviter_user_id' })
+  inviter: User;
 
   @ManyToOne(() => RoleEntity, (role) => role.id)
   @JoinColumn({ name: 'role_id' })
@@ -43,10 +52,12 @@ export class WorkoutPlanCollaboratorInvitationEntity {
   permission: PermissionEntity;
 
   createWorkoutPlanCollaboratorDto() {
-    return new WorkoutPlanCollaboratorDto(
+    return new WorkoutPlanCollaboratorInvitationDto(
       this.id,
+      this.workoutPlan.createPublicWorkoutDto(),
+      this.invitee.createPublicUserDto(),
+      this.inviter.createPublicUserDto(),
       this.role.createRoleDto(),
-      this.user.createPublicUserDto(),
       this.permission.createPermissionDto(),
     );
   }

@@ -23,7 +23,7 @@ import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 import { WorkoutPlanAccessGuard } from '../../guards/workout-plan-access.guard';
 import { UserService } from '../user/user.service';
-import { InviteCollaboratorDto } from '../workout-plan-collaborator/dto/invite-collaborator.dto';
+import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/invite-collaborator-request.dto';
 import { RoleService } from '../role/role.service';
 import { PermissionService } from '../permission/permission.service';
 
@@ -132,7 +132,7 @@ export class WorkoutPlanController {
   async inviteCollaborator(
     @Param() params,
     @AuthUser() authUser,
-    @Body() inviteCollaboratorDto: InviteCollaboratorDto,
+    @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
     @Res() res: Response,
   ) {
     const { workoutPlanName, username } = params;

@@ -37,6 +37,18 @@ export class WorkoutPlanCollaboratorService {
     );
   }
 
+  /**
+   * Creates an invitation from an inviter to an invitee for a workout plan
+   *
+   * issues: multiple redundant queries that are not natively supported by typeorm
+   * https://github.com/typeorm/typeorm/issues/3490
+   *
+   * @param inviteeUserId
+   * @param workoutPlanId
+   * @param roleId
+   * @param permissionId
+   * @param inviterUserId
+   */
   async inviteCollaborator(
     inviteeUserId: number,
     workoutPlanId: number,
@@ -62,12 +74,27 @@ export class WorkoutPlanCollaboratorService {
     if (invitationInDb) {
       invitation.id = invitationInDb.id;
     }
-    const newInvitation = await this.workoutPlanCollaboratorInvitationEntityRepository.save(
+    await this.workoutPlanCollaboratorInvitationEntityRepository.save(
       invitation,
     );
     // If inserted, return new invitation
     // If updated, return nothing
-    if (!invitationInDb) return newInvitation;
+    if (!invitationInDb) {
+      const finalInvitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
+        {
+          where: [{ workoutPlanId, inviterUserId, inviteeUserId }],
+          relations: [
+            'workoutPlan',
+            'workoutPlan.owner',
+            'inviter',
+            'invitee',
+            'role',
+            'permission',
+          ],
+        },
+      );
+      return finalInvitation.createWorkoutPlanCollaboratorDto();
+    }
   }
 
   async isCollaborator(workoutPlanId: number, userId: bigint) {
