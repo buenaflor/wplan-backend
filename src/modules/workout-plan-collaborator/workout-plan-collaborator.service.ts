@@ -201,14 +201,19 @@ export class WorkoutPlanCollaboratorService {
   }
 
   async isCollaborator(workoutPlanId: number, userId: bigint) {
-    const res = await this.workoutPlanCollaboratorRepository.find({
+    const res = await this.workoutPlanCollaboratorRepository.findOne({
       where: [
         {
           workoutPlanId,
           userId,
         },
       ],
+      relations: ['workoutPlan', 'user', 'role', 'permission'],
     });
-    return res.length !== 0;
+    if (!res) return false;
+    return {
+      isCollaborator: true,
+      collaborator: res.createWorkoutPlanCollaboratorDto(),
+    };
   }
 }

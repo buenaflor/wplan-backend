@@ -9,6 +9,7 @@ import { User } from '../user/user.entity';
 import { RoleEntity } from '../role/role.entity';
 import { PermissionEntity } from '../permission/permission.entity';
 import { WorkoutPlanCollaboratorDto } from './dto/workout-plan-collaborator.dto';
+import { WorkoutPlan } from '../workout-plan/workout-plan.entity';
 
 @Entity({ name: 'workout_plan_collaborator' })
 export class WorkoutPlanCollaboratorEntity {
@@ -26,6 +27,10 @@ export class WorkoutPlanCollaboratorEntity {
 
   @Column({ type: 'smallint', name: 'permission_id' })
   permissionId: number;
+
+  @ManyToOne(() => WorkoutPlan, (wPlan) => wPlan.id)
+  @JoinColumn({ name: 'workout_plan_id' })
+  workoutPlan: WorkoutPlan;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })

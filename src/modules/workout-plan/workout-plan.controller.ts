@@ -28,11 +28,12 @@ import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/i
 import { RoleService } from '../role/role.service';
 import { PermissionService } from '../permission/permission.service';
 import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
-import { PublicUserDto } from "../user/dto/public-user-dto";
-import { PublicWorkoutPlanDto } from "./dto/public-workout-plan.dto";
-import { WorkoutPlan } from "./decorator/workout-plan.decorator";
-import { Owner } from "../user/decorator/owner.decorator";
-import { PrivateUserDto } from "../user/dto/private-user.dto";
+import { PublicUserDto } from '../user/dto/public-user-dto';
+import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
+import { WorkoutPlan } from './decorator/workout-plan.decorator';
+import { Owner } from '../user/decorator/owner.decorator';
+import { PrivateUserDto } from '../user/dto/private-user.dto';
+import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -190,7 +191,11 @@ export class WorkoutPlanController {
    * @param updateWorkoutPlanDto
    */
   @Patch(Routes.workoutPlan.patch.one)
-  @UseGuards(JwtAuthGuard, WorkoutPlanCollaboratorGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorWriteAccessGuard,
+  )
   async updateWorkoutPlanForUser(
     @AuthUser() authUser,
     @Owner() owner: PublicUserDto,

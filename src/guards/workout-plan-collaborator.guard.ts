@@ -24,14 +24,15 @@ export class WorkoutPlanCollaboratorGuard implements CanActivate {
       workoutPlanName,
       owner.id,
     );
-    const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
+    const res = await this.workoutPlanCollaboratorService.isCollaborator(
       workoutPlanDto.id,
       authUser.userId,
     );
-    if (isCollaborator) {
+    if (res) {
       req.owner = owner;
       req.workoutPlan = workoutPlanDto;
+      req.collaborator = res.collaborator;
     }
-    return isCollaborator;
+    return res !== undefined;
   }
 }
