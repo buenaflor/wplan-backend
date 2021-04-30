@@ -82,7 +82,8 @@ Depending on how the permission levels can be setup, a role can be accompanied b
 
 For example: coach & read. 
 
-Roles are only accessory data that should only help the user identify a specific collaborator
+Roles are only accessory data that should only help the user identify a specific collaborator. 
+Although it doesn't make semantically sense to assign a coach with none permission even though syntactically it would be ok.
 
 
 
