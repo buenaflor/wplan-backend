@@ -111,6 +111,23 @@ export class WorkoutPlanService {
   }
 
   /**
+   * Finds the workout plan according to plan name and user id and returns it
+   *
+   * @param workoutPlanName
+   * @param userId
+   */
+  async findOneByNameAndUserId(workoutPlanName: string, userId: number) {
+    const workoutPlan = await this.workoutPlanRepository.findOne({
+      where: [{ name: workoutPlanName, userId }],
+      relations: ['owner'],
+    });
+    if (!workoutPlan) {
+      throw new NotFoundException();
+    }
+    return workoutPlan.createPublicWorkoutDto();
+  }
+
+  /**
    * Saves a workout plan with an owner to the database
    *
    * @param createWorkoutPlanDto

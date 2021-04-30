@@ -19,12 +19,18 @@ export class WorkoutPlanCollaboratorService {
     private workoutPlanCollaboratorInvitationEntityRepository: Repository<WorkoutPlanCollaboratorInvitationEntity>,
   ) {}
 
+  /**
+   * Finds and returns all collaborators of a specific workout plan
+   *
+   * @param workoutPlanId
+   * @param options
+   */
   async findAll(workoutPlanId: number, options: IPaginationOptions) {
     const res = await paginate<WorkoutPlanCollaboratorEntity>(
       this.workoutPlanCollaboratorRepository,
       options,
       {
-        where: [{ workoutPlanId }],
+        where: [{ workoutPlanId: workoutPlanId }],
         relations: ['user', 'role', 'permission'],
       },
     );

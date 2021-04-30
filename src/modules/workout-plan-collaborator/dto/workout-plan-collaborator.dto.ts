@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { PublicUserDto } from '../../user/dto/public-user-dto';
 import { PermissionDto } from '../../permission/dto/permission.dto';
 import { RoleDto } from '../../role/dto/RoleDto';
@@ -11,8 +11,8 @@ export class WorkoutPlanCollaboratorDto {
     permission: PermissionDto,
   ) {
     this.id = id;
-    this.role = role;
     this.user = user;
+    this.role = role;
     this.permission = permission;
   }
 
@@ -20,10 +20,10 @@ export class WorkoutPlanCollaboratorDto {
   readonly id: number;
 
   @IsNotEmpty()
-  readonly role: RoleDto;
+  readonly user: PublicUserDto;
 
   @IsNotEmpty()
-  readonly user: PublicUserDto;
+  readonly role: RoleDto;
 
   @IsNotEmpty()
   readonly permission: PermissionDto;

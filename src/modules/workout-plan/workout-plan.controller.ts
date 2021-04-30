@@ -10,8 +10,9 @@ import {
   HttpCode,
   NotFoundException,
   Put,
-  Res, HttpStatus
-} from "@nestjs/common";
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -100,14 +101,23 @@ export class WorkoutPlanController {
     @AuthUser() authUser,
     @Paginated() paginated,
   ) {
-    const { workoutPlanName } = params;
-    const workoutPlan = await this.workoutPlanService.findOneByName(
+    const { ownerName, workoutPlanName } = params;
+    const owner = await this.userService.findOnePublicUserByUsername(ownerName);
+    const workoutPlan = await this.workoutPlanService.findOneByNameAndUserId(
       workoutPlanName,
+      owner.id,
     );
     const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
       workoutPlan.id,
       authUser.userId,
     );
+    // If the authenticated user is the owner of the workout plan, grant access
+    if (workoutPlan.owner.username === authUser.username) {
+      return await this.workoutPlanCollaboratorService.findAll(
+        workoutPlan.id,
+        paginated,
+      );
+    }
     // If the authenticated user is not a collaborator, deny access
     if (isCollaborator) {
       return await this.workoutPlanCollaboratorService.findAll(
