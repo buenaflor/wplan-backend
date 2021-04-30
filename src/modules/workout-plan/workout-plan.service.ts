@@ -14,6 +14,7 @@ import {
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
+import { query } from "express";
 
 @Injectable()
 export class WorkoutPlanService {
@@ -118,7 +119,7 @@ export class WorkoutPlanService {
    */
   async findOneByNameAndUserId(workoutPlanName: string, userId: number) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ name: workoutPlanName, userId }],
+      where: [{ name: workoutPlanName, userId: userId }],
       relations: ['owner'],
     });
     if (!workoutPlan) {
@@ -148,29 +149,34 @@ export class WorkoutPlanService {
    * Note: returning('*') works for MS SQL Server or PostgreSQL
    *
    * @param updateWorkoutPlanDto
-   * @param workoutPlanName
+   * @param workoutPlanId
    * @param userId
    */
   async update(
     updateWorkoutPlanDto: UpdateWorkoutPlanDto,
-    workoutPlanName: string,
-    userId: bigint,
+    workoutPlanId: number,
+    userId: number,
   ) {
     const queryRes = await this.workoutPlanRepository
       .createQueryBuilder()
       .update(WorkoutPlan)
       .set(updateWorkoutPlanDto)
-      .where({ name: workoutPlanName, userId: userId })
-      .returning('*')
+      .where({ id: workoutPlanId, userId: userId })
       .execute();
-    if (queryRes.raw.isEmpty) {
-      throw new NotFoundException(
-        'Could not find a workout plan with name: ' + workoutPlanName,
-      );
+    if (queryRes.affected === 0) {
+      throw new NotFoundException('Could not find a workout plan');
     }
-    if (queryRes.raw.length > 1) {
+    if (queryRes.affected > 1) {
       throw new InternalServerErrorException();
     }
+    // not optimal, have to find another way of doing this in the future
+    // -> two queries instead of one
+    const workoutPlan = await this.workoutPlanRepository.findOne({
+      where: [{ id: workoutPlanId }],
+      relations: ['owner'],
+    });
+    if (!workoutPlan) throw new NotFoundException();
+    return workoutPlan.createPublicWorkoutDto();
   }
 
   async delete(criteria: FindConditions<WorkoutPlan>) {
