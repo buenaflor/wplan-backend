@@ -114,6 +114,21 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
+  async declineInvitation(invitationId: number, userId: number) {
+    const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
+      {
+        id: invitationId,
+        inviteeUserId: userId,
+      },
+    );
+    if (deleteResult.affected === 0) {
+      throw new NotFoundException();
+    }
+    if (deleteResult.affected > 1) {
+      throw new InternalServerErrorException();
+    }
+  }
+
   /**
    * Creates an invitation from an inviter to an invitee for a workout plan
    *

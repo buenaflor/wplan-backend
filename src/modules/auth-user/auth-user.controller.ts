@@ -99,6 +99,12 @@ export class AuthUserController {
     await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
   }
 
+  /**
+   * Returns a list of open invitations for the authenticated user
+   *
+   * @param paginated
+   * @param authUser
+   */
   @Get(Routes.authUser.get.workoutPlanInvitations)
   @UseGuards(JwtAuthGuard)
   async getWorkoutPlanInvitations(
@@ -111,18 +117,43 @@ export class AuthUserController {
     );
   }
 
+  /**
+   * Accepts a workout plan invitation
+   * Searches for an invitation with the invitation id and the authenticated user id
+   * saves the data as collaborator to the workout plan and deletes the invitation.
+   *
+   * If no match is found, a not found exception is thrown
+   *
+   * @param params
+   * @param authUser
+   */
   @Patch(Routes.authUser.patch.acceptWorkoutPlanInvitation)
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async acceptWorkoutPlanInvitation(@Param() params, @AuthUser() authUser) {
     const { invitationId } = params;
-    console.log(invitationId + ' ' + authUser.userId);
     return await this.workoutPlanCollaboratorService.acceptInvitation(
       invitationId,
       authUser.userId,
     );
   }
 
+  /**
+   * Declines a workout plan invitation
+   * Searches for an invitation with the invitation id and the authenticated user id
+   * and deletes it. If no match is found, a not found exception is thrown
+   *
+   * @param params
+   * @param authUser
+   */
   @Delete(Routes.authUser.delete.declineWorkoutPlanInvitation)
-  async declineWorkoutPlanInvitation() {}
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async declineWorkoutPlanInvitation(@Param() params, @AuthUser() authUser) {
+    const { invitationId } = params;
+    return this.workoutPlanCollaboratorService.declineInvitation(
+      invitationId,
+      authUser.userId,
+    );
+  }
 }
