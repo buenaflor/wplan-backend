@@ -18,6 +18,8 @@ import { AuthUserModule } from './modules/auth-user/auth-user.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
 import { WorkoutPlanCollaboratorModule } from './modules/workout-plan-collaborator/workout-plan-collaborator.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -25,6 +27,12 @@ import { WorkoutPlanCollaboratorModule } from './modules/workout-plan-collaborat
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: databaseConfig,
+    }),
+    ThrottlerModule.forRoot({
+      // Time to live in seconds
+      ttl: 60,
+      // Limited number of requests in ttl
+      limit: 30,
     }),
     WorkoutPlanModule,
     MuscleGroupModule,
@@ -41,6 +49,12 @@ import { WorkoutPlanCollaboratorModule } from './modules/workout-plan-collaborat
     PermissionModule,
     RoleModule,
     WorkoutPlanCollaboratorModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
