@@ -22,7 +22,6 @@ import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
-import { WorkoutPlanAccessGuard } from '../../guards/workout-plan-access.guard';
 import { UserService } from '../user/user.service';
 import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/invite-collaborator-request.dto';
 import { RoleService } from '../role/role.service';
@@ -32,7 +31,6 @@ import { PublicUserDto } from '../user/dto/public-user-dto';
 import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
 import { WorkoutPlan } from './decorator/workout-plan.decorator';
 import { Owner } from '../user/decorator/owner.decorator';
-import { PrivateUserDto } from '../user/dto/private-user.dto';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
@@ -99,7 +97,8 @@ export class WorkoutPlanController {
    * Requires an authenticated user and if the auth user is not
    * a collaborator then deny access to the resource
    *
-   * @param params
+   * @param owner
+   * @param workoutPlan
    * @param authUser
    * @param paginated
    */
@@ -110,44 +109,25 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorReadAccessGuard,
   )
   async findCollaborators(
-    @Param() params,
+    @Owner() owner: PublicUserDto,
+    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
     @AuthUser() authUser,
     @Paginated() paginated,
   ) {
-    const { ownerName, workoutPlanName } = params;
-    const owner = await this.userService.findOnePublicUserByUsername(ownerName);
-    const workoutPlan = await this.workoutPlanService.findOneByNameAndUserId(
-      workoutPlanName,
-      owner.id,
-    );
-    // If the authenticated user is the owner of the workout plan, grant access
-    if (workoutPlan.owner.username === authUser.username) {
-      return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
-        workoutPlan.id,
-        paginated,
-      );
-    }
-    // If the authenticated user is not a collaborator, deny access
-    const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
+    return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
       workoutPlan.id,
-      authUser.userId,
+      paginated,
     );
-    if (isCollaborator) {
-      return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
-        workoutPlan.id,
-        paginated,
-      );
-    } else {
-      throw new NotFoundException();
-    }
   }
 
   /**
    * Invites a user to be a collaborator to the
    *
-   * @param params
+   * @param owner
+   * @param workoutPlan
    * @param authUser
    * @param inviteCollaboratorDto
+   * @param params
    * @param res
    */
   @Put(Routes.workoutPlan.put.inviteCollaborator)
@@ -157,18 +137,17 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorAdminAccessGuard,
   )
   async inviteCollaborator(
-    @Param() params,
+    @Owner() owner: PublicUserDto,
+    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
     @AuthUser() authUser,
     @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
+    @Param() params,
     @Res() res: Response,
   ) {
-    const { workoutPlanName, username } = params;
+    const { username } = params;
     const inviterUserId = authUser.userId;
     const invitee = await this.userService.findOnePublicUserByUsername(
       username,
-    );
-    const workoutPlan = await this.workoutPlanService.findOneByName(
-      workoutPlanName,
     );
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
