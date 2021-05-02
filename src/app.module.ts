@@ -32,7 +32,7 @@ import { APP_GUARD } from '@nestjs/core';
       // Time to live in seconds
       ttl: 60,
       // Limited number of requests in ttl
-      limit: 30,
+      limit: 20,
     }),
     WorkoutPlanModule,
     MuscleGroupModule,

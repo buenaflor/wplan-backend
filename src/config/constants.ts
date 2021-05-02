@@ -1,3 +1,6 @@
+const owner = 'ownerUsername';
+const workoutPlan = 'workoutPlanName';
+
 export const Routes = {
   user: {
     controller: '/users',
