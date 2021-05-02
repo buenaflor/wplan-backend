@@ -5,6 +5,7 @@ import {
   Request,
   Body,
   Get,
+  Put,
 } from '@nestjs/common';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
@@ -73,7 +74,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(Routes.auth.post.resendEmail)
+  @Put(Routes.auth.post.resendEmail)
   async resendMail(@Request() req) {
     const userId = req.user.userId;
     const resendEmailUserDto = req.body;
