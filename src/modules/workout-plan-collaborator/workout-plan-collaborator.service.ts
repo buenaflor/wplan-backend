@@ -90,6 +90,23 @@ export class WorkoutPlanCollaboratorService {
   }
 
   /**
+   * Returns true if the invitation exists for a user and a workout plan
+   * otherwise false
+   *
+   * @param workoutPlanId
+   * @param userId
+   */
+  async invitationExists(workoutPlanId: number, userId: number) {
+    const invitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
+      {
+        workoutPlanId,
+        inviteeUserId: userId,
+      },
+    );
+    return !!invitation;
+  }
+
+  /**
    * Accepts a collaboration invitation
    *
    * @param invitationId

@@ -121,7 +121,8 @@ export class WorkoutPlanController {
   }
 
   /**
-   * Invites a user to be a collaborator to the
+   * Invites a user to be a collaborator to the workout plan
+   * A user should only have at most one invitation to a specific workout plan
    *
    * @param owner
    * @param workoutPlan
@@ -149,6 +150,15 @@ export class WorkoutPlanController {
     const invitee = await this.userService.findOnePublicUserByUsername(
       username,
     );
+    // If the invitation already exists, then we don't need to do any further work
+    if (
+      await this.workoutPlanCollaboratorService.invitationExists(
+        workoutPlan.id,
+        invitee.id,
+      )
+    ) {
+      res.status(HttpStatus.NO_CONTENT).send();
+    }
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
     );
