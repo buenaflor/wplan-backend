@@ -23,6 +23,10 @@
 - JSON Web Tokens for authentication and authorization
 - Docker for containerization
 
+## Database
+
+Currently, the PostgreSQL test development database "wplan_dev" is hosted on Microsoft Azure.
+
 ## Environment
 
 ### Development
