@@ -121,7 +121,10 @@ export class WorkoutPlanController {
   }
 
   /**
-   * Invites a user to be a collaborator to the
+   * Invites a user to be a collaborator to the workout plan
+   * A user can only have one invitation per workout plan
+   * Sending multiple invitations by multiple users will only replace
+   * the current invitation in the database
    *
    * @param owner
    * @param workoutPlan

@@ -168,7 +168,6 @@ export class WorkoutPlanCollaboratorService {
     const invitationInDb = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
       {
         workoutPlanId,
-        inviterUserId,
         inviteeUserId,
       },
     );
