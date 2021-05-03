@@ -158,6 +158,7 @@ export class WorkoutPlanController {
       )
     ) {
       res.status(HttpStatus.NO_CONTENT).send();
+      return;
     }
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
