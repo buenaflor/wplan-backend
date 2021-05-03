@@ -45,12 +45,12 @@ EMAIL_HOST=
 EMAIL_PORT=
   
 # Database  
-DB_TYPE=
-DB_HOST=
-DB_PORT=
+DB_TYPE=pg
+DB_HOST=wplan-test-dev.postgres.database.azure.com
+DB_PORT=5432
 DB_USER=
 DB_PASS=
-DB_NAME=
+DB_NAME=wplan_dev
   
 # JWT  
 JWT_SECRET=
