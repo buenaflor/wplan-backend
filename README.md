@@ -2,7 +2,7 @@
 
 # wplan Backend
 
-## Read about the current state of [features](https://github.com/buenaflor/wplan-backend/wiki/Naming-Conventions-and-Routes) 
+## Read about the current state of [features](https://github.com/buenaflor/wplan-backend/wiki/Features) 
 
 ## TODO
 
