@@ -15,9 +15,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { raw } from "express";
-import { camelCase } from "typeorm/util/StringUtils";
-import { CreateUserDto } from "./dto/create-user.dto";
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
