@@ -150,16 +150,6 @@ export class WorkoutPlanController {
     const invitee = await this.userService.findOnePublicUserByUsername(
       username,
     );
-    // If the invitation already exists, then we don't need to do any further work
-    if (
-      await this.workoutPlanCollaboratorService.invitationExists(
-        workoutPlan.id,
-        invitee.id,
-      )
-    ) {
-      res.status(HttpStatus.NO_CONTENT).send();
-      return;
-    }
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
     );
