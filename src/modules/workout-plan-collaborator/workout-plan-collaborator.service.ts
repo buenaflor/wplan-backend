@@ -23,15 +23,16 @@ export class WorkoutPlanCollaboratorService {
     private workoutPlanCollaboratorInvitationEntityRepository: Repository<WorkoutPlanCollaboratorInvitationEntity>,
   ) {}
 
-  async findOneCollaborator(workoutPlanId: number, collaboratorId: number) {
-    const collaborator = this.workoutPlanCollaboratorRepository.findOne({
-      workoutPlanId,
+  /**
+   * Returns all workout plan ids where the given user id is a collaborator
+   *
+   * @param collaboratorId
+   */
+  async findAllWorkoutPlanIdsForCollaborator(collaboratorId: number) {
+    const res = await this.workoutPlanCollaboratorRepository.find({
       userId: collaboratorId,
     });
-    if (!collaborator) {
-      throw new NotFoundException();
-    }
-    return collaborator;
+    return res.map((elem) => elem.workoutPlanId);
   }
 
   /**

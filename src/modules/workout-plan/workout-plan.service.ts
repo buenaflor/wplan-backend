@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { WorkoutPlan } from './workout-plan.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   paginate,
@@ -14,13 +14,14 @@ import {
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
-import { query } from "express";
+import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 
 @Injectable()
 export class WorkoutPlanService {
   constructor(
     @InjectRepository(WorkoutPlan)
     private workoutPlanRepository: Repository<WorkoutPlan>,
+    private workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
   ) {}
 
   /**
@@ -53,12 +54,15 @@ export class WorkoutPlanService {
    * @param userId
    * @param options
    */
-  async findAllAccessibleByUser(userId: bigint, options: IPaginationOptions) {
+  async findAllAccessibleByUser(userId: number, options: IPaginationOptions) {
+    const collabWorkoutPlanIds = await this.workoutPlanCollaboratorService.findAllWorkoutPlanIdsForCollaborator(
+      userId,
+    );
     const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
       options,
       {
-        where: [{ userId }],
+        where: [{ userId }, { id: In(collabWorkoutPlanIds) }],
         relations: ['owner'],
       },
     );

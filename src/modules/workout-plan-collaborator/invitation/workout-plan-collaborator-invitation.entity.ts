@@ -9,7 +9,7 @@ import { User } from '../../user/user.entity';
 import { RoleEntity } from '../../role/role.entity';
 import { PermissionEntity } from '../../permission/permission.entity';
 import { WorkoutPlanCollaboratorInvitationDto } from '../dto/workout-plan-collaborator-invitation.dto';
-import { WorkoutPlan } from "../../workout-plan/workout-plan.entity";
+import { WorkoutPlan } from '../../workout-plan/workout-plan.entity';
 
 @Entity({ name: 'workout_plan_collaborator_invitation' })
 export class WorkoutPlanCollaboratorInvitationEntity {
