@@ -1,5 +1,7 @@
 -- user ids are hard coded values, be careful
--- created with mockaroo: https://www.mockaroo.com/schemas/312130, https://www.mockaroo.com/2bdd3100
+-- created with mockaroo:
+-- https://www.mockaroo.com/schemas/312130
+-- https://www.mockaroo.com/2bdd3100
 
 insert into workout_plan (name, user_id, description) values ('Bjorn', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Burn of second degree of toe(s) (nail)');
 insert into workout_plan (name, user_id, description) values ('Peggie', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Poisoning by other psychotropic drugs, accidental (unintentional)');
