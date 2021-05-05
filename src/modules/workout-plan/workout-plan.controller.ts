@@ -36,6 +36,7 @@ import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-pl
 import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
 import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
+import { WorkoutPlanId } from "./decorator/workout-plan-id.decorator";
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -72,13 +73,12 @@ export class WorkoutPlanController {
    * Otherwise, the authenticated owner of the workout plan, will be able
    * to fetch the resource
    *
-   * @param params
+   * @param workoutPlanId
    * @param authUser
    */
   @Get(Routes.workoutPlan.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
-  async getOne(@Param() params, @AuthUser() authUser) {
-    const { workoutPlanId } = params;
+  async getOne(@WorkoutPlanId() workoutPlanId: string, @AuthUser() authUser) {
     const workoutPlanDto = await this.workoutPlanService.findOneById(
       workoutPlanId,
     );
@@ -100,10 +100,9 @@ export class WorkoutPlanController {
   /**
    * Returns the collaborators of a workout plan
    * Requires an authenticated user and if the auth user is not
-   * a collaborator then deny access to the resource
+   * a collaborator with at least read permission then deny access to the resource
    *
-   * @param owner
-   * @param workoutPlan
+   * @param workoutPlanId
    * @param authUser
    * @param paginated
    */
@@ -114,13 +113,12 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorReadAccessGuard,
   )
   async findCollaborators(
-    @Owner() owner: PublicUserDto,
-    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
+    @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser,
     @Paginated() paginated,
   ) {
     return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
-      workoutPlan.id,
+      workoutPlanId,
       paginated,
     );
   }
