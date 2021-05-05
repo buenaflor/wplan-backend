@@ -19,8 +19,8 @@ export class WorkoutPlanCollaboratorEntity {
   @Column({ type: 'integer', name: 'workout_plan_id' })
   workoutPlanId: number;
 
-  @Column({ type: 'bigint', name: 'user_id' })
-  userId: number;
+  @Column({ name: 'user_id' })
+  userId: string;
 
   @Column({ type: 'smallint', name: 'role_id' })
   roleId: number;

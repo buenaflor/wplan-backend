@@ -25,9 +25,12 @@ export class AuthService {
     if (user && (await argon2.verify(user.password, pass))) {
       return new PrivateUserDto(
         user.id,
-        user.username,
+        user.login,
+        user.name,
         user.email,
+        user.bio,
         user.createdAt,
+        user.updatedAt,
         user.lastLoginAt,
         user.isEmailConfirmed,
       );
@@ -39,7 +42,7 @@ export class AuthService {
     await this.userService.updateLoginDate(userId);
   }
 
-  async createEmailVerification(userId: number) {
+  async createEmailVerification(userId: string) {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
     const emailVerification = new EmailVerification(verificationToken, userId);
@@ -51,7 +54,7 @@ export class AuthService {
   }
 
   createJWT(user: User) {
-    const payload = { username: user.username, id: user.id };
+    const payload = { username: user.login, id: user.id };
     return {
       expiresIn: this.configService.getNumber('JWT_EXPIRATION_DURATION'),
       accessToken: this.jwtService.sign(payload),

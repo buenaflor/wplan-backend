@@ -11,5 +11,8 @@ export const databaseConfig = (configService: ConfigService) => {
     database: configService.get('DB_NAME'),
     entities: ['dist/**/*.entity.js'],
     synchronize: false,
+    extra: {
+      ssl: true,
+    },
   } as TypeOrmModuleOptions;
 };

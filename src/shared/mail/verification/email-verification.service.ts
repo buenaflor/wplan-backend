@@ -24,7 +24,7 @@ export class EmailVerificationService {
     });
   }
 
-  async deleteByUserId(id: number) {
+  async deleteByUserId(id: string) {
     await this.emailVerificationRepository.delete({
       userId: id,
     });

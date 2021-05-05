@@ -50,12 +50,10 @@ export class AuthController {
       user.id,
     );
     await this.authService.sendMail(user.email, emailVerification);
-    // TODO: maybe expiration time for email confirmation?
-    // TODO: return a user DTO
-    return 'succ';
+    return user;
   }
 
-  @Get(Routes.auth.get.emailConfirmationToken)
+  @Post(Routes.auth.get.emailConfirmationToken)
   @UseGuards(EmailConfirmationGuard)
   async confirmMail(@Request() req) {
     const emailVerification = req.emailVerification;
@@ -67,9 +65,13 @@ export class AuthController {
     if (verified) {
       const userId = emailVerification.userId;
       await this.userService.updateEmailConfirmed(userId, true);
-      return 'verified';
+      return {
+        message: 'Success, your account has been verified',
+      };
     }
-    return 'token expired';
+    return {
+      message: 'Token expired. Resend the email verification',
+    };
     // TODO: return an email verification DTO
   }
 
@@ -79,7 +81,6 @@ export class AuthController {
     const userId = req.user.userId;
     const resendEmailUserDto = req.body;
     await this.emailVerificationService.deleteByUserId(userId);
-
     const emailVerification = await this.authService.createEmailVerification(
       resendEmailUserDto.id,
     );

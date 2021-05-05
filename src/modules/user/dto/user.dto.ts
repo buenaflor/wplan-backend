@@ -13,48 +13,55 @@ import {
  */
 export class UserDto {
   constructor(
-    id: number,
-    username: string,
+    id: string,
+    login: string,
+    name: string,
     email: string,
+    bio: string,
     password: string,
     createdAt: Date,
+    updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
   ) {
     this.id = id;
-    this.username = username;
+    this.login = login;
+    this.name = name;
     this.email = email;
+    this.bio = bio;
     this.password = password;
     this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
     this.lastLoginAt = lastLoginAt;
     this.isEmailConfirmed = isEmailConfirmed;
   }
 
-  @IsNumber()
   @IsNotEmpty()
-  readonly id: number;
+  readonly id: string;
 
-  @IsString()
   @IsNotEmpty()
-  readonly username: string;
+  readonly login: string;
 
-  @IsString()
+  @IsNotEmpty()
+  readonly name: string;
+
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @IsString()
+  readonly bio: string;
+
   @IsNotEmpty()
   readonly password: string;
 
-  @IsDate()
   @IsNotEmpty()
-  createdAt: Date;
+  readonly createdAt: Date;
 
-  @IsDate()
-  lastLoginAt: Date;
-
-  @IsBoolean()
   @IsNotEmpty()
-  isEmailConfirmed: boolean;
+  readonly updatedAt: Date;
+
+  readonly lastLoginAt: Date;
+
+  @IsNotEmpty()
+  readonly isEmailConfirmed: boolean;
 }

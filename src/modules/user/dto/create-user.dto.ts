@@ -15,7 +15,11 @@ import {
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  readonly username: string;
+  readonly login: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly name: string;
 
   @IsString()
   @IsEmail()

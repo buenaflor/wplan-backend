@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsEmail,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 /**
  * DTO that encapsulates user data that is publicly available
@@ -12,36 +6,49 @@ import {
  */
 export class PublicUserDto {
   constructor(
-    id: number,
-    username: string,
+    id: string,
+    login: string,
+    name: string,
     email: string,
+    bio: string,
     createdAt: Date,
+    updatedAt: Date,
     lastLoginAt: Date,
   ) {
     this.id = id;
-    this.username = username;
+    this.login = login;
+    this.name = name;
     this.email = email;
+    this.bio = bio;
     this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
     this.lastLoginAt = lastLoginAt;
   }
 
   @IsNotEmpty()
-  @IsNumber()
-  readonly id: number;
+  readonly id: string;
 
-  @IsString()
   @IsNotEmpty()
-  readonly username: string;
+  @Length(3, 40)
+  readonly login: string;
 
-  @IsString()
+  @IsNotEmpty()
+  @Length(3, 40)
+  readonly name: string;
+
+  @Length(0, 160)
+  readonly bio: string;
+
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @IsDate()
   @IsNotEmpty()
   readonly createdAt: Date;
 
-  @IsDate()
+  @IsNotEmpty()
+  readonly updatedAt: Date;
+
+  @IsNotEmpty()
   readonly lastLoginAt: Date;
 }

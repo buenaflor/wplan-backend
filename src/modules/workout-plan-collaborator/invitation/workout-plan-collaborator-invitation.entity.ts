@@ -19,11 +19,11 @@ export class WorkoutPlanCollaboratorInvitationEntity {
   @Column({ type: 'integer', name: 'workout_plan_id' })
   workoutPlanId: number;
 
-  @Column({ type: 'bigint', name: 'invitee_user_id' })
-  inviteeUserId: number;
+  @Column({ name: 'invitee_user_id' })
+  inviteeUserId: string;
 
-  @Column({ type: 'bigint', name: 'inviter_user_id' })
-  inviterUserId: number;
+  @Column({ name: 'inviter_user_id' })
+  inviterUserId: string;
 
   @Column({ type: 'smallint', name: 'role_id' })
   roleId: number;

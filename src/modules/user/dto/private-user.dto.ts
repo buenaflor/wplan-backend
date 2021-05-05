@@ -7,60 +7,29 @@ import {
   IsString,
 } from 'class-validator';
 import { User } from '../user.entity';
+import { PublicUserDto } from './public-user-dto';
 
 /**
  * DTO that encapsulates user data that is privately available
  *
  */
-export class PrivateUserDto {
+export class PrivateUserDto extends PublicUserDto {
   constructor(
-    id: number,
-    username: string,
+    id: string,
+    login: string,
+    name: string,
     email: string,
+    bio: string,
     createdAt: Date,
+    updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
   ) {
-    this.id = id;
-    this.username = username;
-    this.email = email;
-    this.createdAt = createdAt;
-    this.lastLoginAt = lastLoginAt;
+    super(id, login, name, email, bio, createdAt, updatedAt, lastLoginAt);
     this.isEmailConfirmed = isEmailConfirmed;
   }
-
-  @IsNotEmpty()
-  @IsNumber()
-  readonly id: number;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly username: string;
-
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty()
-  readonly email: string;
-
-  @IsDate()
-  @IsNotEmpty()
-  readonly createdAt: Date;
-
-  @IsDate()
-  readonly lastLoginAt: Date;
 
   @IsBoolean()
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
-
-  static createFromUser(user: User) {
-    return new PrivateUserDto(
-      user.id,
-      user.username,
-      user.email,
-      user.createdAt,
-      user.lastLoginAt,
-      user.isEmailConfirmed,
-    );
-  }
 }

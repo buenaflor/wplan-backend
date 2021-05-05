@@ -65,7 +65,7 @@ export class UserService {
    * @param username
    */
   async findOnePublicUserByUsername(username: string): Promise<PublicUserDto> {
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
@@ -74,13 +74,25 @@ export class UserService {
     return user.createPublicUserDto();
   }
 
+  async loginNameExists(login: string) {
+    const user = await this.userRepository.findOne({ login });
+    return !!user;
+  }
+
+  async emailExists(email: string) {
+    const user = await this.userRepository.findOne({ email });
+    return !!user;
+  }
+
   /**
    * Finds a user and returns the publicly and privately available info of that user
    *
    * @param username
    */
-  async findOnePrivateUserByUsername(username: string): Promise<PublicUserDto> {
-    const user = await this.userRepository.findOne({ username });
+  async findOnePrivateUserByUsername(
+    username: string,
+  ): Promise<PrivateUserDto> {
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
@@ -102,7 +114,7 @@ export class UserService {
    * @param username
    */
   async findOneInternalUserByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
@@ -159,7 +171,8 @@ export class UserService {
 
   // CREATE REQUESTS
 
-  save(user: CreateUserDto) {
-    return this.userRepository.save(user);
+  async save(user: CreateUserDto) {
+    const userFromDb = await this.userRepository.save(user);
+    return userFromDb.createPrivateUserDto();
   }
 }
