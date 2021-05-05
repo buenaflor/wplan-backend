@@ -86,6 +86,9 @@ export class User {
       this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
+      this.collaborators,
+      this.publicWorkoutPlans,
+      this.privateWorkoutPlans,
     );
   }
 
@@ -114,6 +117,9 @@ export class User {
       this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
+      this.collaborators,
+      this.publicWorkoutPlans,
+      this.privateWorkoutPlans,
     );
   }
 }

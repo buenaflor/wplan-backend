@@ -33,6 +33,9 @@ export class AuthService {
         user.updatedAt,
         user.lastLoginAt,
         user.isEmailConfirmed,
+        user.collaborators,
+        user.publicWorkoutPlans,
+        user.privateWorkoutPlans,
       );
     }
     return null;
