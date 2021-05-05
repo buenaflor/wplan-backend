@@ -38,6 +38,6 @@ export class UserProfileDto {
   isPublic: boolean;
 
   static createFromUser(user: User) {
-    return new UserProfileDto(user.id, user.username, user.email, '', '', '');
+    return new UserProfileDto(user.id, user.login, user.email, '', '', '');
   }
 }

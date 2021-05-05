@@ -13,7 +13,7 @@ import {
  */
 export class UserDto {
   constructor(
-    id: number,
+    id: string,
     username: string,
     email: string,
     password: string,
@@ -30,9 +30,9 @@ export class UserDto {
     this.isEmailConfirmed = isEmailConfirmed;
   }
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly id: number;
+  readonly id: string;
 
   @IsString()
   @IsNotEmpty()

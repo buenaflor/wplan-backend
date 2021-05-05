@@ -54,7 +54,7 @@ export class WorkoutPlanService {
    * @param userId
    * @param options
    */
-  async findAllAccessibleByUser(userId: number, options: IPaginationOptions) {
+  async findAllAccessibleByUser(userId: string, options: IPaginationOptions) {
     const collabWorkoutPlanIds = await this.workoutPlanCollaboratorService.findAllWorkoutPlanIdsForCollaborator(
       userId,
     );
@@ -81,7 +81,7 @@ export class WorkoutPlanService {
    * @param userId
    * @param options
    */
-  async findAllPublicByUser(userId: number, options: IPaginationOptions) {
+  async findAllPublicByUser(userId: string, options: IPaginationOptions) {
     const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
       options,
@@ -121,7 +121,7 @@ export class WorkoutPlanService {
    * @param workoutPlanName
    * @param userId
    */
-  async findOneByNameAndUserId(workoutPlanName: string, userId: number) {
+  async findOneByNameAndUserId(workoutPlanName: string, userId: string) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
       where: [{ name: workoutPlanName, userId: userId }],
       relations: ['owner'],
@@ -159,7 +159,7 @@ export class WorkoutPlanService {
   async update(
     updateWorkoutPlanDto: UpdateWorkoutPlanDto,
     workoutPlanId: number,
-    userId: number,
+    userId: string,
   ) {
     const queryRes = await this.workoutPlanRepository
       .createQueryBuilder()

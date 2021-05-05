@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import * as argon2 from 'argon2';
 import { PrivateUserDto } from './dto/private-user.dto';
@@ -14,34 +15,52 @@ import { UserDto } from './dto/user.dto';
 @Entity({ name: 'user' })
 export class User {
   constructor(
-    id?: number,
+    id?: string,
     username?: string,
     email?: string,
     password?: string,
   ) {
     this.id = id;
-    this.username = username;
+    this.login = username;
     this.email = email;
     this.password = password;
     this.createdAt = new Date();
   }
 
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  username: string;
+  @Column({ length: 40 })
+  login: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ length: 40 })
+  name: string;
+
+  @Column({ length: 128 })
+  password: string;
+
+  @Column()
   email: string;
 
-  @Column({ type: 'varchar', length: 128 })
-  password: string;
+  @Column({ length: 160 })
+  bio: string;
+
+  @Column()
+  collaborators: number;
+
+  @Column({ name: 'public_workout_plans' })
+  publicWorkoutPlans: number;
+
+  @Column({ name: 'private_workout_plans' })
+  privateWorkoutPlans: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ type: 'timestamptz', name: 'last_login_at' })
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @Column({ name: 'last_login_at' })
   lastLoginAt: Date;
 
   @Column({ type: 'boolean', name: 'email_confirmed' })
@@ -59,7 +78,7 @@ export class User {
   createPrivateUserDto() {
     return new PrivateUserDto(
       this.id,
-      this.username,
+      this.login,
       this.email,
       this.createdAt,
       this.lastLoginAt,
@@ -70,9 +89,11 @@ export class User {
   createPublicUserDto() {
     return new PublicUserDto(
       this.id,
-      this.username,
+      this.login,
       this.email,
+      this.bio,
       this.createdAt,
+      this.updatedAt,
       this.lastLoginAt,
     );
   }
@@ -80,7 +101,7 @@ export class User {
   createInternalUserDto() {
     return new UserDto(
       this.id,
-      this.username,
+      this.login,
       this.email,
       this.password,
       this.createdAt,

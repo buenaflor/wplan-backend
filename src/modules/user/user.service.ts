@@ -65,7 +65,7 @@ export class UserService {
    * @param username
    */
   async findOnePublicUserByUsername(username: string): Promise<PublicUserDto> {
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
@@ -79,8 +79,8 @@ export class UserService {
    *
    * @param username
    */
-  async findOnePrivateUserByUsername(username: string): Promise<PublicUserDto> {
-    const user = await this.userRepository.findOne({ username });
+  async findOnePrivateUserByUsername(username: string): Promise<PrivateUserDto> {
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
@@ -102,7 +102,7 @@ export class UserService {
    * @param username
    */
   async findOneInternalUserByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,

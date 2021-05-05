@@ -8,24 +8,24 @@ import {
 
 @Entity({ name: 'email_verification' })
 export class EmailVerification {
-  constructor(token: string, userId: number) {
+  constructor(token: string, userId: string) {
     this.token = token;
     this.userId = userId;
     this.expirationTime = 120;
   }
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ length: 255 })
   token: string;
 
-  @Column({ type: 'integer', name: 'expiration_time' })
+  @Column({ name: 'expiration_time' })
   expirationTime: number;
 
-  @Column({ type: 'integer', name: 'user_id' })
-  userId: number;
+  @Column({ name: 'user_id' })
+  userId: string;
 
-  @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
