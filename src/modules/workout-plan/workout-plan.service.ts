@@ -44,25 +44,30 @@ export class WorkoutPlanService {
       query.innerJoinAndSelect(
         'workoutPlan.owner',
         'owner',
-        'owner.login = :ownerName AND workoutPlan.name = :workoutPlanName',
-        { ownerName, workoutPlanName },
+        'owner.login = :ownerName AND workoutPlan.name = :workoutPlanName AND workoutPlan.isPrivate = :isPrivate',
+        { ownerName, workoutPlanName, isPrivate: true },
       );
     } else if (workoutPlanName) {
       query.innerJoinAndSelect(
         'workoutPlan.owner',
         'owner',
-        'workoutPlan.name = :workoutPlanName',
-        { workoutPlanName },
+        'workoutPlan.name = :workoutPlanName AND workoutPlan.isPrivate = :isPrivate',
+        { workoutPlanName, isPrivate: true },
       );
     } else if (ownerName) {
       query.innerJoinAndSelect(
         'workoutPlan.owner',
         'owner',
-        'owner.login = :ownerName',
-        { ownerName },
+        'owner.login = :ownerName AND workoutPlan.isPrivate = :isPrivate',
+        { ownerName, isPrivate: true },
       );
     } else {
-      query.innerJoinAndSelect('workoutPlan.owner', 'owner');
+      query.innerJoinAndSelect(
+        'workoutPlan.owner',
+        'owner',
+        'workoutPlan.isPrivate = :isPrivate',
+        { isPrivate: false },
+      );
     }
     const res = await paginate(query, options);
     return new Pagination(
