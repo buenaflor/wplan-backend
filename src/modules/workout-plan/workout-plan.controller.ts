@@ -34,6 +34,8 @@ import { Owner } from '../user/decorator/owner.decorator';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
+import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
+import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -48,15 +50,22 @@ export class WorkoutPlanController {
   /**
    * Returns all public workout plans
    *
+   * @param searchWorkoutPlanQuery
    * @param paginated
    */
   @Get()
-  async findAllPublic(@Paginated() paginated) {
-    return await this.workoutPlanService.findAllPublic(paginated);
+  async findAllPublic(
+    @SearchWorkoutPlanQuery() searchWorkoutPlanQuery: SearchWorkoutPlanDto,
+    @Paginated() paginated,
+  ) {
+    return await this.workoutPlanService.findAllPublic(
+      paginated,
+      searchWorkoutPlanQuery,
+    );
   }
 
   /**
-   * Finds one workout plan matching a user and workout plan name
+   * Finds one workout plan matching a workout plan id
    * If the workout plan is private, the unauthenticated recipient
    * will always receive a 404 Not Found error
    *
@@ -66,12 +75,12 @@ export class WorkoutPlanController {
    * @param params
    * @param authUser
    */
-  @Get(Routes.workoutPlan.get.one)
+  @Get(Routes.workoutPlan.get.one2)
   @UseGuards(AllowAnonymousJwtGuard)
-  async findOneForUser(@Param() params, @AuthUser() authUser) {
-    const { ownerName, workoutPlanName } = params;
-    const workoutPlanDto = await this.workoutPlanService.findOneByName(
-      workoutPlanName,
+  async getOne(@Param() params, @AuthUser() authUser) {
+    const { workoutPlanId } = params;
+    const workoutPlanDto = await this.workoutPlanService.findOneById(
+      workoutPlanId,
     );
     if (authUser && authUser.userId === workoutPlanDto.owner.id) {
       return workoutPlanDto;
@@ -83,13 +92,9 @@ export class WorkoutPlanController {
       );
       if (isCollaborator) return workoutPlanDto;
     }
-    if (
-      workoutPlanDto.owner.login !== ownerName ||
-      workoutPlanDto.isPrivate
-    ) {
+    if (workoutPlanDto.isPrivate) {
       throw new NotFoundException();
     }
-    return workoutPlanDto;
   }
 
   /**

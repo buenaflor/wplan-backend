@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { User } from '../user.entity';
 import { PublicUserDto } from './public-user-dto';
+import { Column } from "typeorm";
 
 /**
  * DTO that encapsulates user data that is privately available
@@ -24,12 +25,26 @@ export class PrivateUserDto extends PublicUserDto {
     updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
+    collaborators: number,
+    publicWorkoutPlans: number,
+    privateWorkoutPlans: number,
   ) {
     super(id, login, name, email, bio, createdAt, updatedAt, lastLoginAt);
     this.isEmailConfirmed = isEmailConfirmed;
+    this.collaborators = collaborators;
+    this.publicWorkoutPlans = publicWorkoutPlans;
+    this.privateWorkoutPlans = privateWorkoutPlans;
   }
 
-  @IsBoolean()
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
+
+  @IsNotEmpty()
+  readonly collaborators: number;
+
+  @IsNotEmpty()
+  readonly publicWorkoutPlans: number;
+
+  @IsNotEmpty()
+  readonly privateWorkoutPlans: number;
 }

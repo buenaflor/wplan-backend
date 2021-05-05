@@ -4,7 +4,6 @@ import {
   UseGuards,
   Request,
   Body,
-  Get,
   Put,
 } from '@nestjs/common';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';

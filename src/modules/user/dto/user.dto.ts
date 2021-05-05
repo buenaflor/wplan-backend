@@ -23,6 +23,9 @@ export class UserDto {
     updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
+    collaborators: number,
+    publicWorkoutPlans: number,
+    privateWorkoutPlans: number,
   ) {
     this.id = id;
     this.login = login;
@@ -34,6 +37,9 @@ export class UserDto {
     this.updatedAt = updatedAt;
     this.lastLoginAt = lastLoginAt;
     this.isEmailConfirmed = isEmailConfirmed;
+    this.collaborators = collaborators;
+    this.publicWorkoutPlans = publicWorkoutPlans;
+    this.privateWorkoutPlans = privateWorkoutPlans;
   }
 
   @IsNotEmpty()
@@ -64,4 +70,13 @@ export class UserDto {
 
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
+
+  @IsNotEmpty()
+  readonly collaborators: number;
+
+  @IsNotEmpty()
+  readonly publicWorkoutPlans: number;
+
+  @IsNotEmpty()
+  readonly privateWorkoutPlans: number;
 }

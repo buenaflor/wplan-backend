@@ -29,6 +29,7 @@ export const Routes = {
     controller: 'workout_plans',
     get: {
       one: '/:ownerName/:workoutPlanName',
+      one2: '/:workoutPlanId',
       collaborators: '/:ownerName/:workoutPlanName/collaborators',
     },
     patch: {

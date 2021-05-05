@@ -15,6 +15,7 @@ import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
+import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -28,15 +29,42 @@ export class WorkoutPlanService {
    * Finds all public workout plans
    *
    * @param options
+   * @param searchWorkoutPlanQuery
    */
-  async findAllPublic(options: IPaginationOptions) {
-    const res = await paginate<WorkoutPlan>(
-      this.workoutPlanRepository,
-      options,
-      {
-        relations: ['owner'],
-      },
+  async findAllPublic(
+    options: IPaginationOptions,
+    searchWorkoutPlanQuery: SearchWorkoutPlanDto,
+  ) {
+    const ownerName = searchWorkoutPlanQuery.ownerName;
+    const workoutPlanName = searchWorkoutPlanQuery.workoutPlanName;
+    const query = await this.workoutPlanRepository.createQueryBuilder(
+      'workoutPlan',
     );
+    if (ownerName && workoutPlanName) {
+      query.innerJoinAndSelect(
+        'workoutPlan.owner',
+        'owner',
+        'owner.login = :ownerName AND workoutPlan.name = :workoutPlanName',
+        { ownerName, workoutPlanName },
+      );
+    } else if (workoutPlanName) {
+      query.innerJoinAndSelect(
+        'workoutPlan.owner',
+        'owner',
+        'workoutPlan.name = :workoutPlanName',
+        { workoutPlanName },
+      );
+    } else if (ownerName) {
+      query.innerJoinAndSelect(
+        'workoutPlan.owner',
+        'owner',
+        'owner.login = :ownerName',
+        { ownerName },
+      );
+    } else {
+      query.innerJoinAndSelect('workoutPlan.owner', 'owner');
+    }
+    const res = await paginate(query, options);
     return new Pagination(
       res.items.map((elem) => {
         return elem.createPublicWorkoutDto();
@@ -107,6 +135,22 @@ export class WorkoutPlanService {
   async findOneByName(workoutPlanName: string) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
       where: [{ name: workoutPlanName }],
+      relations: ['owner'],
+    });
+    if (!workoutPlan) {
+      throw new NotFoundException();
+    }
+    return workoutPlan.createPublicWorkoutDto();
+  }
+
+  /**
+   * Finds a workout plan with the given id
+   *
+   * @param workoutPlanId
+   */
+  async findOneById(workoutPlanId: string) {
+    const workoutPlan = await this.workoutPlanRepository.findOne({
+      where: [{ id: workoutPlanId }],
       relations: ['owner'],
     });
     if (!workoutPlan) {
