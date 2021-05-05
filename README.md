@@ -5,11 +5,8 @@
 ## Read about the current state of [features](https://github.com/buenaflor/wplan-backend/wiki/Features) 
 
 ## TODO
-
-- DTO architecture -> should service layer only return dtos i.e are DTOs allowed inside the service layer? https://stackoverflow.com/questions/16866102/using-dto-to-transfer-data-between-service-layer-and-ui-layer/16872129#16872129
 - Deny access if authentication failed too often in a short amount of time
 - Error handling -> error pipeline? which errors should be returned
-- Default query parameters for GET endpoints that return lists? sort & order
 - Change email to not verified when updating an email address
 - Success response in controllers
 
