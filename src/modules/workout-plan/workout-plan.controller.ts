@@ -75,7 +75,7 @@ export class WorkoutPlanController {
    * @param params
    * @param authUser
    */
-  @Get(Routes.workoutPlan.get.one2)
+  @Get(Routes.workoutPlan.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
   async getOne(@Param() params, @AuthUser() authUser) {
     const { workoutPlanId } = params;

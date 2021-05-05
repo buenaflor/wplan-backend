@@ -28,19 +28,17 @@ export const Routes = {
   workoutPlan: {
     controller: 'workout_plans',
     get: {
-      one: '/:ownerName/:workoutPlanName',
-      one2: '/:workoutPlanId',
-      collaborators: '/:ownerName/:workoutPlanName/collaborators',
+      one: '/:workoutPlanId',
+      collaborators: '/:workoutPlanId/collaborators',
     },
     patch: {
-      one: '/:ownerName/:workoutPlanName',
+      one: '/:workoutPlanId',
     },
     delete: {
-      one: '/:ownerName/:workoutPlanName',
+      one: '/:workoutPlanId',
     },
     put: {
-      inviteCollaborator:
-        '/:ownerName/:workoutPlanName/collaborators/:username',
+      inviteCollaborator: '/:workoutPlanId/collaborators/:username',
     },
   },
   auth: {
