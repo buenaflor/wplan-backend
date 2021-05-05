@@ -14,16 +14,15 @@ export class UserRegistrationGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const checkUser: CreateUserDto = context.switchToHttp().getRequest().body;
-    const userWithUsername = await this.userService.findOnePublicUserByUsername(
-      checkUser.username,
+    const loginNameExists = await this.userService.loginNameExists(
+      checkUser.login,
     );
-    if (userWithUsername) {
+    const emailExists = await this.userService.emailExists(checkUser.email);
+    console.log(loginNameExists);
+    if (loginNameExists) {
       this.throwErr('Duplicate: username already exists.');
     }
-    const userWithEmail = await this.userService.findOneByEmail(
-      checkUser.email,
-    );
-    if (userWithEmail) {
+    if (emailExists) {
       this.throwErr('Duplicate: email already exists.');
     }
     return true;

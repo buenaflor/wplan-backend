@@ -74,12 +74,24 @@ export class UserService {
     return user.createPublicUserDto();
   }
 
+  async loginNameExists(login: string) {
+    const user = await this.userRepository.findOne({ login });
+    return !!user;
+  }
+
+  async emailExists(email: string) {
+    const user = await this.userRepository.findOne({ email });
+    return !!user;
+  }
+
   /**
    * Finds a user and returns the publicly and privately available info of that user
    *
    * @param username
    */
-  async findOnePrivateUserByUsername(username: string): Promise<PrivateUserDto> {
+  async findOnePrivateUserByUsername(
+    username: string,
+  ): Promise<PrivateUserDto> {
     const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
