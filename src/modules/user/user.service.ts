@@ -171,7 +171,8 @@ export class UserService {
 
   // CREATE REQUESTS
 
-  save(user: CreateUserDto) {
-    return this.userRepository.save(user);
+  async save(user: CreateUserDto) {
+    const userFromDb = await this.userRepository.save(user);
+    return userFromDb.createPrivateUserDto();
   }
 }
