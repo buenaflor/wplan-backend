@@ -4,12 +4,6 @@
 
 ## Read about the current state of [features](https://github.com/buenaflor/wplan-backend/wiki/Features) 
 
-## TODO
-- Deny access if authentication failed too often in a short amount of time
-- Error handling -> error pipeline? which errors should be returned
-- Change email to not verified when updating an email address
-- Success response in controllers
-
 ## Tech Stack
 
 - PostgreSQL 
