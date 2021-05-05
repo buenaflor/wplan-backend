@@ -7,7 +7,8 @@ import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 export class PublicUserDto {
   constructor(
     id: string,
-    username: string,
+    login: string,
+    name: string,
     email: string,
     bio: string,
     createdAt: Date,
@@ -15,7 +16,8 @@ export class PublicUserDto {
     lastLoginAt: Date,
   ) {
     this.id = id;
-    this.username = username;
+    this.login = login;
+    this.name = name;
     this.email = email;
     this.bio = bio;
     this.createdAt = createdAt;
@@ -28,7 +30,11 @@ export class PublicUserDto {
 
   @IsNotEmpty()
   @Length(3, 40)
-  readonly username: string;
+  readonly login: string;
+
+  @IsNotEmpty()
+  @Length(3, 40)
+  readonly name: string;
 
   @Length(0, 160)
   readonly bio: string;

@@ -79,8 +79,11 @@ export class User {
     return new PrivateUserDto(
       this.id,
       this.login,
+      this.name,
       this.email,
+      this.bio,
       this.createdAt,
+      this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
     );
@@ -90,6 +93,7 @@ export class User {
     return new PublicUserDto(
       this.id,
       this.login,
+      this.name,
       this.email,
       this.bio,
       this.createdAt,
@@ -102,9 +106,12 @@ export class User {
     return new UserDto(
       this.id,
       this.login,
+      this.name,
       this.email,
+      this.bio,
       this.password,
       this.createdAt,
+      this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
     );

@@ -25,9 +25,12 @@ export class AuthService {
     if (user && (await argon2.verify(user.password, pass))) {
       return new PrivateUserDto(
         user.id,
-        user.username,
+        user.login,
+        user.name,
         user.email,
+        user.bio,
         user.createdAt,
+        user.updatedAt,
         user.lastLoginAt,
         user.isEmailConfirmed,
       );
