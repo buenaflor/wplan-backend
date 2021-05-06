@@ -101,7 +101,7 @@ export class WorkoutPlanService {
     );
     return new Pagination(
       res.items.map((elem) => {
-        return elem.createPrivateWorkoutDto();
+        return elem.createPublicWorkoutDto();
       }),
       res.meta,
       res.links,
@@ -203,18 +203,16 @@ export class WorkoutPlanService {
    *
    * @param updateWorkoutPlanDto
    * @param workoutPlanId
-   * @param userId
    */
   async update(
     updateWorkoutPlanDto: UpdateWorkoutPlanDto,
-    workoutPlanId: number,
-    userId: string,
+    workoutPlanId: string,
   ) {
     const queryRes = await this.workoutPlanRepository
       .createQueryBuilder()
       .update(WorkoutPlan)
       .set(updateWorkoutPlanDto)
-      .where({ id: workoutPlanId, userId: userId })
+      .where({ id: workoutPlanId })
       .execute();
     if (queryRes.affected === 0) {
       throw new NotFoundException('Could not find a workout plan');

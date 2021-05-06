@@ -9,7 +9,7 @@ import { PublicUserDto } from '../../user/dto/public-user-dto';
 
 export class PublicWorkoutPlanDto {
   constructor(
-    id: number,
+    id: string,
     name: string,
     description: string,
     isCompleted: boolean,
@@ -29,7 +29,7 @@ export class PublicWorkoutPlanDto {
   }
 
   @IsNumber()
-  id: number;
+  id: string;
 
   @IsString()
   name: string;

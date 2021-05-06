@@ -91,7 +91,7 @@ export class AuthUserController {
     @Paginated() paginated,
     @AuthUser() authUser,
   ) {
-    return await this.workoutPlanCollaboratorService.findAllInvitationsByUserId(
+    return await this.workoutPlanCollaboratorService.getAllInvitationsByUserId(
       authUser.userId,
       paginated,
     );

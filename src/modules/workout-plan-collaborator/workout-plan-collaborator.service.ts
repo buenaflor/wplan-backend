@@ -69,10 +69,13 @@ export class WorkoutPlanCollaboratorService {
     });
   }
 
-  async findAllInvitationsByUserId(
-    userId: number,
-    options: IPaginationOptions,
-  ) {
+  /**
+   * Returns a list of all invitations that the user id has
+   *
+   * @param userId
+   * @param options
+   */
+  async getAllInvitationsByUserId(userId: number, options: IPaginationOptions) {
     const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
       this.workoutPlanCollaboratorInvitationEntityRepository,
       options,
@@ -207,7 +210,7 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async isCollaborator(workoutPlanId: number, userId: string) {
+  async isCollaborator(workoutPlanId: string, userId: string) {
     const res = await this.workoutPlanCollaboratorRepository.findOne({
       where: [
         {
