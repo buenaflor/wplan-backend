@@ -42,7 +42,7 @@ export class WorkoutPlanCollaboratorService {
    * @param options
    */
   async findAllCollaboratorsByWorkoutPlanId(
-    workoutPlanId: number,
+    workoutPlanId: string,
     options: IPaginationOptions,
   ) {
     const res = await paginate<WorkoutPlanCollaboratorEntity>(
@@ -60,6 +60,13 @@ export class WorkoutPlanCollaboratorService {
       res.meta,
       res.links,
     );
+  }
+
+  async findOneRaw(workoutPlanId: string, userId: string) {
+    return this.workoutPlanCollaboratorRepository.findOne({
+      where: [{ userId, workoutPlanId }],
+      relations: ['permission'],
+    });
   }
 
   async findAllInvitationsByUserId(
@@ -200,7 +207,7 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async isCollaborator(workoutPlanId: number, userId: bigint) {
+  async isCollaborator(workoutPlanId: number, userId: string) {
     const res = await this.workoutPlanCollaboratorRepository.findOne({
       where: [
         {
@@ -208,12 +215,7 @@ export class WorkoutPlanCollaboratorService {
           userId,
         },
       ],
-      relations: ['workoutPlan', 'user', 'role', 'permission'],
     });
-    if (!res) return false;
-    return {
-      isCollaborator: true,
-      collaborator: res.createWorkoutPlanCollaboratorDto(),
-    };
+    return !!res;
   }
 }
