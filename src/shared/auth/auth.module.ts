@@ -12,13 +12,11 @@ import { ConfigModule } from '../../config/config.module';
 import { ConfigService } from '../../config/config.service';
 import { EmailVerificationModule } from '../mail/verification/email-verification.module';
 import { UserMapper } from '../../modules/user/mapper/user.mapper';
-import { UserProfileModule } from '../../modules/user-profile/user-profile.module';
 
 @Module({
   imports: [
     MailModule,
     UserModule,
-    UserProfileModule,
     PassportModule,
     EmailVerificationModule,
     JwtModule.registerAsync({

@@ -1,6 +1,3 @@
-const owner = 'ownerUsername';
-const workoutPlan = 'workoutPlanName';
-
 export const Routes = {
   user: {
     controller: '/users',
@@ -10,7 +7,7 @@ export const Routes = {
     },
   },
   authUser: {
-    controller: '/user',
+    controller: '/me',
     get: {
       workoutPlans: '/workout_plans',
       workoutPlanInvitations: '/workout_plan_invitations',
@@ -28,18 +25,17 @@ export const Routes = {
   workoutPlan: {
     controller: 'workout_plans',
     get: {
-      one: '/:ownerName/:workoutPlanName',
-      collaborators: '/:ownerName/:workoutPlanName/collaborators',
+      one: '/:workoutPlanId',
+      collaborators: '/:workoutPlanId/collaborators',
     },
     patch: {
-      one: '/:ownerName/:workoutPlanName',
+      one: '/:workoutPlanId',
     },
     delete: {
-      one: '/:ownerName/:workoutPlanName',
+      one: '/:workoutPlanId',
     },
     put: {
-      inviteCollaborator:
-        '/:ownerName/:workoutPlanName/collaborators/:username',
+      inviteCollaborator: '/:workoutPlanId/collaborators/:username',
     },
   },
   auth: {
@@ -47,10 +43,10 @@ export const Routes = {
     post: {
       login: '/login',
       register: '/register',
-      resendEmail: '/mail/confirmation/resend/',
+      resendEmail: '/mail_confirmation/resend/',
     },
     get: {
-      emailConfirmationToken: '/mail/confirmation/:token',
+      emailConfirmationToken: '/mail_confirmation/:token',
     },
   },
 };

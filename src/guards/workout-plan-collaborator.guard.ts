@@ -17,22 +17,15 @@ export class WorkoutPlanCollaboratorGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const { ownerName, workoutPlanName } = req.params;
+    const { workoutPlanId } = req.params;
     const authUser = req.user;
-    const owner = await this.userService.findOnePublicUserByUsername(ownerName);
-    const workoutPlanDto = await this.workoutPlanService.findOneByNameAndUserId(
-      workoutPlanName,
-      owner.id,
+    const workoutPlanDto = await this.workoutPlanService.findOneById(
+      workoutPlanId,
     );
     const res = await this.workoutPlanCollaboratorService.isCollaborator(
       workoutPlanDto.id,
       authUser.userId,
     );
-    if (res) {
-      req.owner = owner;
-      req.workoutPlan = workoutPlanDto;
-      req.collaborator = res.collaborator;
-    }
     return res !== undefined;
   }
 }

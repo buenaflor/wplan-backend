@@ -11,8 +11,8 @@ import {
   NotFoundException,
   Put,
   Res,
-  HttpStatus,
-} from '@nestjs/common';
+  HttpStatus, Post
+} from "@nestjs/common";
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -34,6 +34,7 @@ import { Owner } from '../user/decorator/owner.decorator';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
+import { CreateWorkoutPlanDto } from "./dto/create-workout-plan.dto";
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -51,12 +52,12 @@ export class WorkoutPlanController {
    * @param paginated
    */
   @Get()
-  async findAllPublic(@Paginated() paginated) {
+  async getAllPublic(@Paginated() paginated) {
     return await this.workoutPlanService.findAllPublic(paginated);
   }
 
   /**
-   * Finds one workout plan matching a user and workout plan name
+   * Finds one workout plan matching a workout plan id
    * If the workout plan is private, the unauthenticated recipient
    * will always receive a 404 Not Found error
    *
@@ -68,10 +69,10 @@ export class WorkoutPlanController {
    */
   @Get(Routes.workoutPlan.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
-  async findOneForUser(@Param() params, @AuthUser() authUser) {
-    const { ownerName, workoutPlanName } = params;
-    const workoutPlanDto = await this.workoutPlanService.findOneByName(
-      workoutPlanName,
+  async findOneById(@Param() params, @AuthUser() authUser) {
+    const { workoutPlanId } = params;
+    const workoutPlanDto = await this.workoutPlanService.findOneById(
+      workoutPlanId,
     );
     if (authUser && authUser.userId === workoutPlanDto.owner.id) {
       return workoutPlanDto;
@@ -83,7 +84,7 @@ export class WorkoutPlanController {
       );
       if (isCollaborator) return workoutPlanDto;
     }
-    if (workoutPlanDto.owner.login !== ownerName || workoutPlanDto.isPrivate) {
+    if (workoutPlanDto.isPrivate) {
       throw new NotFoundException();
     }
     return workoutPlanDto;
@@ -94,9 +95,7 @@ export class WorkoutPlanController {
    * Requires an authenticated user and if the auth user is not
    * a collaborator then deny access to the resource
    *
-   * @param owner
    * @param workoutPlan
-   * @param authUser
    * @param paginated
    */
   @Get(Routes.workoutPlan.get.collaborators)
@@ -106,9 +105,7 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorReadAccessGuard,
   )
   async findCollaborators(
-    @Owner() owner: PublicUserDto,
     @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
-    @AuthUser() authUser,
     @Paginated() paginated,
   ) {
     return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
@@ -167,6 +164,22 @@ export class WorkoutPlanController {
     } else {
       res.status(HttpStatus.NO_CONTENT).send();
     }
+  }
+
+  /**
+   * Creates a workout plan where the authenticated user is the owner
+   *
+   * @param authUser
+   * @param createWorkoutPlanDTO
+   */
+  @Post(Routes.workoutPlan.controller)
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async createWorkoutPlan(
+    @AuthUser() authUser,
+    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
+  ) {
+    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
   }
 
   /**

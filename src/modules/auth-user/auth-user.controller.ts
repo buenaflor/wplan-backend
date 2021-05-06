@@ -67,9 +67,6 @@ export class AuthUserController {
    * The authenticated user has explicit permission to access workout plans they own or
    * where they are a collaborator
    *
-   * -> Currently only workout plans where the user is the owner will be returned
-   * TODO: implement collaboration / coaching
-   *
    * @param authUser
    * @param paginated
    */
@@ -80,23 +77,6 @@ export class AuthUserController {
       authUser.userId,
       paginated,
     );
-  }
-
-  /**
-   * Creates a workout plan where the authenticated user is the owner
-   *
-   * @param authUser
-   * @param createWorkoutPlanDTO
-   */
-  @Post(Routes.authUser.post.workoutPlans)
-  @HttpCode(204)
-  @UseGuards(JwtAuthGuard)
-  async createWorkoutPlan(
-    @AuthUser() authUser,
-    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
-  ) {
-    // TODO: dont allow duplicate workout plan names for a user
-    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
   }
 
   /**
