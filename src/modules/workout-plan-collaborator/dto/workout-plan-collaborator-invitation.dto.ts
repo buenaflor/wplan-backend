@@ -6,7 +6,7 @@ import { PublicWorkoutPlanDto } from '../../workout-plan/dto/public-workout-plan
 
 export class WorkoutPlanCollaboratorInvitationDto {
   constructor(
-    id: number,
+    id: string,
     workoutPlan: PublicWorkoutPlanDto,
     invitee: PublicUserDto,
     inviter: PublicUserDto,
@@ -22,7 +22,7 @@ export class WorkoutPlanCollaboratorInvitationDto {
   }
 
   @IsNotEmpty()
-  readonly id: number;
+  readonly id: string;
 
   @IsNotEmpty()
   readonly workoutPlan: PublicWorkoutPlanDto;

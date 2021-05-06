@@ -114,7 +114,7 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorGuard,
     WorkoutPlanCollaboratorReadAccessGuard,
   )
-  async findCollaborators(
+  async getCollaborators(
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser,
     @Paginated() paginated,
@@ -131,9 +131,8 @@ export class WorkoutPlanController {
    * Sending multiple invitations by multiple users will only replace
    * the current invitation in the database
    *
-   * @param owner
-   * @param workoutPlan
    * @param authUser
+   * @param workoutPlanId
    * @param inviteCollaboratorDto
    * @param params
    * @param res
@@ -145,17 +144,16 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorAdminAccessGuard,
   )
   async inviteCollaborator(
-    @Owner() owner: PublicUserDto,
-    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
     @AuthUser() authUser,
+    @WorkoutPlanId() workoutPlanId: string,
     @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
     @Param() params,
     @Res() res: Response,
   ) {
-    const { username } = params;
+    const { inviteeUsername } = params;
     const inviterUserId = authUser.userId;
     const invitee = await this.userService.findOnePublicUserByUsername(
-      username,
+      inviteeUsername,
     );
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
@@ -165,7 +163,7 @@ export class WorkoutPlanController {
     );
     const invitation = await this.workoutPlanCollaboratorService.inviteCollaborator(
       invitee.id,
-      workoutPlan.id,
+      workoutPlanId,
       role.id,
       permission.id,
       inviterUserId,

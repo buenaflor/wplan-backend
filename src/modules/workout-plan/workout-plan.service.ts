@@ -165,22 +165,6 @@ export class WorkoutPlanService {
   }
 
   /**
-   * Finds a workout plan with the given id
-   *
-   * @param workoutPlanId
-   */
-  async findOneById(workoutPlanId: string) {
-    const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ id: workoutPlanId }],
-      relations: ['owner'],
-    });
-    if (!workoutPlan) {
-      throw new NotFoundException();
-    }
-    return workoutPlan.createPublicWorkoutDto();
-  }
-
-  /**
    * Finds the workout plan according to plan name and user id and returns it
    *
    * @param workoutPlanName

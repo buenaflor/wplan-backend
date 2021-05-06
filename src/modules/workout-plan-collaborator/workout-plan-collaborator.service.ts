@@ -103,7 +103,7 @@ export class WorkoutPlanCollaboratorService {
    * @param invitationId
    * @param userId
    */
-  async acceptInvitation(invitationId: number, userId: string) {
+  async acceptInvitation(invitationId: string, userId: string) {
     const invitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
       {
         id: invitationId,
@@ -133,7 +133,7 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async declineInvitation(invitationId: number, userId: string) {
+  async declineInvitation(invitationId: string, userId: string) {
     const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
       {
         id: invitationId,
@@ -162,9 +162,9 @@ export class WorkoutPlanCollaboratorService {
    */
   async inviteCollaborator(
     inviteeUserId: string,
-    workoutPlanId: number,
-    roleId: number,
-    permissionId: number,
+    workoutPlanId: string,
+    roleId: string,
+    permissionId: string,
     inviterUserId: string,
   ) {
     const invitation = this.workoutPlanCollaboratorInvitationEntityRepository.create();

@@ -10,7 +10,7 @@ export class RoleService {
     private roleRepository: Repository<RoleEntity>,
   ) {}
 
-  async findOneById(id: number) {
+  async findOneById(id: string) {
     return this.roleRepository.findOne({ id });
   }
 

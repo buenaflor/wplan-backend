@@ -4,7 +4,7 @@ import { RoleDto } from './dto/RoleDto';
 @Entity({ name: 'role' })
 export class RoleEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ type: 'varchar', length: '32' })
   name: string;
