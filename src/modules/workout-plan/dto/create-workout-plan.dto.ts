@@ -10,11 +10,8 @@ export class CreateWorkoutPlanDto {
   @IsNotEmpty()
   name: string;
 
-  @IsString()
   description: string;
 
-  @IsBoolean()
-  @IsNotEmpty()
   isCompleted: boolean;
 
   @IsBoolean()

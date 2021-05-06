@@ -83,10 +83,7 @@ export class WorkoutPlanController {
       );
       if (isCollaborator) return workoutPlanDto;
     }
-    if (
-      workoutPlanDto.owner.login !== ownerName ||
-      workoutPlanDto.isPrivate
-    ) {
+    if (workoutPlanDto.owner.login !== ownerName || workoutPlanDto.isPrivate) {
       throw new NotFoundException();
     }
     return workoutPlanDto;
