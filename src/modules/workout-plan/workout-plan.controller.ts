@@ -96,6 +96,27 @@ export class WorkoutPlanController {
   }
 
   /**
+   * Returns a list of open invitations of the workout plan
+   *
+   * @param workoutPlanId
+   * @param paginated
+   */
+  @Get(Routes.workoutPlan.get.openInvitations)
+  @UseGuards(
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
+  async getOpenInvitations(
+    @WorkoutPlanId() workoutPlanId: string,
+    @Paginated() paginated,
+  ) {
+    return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
+      workoutPlanId,
+      paginated
+    );
+  }
+
+  /**
    * Returns the collaborators of a workout plan
    * Requires an authenticated user and if the auth user is not
    * a collaborator with at least read permission then deny access to the resource
