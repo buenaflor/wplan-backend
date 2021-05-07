@@ -26,6 +26,7 @@ export const Routes = {
     controller: 'workout_plans',
     get: {
       one: '/:workoutPlanId',
+      openInvitations: ':workoutPlanId/invitations',
       collaborators: '/:workoutPlanId/collaborators',
     },
     patch: {

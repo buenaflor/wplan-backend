@@ -51,7 +51,7 @@ export class WorkoutPlanCollaboratorInvitationEntity {
   @JoinColumn({ name: 'permission_id' })
   permission: PermissionEntity;
 
-  createWorkoutPlanCollaboratorDto() {
+  createWorkoutPlanInvitationDto() {
     return new WorkoutPlanCollaboratorInvitationDto(
       this.id,
       this.workoutPlan.createPublicWorkoutDto(),

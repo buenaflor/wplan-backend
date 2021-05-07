@@ -70,6 +70,40 @@ export class WorkoutPlanCollaboratorService {
   }
 
   /**
+   * Returns a list of all invitations that a workout plan has
+   *
+   * @param workoutPlanId
+   * @param options
+   */
+  async getAllInvitationsByWorkoutPlanId(
+    workoutPlanId: string,
+    options: IPaginationOptions
+  ) {
+    const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
+      this.workoutPlanCollaboratorInvitationEntityRepository,
+      options,
+      {
+        where: [{ workoutPlanId }],
+        relations: [
+          'workoutPlan',
+          'workoutPlan.owner',
+          'inviter',
+          'invitee',
+          'role',
+          'permission',
+        ],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createWorkoutPlanInvitationDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
+
+  /**
    * Returns a list of all invitations that the user id has
    *
    * @param userId
@@ -93,7 +127,7 @@ export class WorkoutPlanCollaboratorService {
     );
     return new Pagination(
       res.items.map((elem) => {
-        return elem.createWorkoutPlanCollaboratorDto();
+        return elem.createWorkoutPlanInvitationDto();
       }),
       res.meta,
       res.links,
@@ -206,7 +240,7 @@ export class WorkoutPlanCollaboratorService {
           ],
         },
       );
-      return finalInvitation.createWorkoutPlanCollaboratorDto();
+      return finalInvitation.createWorkoutPlanInvitationDto();
     }
   }
 
