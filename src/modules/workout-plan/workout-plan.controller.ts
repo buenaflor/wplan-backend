@@ -12,8 +12,8 @@ import {
   Put,
   Res,
   HttpStatus,
-  Post,
-} from '@nestjs/common';
+  Post, UnprocessableEntityException
+} from "@nestjs/common";
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -172,6 +172,9 @@ export class WorkoutPlanController {
     const invitee = await this.userService.findOnePublicUserByUsername(
       inviteeUsername,
     );
+    if (invitee.id === inviterUserId) {
+      throw new UnprocessableEntityException('Cannot send invitation to oneself')
+    }
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
     );
