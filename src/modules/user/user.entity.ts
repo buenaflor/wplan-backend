@@ -45,9 +45,6 @@ export class User {
   @Column({ length: 160 })
   bio: string;
 
-  @Column()
-  collaborators: number;
-
   @Column({ name: 'public_workout_plans' })
   publicWorkoutPlans: number;
 
@@ -86,7 +83,6 @@ export class User {
       this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
-      this.collaborators,
       this.publicWorkoutPlans,
       this.privateWorkoutPlans,
     );
@@ -117,7 +113,6 @@ export class User {
       this.updatedAt,
       this.lastLoginAt,
       this.isEmailConfirmed,
-      this.collaborators,
       this.publicWorkoutPlans,
       this.privateWorkoutPlans,
     );

@@ -25,22 +25,17 @@ export class PrivateUserDto extends PublicUserDto {
     updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
-    collaborators: number,
     publicWorkoutPlans: number,
     privateWorkoutPlans: number,
   ) {
     super(id, login, name, email, bio, createdAt, updatedAt, lastLoginAt);
     this.isEmailConfirmed = isEmailConfirmed;
-    this.collaborators = collaborators;
     this.publicWorkoutPlans = publicWorkoutPlans;
     this.privateWorkoutPlans = privateWorkoutPlans;
   }
 
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
-
-  @IsNotEmpty()
-  readonly collaborators: number;
 
   @IsNotEmpty()
   readonly publicWorkoutPlans: number;
