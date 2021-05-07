@@ -43,7 +43,7 @@ export const Routes = {
     post: {
       login: '/login',
       register: '/register',
-      resendEmail: '/mail_confirmation/resend/',
+      resendEmail: '/mail_confirmation/:token/resend/',
     },
     get: {
       emailConfirmationToken: '/mail_confirmation/:token',

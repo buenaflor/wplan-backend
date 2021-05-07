@@ -6,7 +6,8 @@ import {
   Body,
   Put,
   Patch,
-} from '@nestjs/common';
+  Param, ForbiddenException
+} from "@nestjs/common";
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
@@ -85,23 +86,21 @@ export class AuthController {
   /**
    * Resends the email verification link to the specified email
    *
-   * @param req
+   * @param authUser
    */
   @UseGuards(JwtAuthGuard)
   @Put(Routes.auth.post.resendEmail)
-  async resendMail(@Request() req) {
-    const userId = req.user.userId;
-    const resendEmailUserDto = req.body;
+  async resendMail(@AuthUser() authUser) {
+    const userId = authUser.userId;
+    const user = await this.userService.findOnePrivateUserById(userId);
+    if (user.isEmailConfirmed) {
+      throw new ForbiddenException('Email is already verified');
+    }
     await this.emailVerificationService.deleteByUserId(userId);
     const emailVerification = await this.authService.createEmailVerification(
-      resendEmailUserDto.id,
+      userId,
     );
-    await this.authService.sendMail(
-      resendEmailUserDto.email,
-      emailVerification,
-    );
+    await this.authService.sendMail(user.email, emailVerification);
     return new BaseResponseDto('Resending email was successful');
-    // TODO: only resend a limited number of times -> danger of DOS attacks
-    // TODO: prevent resend, if the email is already confirmed, maybe with guard
   }
 }
