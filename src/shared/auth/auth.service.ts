@@ -20,31 +20,34 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
+  /**
+   * Validates a user
+   *
+   * @param username
+   * @param pass
+   */
   async validateUser(username: string, pass: string): Promise<PrivateUserDto> {
     const user = await this.userService.findOneInternalUserByUsername(username);
     if (user && (await argon2.verify(user.password, pass))) {
-      return new PrivateUserDto(
-        user.id,
-        user.login,
-        user.name,
-        user.email,
-        user.bio,
-        user.createdAt,
-        user.updatedAt,
-        user.lastLoginAt,
-        user.isEmailConfirmed,
-        user.collaborators,
-        user.publicWorkoutPlans,
-        user.privateWorkoutPlans,
-      );
+      return user.createPrivateUserDto();
     }
     return null;
   }
 
-  async updateLoginDate(userId: bigint) {
+  /**
+   * Updates the login date when a user logs in
+   *
+   * @param userId
+   */
+  async updateLoginDate(userId: string) {
     await this.userService.updateLoginDate(userId);
   }
 
+  /**
+   * Creates an email verification token and saves it
+   *
+   * @param userId
+   */
   async createEmailVerification(userId: string) {
     const buffer = crypto.randomBytes(64);
     const verificationToken = buffer.toString('hex');
@@ -52,10 +55,21 @@ export class AuthService {
     return await this.emailVerificationService.save(emailVerification);
   }
 
+  /**
+   * Sends an email verification to the specified email
+   *
+   * @param email
+   * @param emailVerification
+   */
   async sendMail(email: string, emailVerification: EmailVerification) {
     await this.mailService.sendUserConfirmation(email, emailVerification);
   }
 
+  /**
+   * Creates a JWT for a user
+   *
+   * @param user
+   */
   createJWT(user: User) {
     const payload = { username: user.login, id: user.id };
     return {

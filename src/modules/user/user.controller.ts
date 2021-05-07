@@ -17,6 +17,11 @@ export class UserController {
     private workoutPlanService: WorkoutPlanService,
   ) {}
 
+  /**
+   * Returns a list of users with public information
+   *
+   * @param paginated
+   */
   @Get()
   async findAllUsers(@Paginated() paginated) {
     return await this.userService.findAllUsers(paginated);

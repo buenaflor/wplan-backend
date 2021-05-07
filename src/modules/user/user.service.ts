@@ -9,7 +9,6 @@ import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrivateUserDto } from './dto/private-user.dto';
 import { PublicUserDto } from './dto/public-user-dto';
-import { UserDto } from './dto/user.dto';
 import {
   IPaginationOptions,
   paginate,
@@ -85,66 +84,54 @@ export class UserService {
   }
 
   /**
-   * Finds a user and returns the publicly and privately available info of that user
-   *
-   * @param username
-   */
-  async findOnePrivateUserByUsername(
-    username: string,
-  ): Promise<PrivateUserDto> {
-    const user = await this.userRepository.findOne({ login: username });
-    if (!user) {
-      throw new NotFoundException(
-        'Could not find a user with username: ' + username,
-      );
-    }
-    return user.createPrivateUserDto();
-  }
-
-  findOneByEmail(email: string) {
-    return this.userRepository.findOne({
-      email,
-    });
-  }
-
-  /**
    * Finds a user and returns the internal representation
    * Don't expose the internal DTO to the controller
    *
    * @param username
    */
-  async findOneInternalUserByUsername(username: string): Promise<UserDto> {
+  async findOneInternalUserByUsername(username: string): Promise<User> {
     const user = await this.userRepository.findOne({ login: username });
     if (!user) {
       throw new NotFoundException(
         'Could not find a user with username: ' + username,
       );
     }
-    return user.createInternalUserDto();
+    return user;
   }
 
   //================================================================================
   // Update resources
   //================================================================================
 
-  async update(updateUserDto: UpdateUserDto, id: bigint) {
+  /**
+   * Updates the user information
+   *
+   * @param updateUserDto
+   * @param userId
+   */
+  async update(updateUserDto: UpdateUserDto, userId: string) {
     const queryRes = await this.userRepository
       .createQueryBuilder()
       .update(User)
       .set(updateUserDto)
-      .where({ id })
+      .where({ id: userId })
       .returning('*')
       .execute();
+    // ToDo: raw query will not parse snake case
     if (queryRes.raw.isEmpty) {
       throw new NotFoundException('Could not update user');
     }
     if (queryRes.raw.length > 1) {
       throw new InternalServerErrorException();
     }
-    // TODO: map queryRes.raw snake case?
   }
 
-  updateLoginDate(id) {
+  /**
+   * Updates the login date to the current timestamp
+   *
+   * @param userId
+   */
+  updateLoginDate(userId: string) {
     const dateToday = new Date(
       Date.now() + 1000 * 60 * -new Date().getTimezoneOffset(),
     )
@@ -156,16 +143,16 @@ export class UserService {
       .createQueryBuilder()
       .update()
       .set({ lastLoginAt: dateToday })
-      .where({ id: id })
+      .where({ id: userId })
       .execute();
   }
 
-  updateEmailConfirmed(id: bigint, value: boolean) {
+  updateEmailConfirmed(userId: string, value: boolean) {
     return this.userRepository
       .createQueryBuilder()
       .update(User)
       .set({ isEmailConfirmed: value })
-      .where({ id })
+      .where({ id: userId })
       .execute();
   }
 
