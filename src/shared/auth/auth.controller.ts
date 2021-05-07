@@ -19,7 +19,7 @@ import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Routes } from '../../config/constants';
 import { AuthUser } from '../../modules/auth-user/decorator/auth-user.decorator';
-import { BaseResponseDto } from '../base-response/base-response.dto';
+import { BaseResponseDto } from '../../utils/base-response/base-response.dto';
 
 //TODO: limit exposure? -> client secret maybe
 @Controller(Routes.auth.controller)
