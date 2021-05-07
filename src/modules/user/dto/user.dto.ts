@@ -23,7 +23,6 @@ export class UserDto {
     updatedAt: Date,
     lastLoginAt: Date,
     isEmailConfirmed: boolean,
-    collaborators: number,
     publicWorkoutPlans: number,
     privateWorkoutPlans: number,
   ) {
@@ -37,7 +36,6 @@ export class UserDto {
     this.updatedAt = updatedAt;
     this.lastLoginAt = lastLoginAt;
     this.isEmailConfirmed = isEmailConfirmed;
-    this.collaborators = collaborators;
     this.publicWorkoutPlans = publicWorkoutPlans;
     this.privateWorkoutPlans = privateWorkoutPlans;
   }
@@ -70,9 +68,6 @@ export class UserDto {
 
   @IsNotEmpty()
   readonly isEmailConfirmed: boolean;
-
-  @IsNotEmpty()
-  readonly collaborators: number;
 
   @IsNotEmpty()
   readonly publicWorkoutPlans: number;
