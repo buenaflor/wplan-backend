@@ -10,7 +10,7 @@ export class PermissionService {
     private permissionRepository: Repository<PermissionEntity>,
   ) {}
 
-  async findOneById(id: number) {
+  async findOneById(id: string) {
     return this.permissionRepository.findOne({ id });
   }
 

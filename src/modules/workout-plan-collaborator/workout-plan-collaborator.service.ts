@@ -69,10 +69,13 @@ export class WorkoutPlanCollaboratorService {
     });
   }
 
-  async findAllInvitationsByUserId(
-    userId: number,
-    options: IPaginationOptions,
-  ) {
+  /**
+   * Returns a list of all invitations that the user id has
+   *
+   * @param userId
+   * @param options
+   */
+  async getAllInvitationsByUserId(userId: number, options: IPaginationOptions) {
     const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
       this.workoutPlanCollaboratorInvitationEntityRepository,
       options,
@@ -103,7 +106,7 @@ export class WorkoutPlanCollaboratorService {
    * @param invitationId
    * @param userId
    */
-  async acceptInvitation(invitationId: number, userId: string) {
+  async acceptInvitation(invitationId: string, userId: string) {
     const invitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
       {
         id: invitationId,
@@ -133,7 +136,7 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async declineInvitation(invitationId: number, userId: string) {
+  async declineInvitation(invitationId: string, userId: string) {
     const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
       {
         id: invitationId,
@@ -162,9 +165,9 @@ export class WorkoutPlanCollaboratorService {
    */
   async inviteCollaborator(
     inviteeUserId: string,
-    workoutPlanId: number,
-    roleId: number,
-    permissionId: number,
+    workoutPlanId: string,
+    roleId: string,
+    permissionId: string,
     inviterUserId: string,
   ) {
     const invitation = this.workoutPlanCollaboratorInvitationEntityRepository.create();
@@ -207,7 +210,7 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async isCollaborator(workoutPlanId: number, userId: string) {
+  async isCollaborator(workoutPlanId: string, userId: string) {
     const res = await this.workoutPlanCollaboratorRepository.findOne({
       where: [
         {

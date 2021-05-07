@@ -12,6 +12,7 @@ import {
   Put,
   Res,
   HttpStatus,
+  Post,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
@@ -27,16 +28,13 @@ import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/i
 import { RoleService } from '../role/role.service';
 import { PermissionService } from '../permission/permission.service';
 import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
-import { PublicUserDto } from '../user/dto/public-user-dto';
-import { PublicWorkoutPlanDto } from './dto/public-workout-plan.dto';
-import { WorkoutPlan } from './decorator/workout-plan.decorator';
-import { Owner } from '../user/decorator/owner.decorator';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-plan-collaborator-read-access.guard';
 import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
-import { WorkoutPlanId } from "./decorator/workout-plan-id.decorator";
+import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
+import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -55,7 +53,7 @@ export class WorkoutPlanController {
    * @param paginated
    */
   @Get()
-  async findAllPublic(
+  async getAllPublic(
     @SearchWorkoutPlanQuery() searchWorkoutPlanQuery: SearchWorkoutPlanDto,
     @Paginated() paginated,
   ) {
@@ -87,7 +85,7 @@ export class WorkoutPlanController {
     }
     if (authUser) {
       const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
-        workoutPlanDto.id,
+        workoutPlanId,
         authUser.userId,
       );
       if (isCollaborator) return workoutPlanDto;
@@ -112,7 +110,7 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorGuard,
     WorkoutPlanCollaboratorReadAccessGuard,
   )
-  async findCollaborators(
+  async getCollaborators(
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser,
     @Paginated() paginated,
@@ -129,9 +127,8 @@ export class WorkoutPlanController {
    * Sending multiple invitations by multiple users will only replace
    * the current invitation in the database
    *
-   * @param owner
-   * @param workoutPlan
    * @param authUser
+   * @param workoutPlanId
    * @param inviteCollaboratorDto
    * @param params
    * @param res
@@ -143,17 +140,16 @@ export class WorkoutPlanController {
     WorkoutPlanCollaboratorAdminAccessGuard,
   )
   async inviteCollaborator(
-    @Owner() owner: PublicUserDto,
-    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
     @AuthUser() authUser,
+    @WorkoutPlanId() workoutPlanId: string,
     @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
     @Param() params,
     @Res() res: Response,
   ) {
-    const { username } = params;
+    const { inviteeUsername } = params;
     const inviterUserId = authUser.userId;
     const invitee = await this.userService.findOnePublicUserByUsername(
-      username,
+      inviteeUsername,
     );
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
@@ -163,7 +159,7 @@ export class WorkoutPlanController {
     );
     const invitation = await this.workoutPlanCollaboratorService.inviteCollaborator(
       invitee.id,
-      workoutPlan.id,
+      workoutPlanId,
       role.id,
       permission.id,
       inviterUserId,
@@ -176,13 +172,28 @@ export class WorkoutPlanController {
   }
 
   /**
+   * Creates a workout plan where the authenticated user is the owner
+   *
+   * @param authUser
+   * @param createWorkoutPlanDTO
+   */
+  @Post(Routes.workoutPlan.controller)
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async createWorkoutPlanForUser(
+    @AuthUser() authUser,
+    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
+  ) {
+    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
+  }
+
+  /**
    * Updates the workout plan according to updateWorkoutPlanDto and
    * the given params. An authenticated user and a valid workout plan name
    * is required.
    *
    * @param authUser
-   * @param owner
-   * @param workoutPlan
+   * @param workoutPlanId
    * @param updateWorkoutPlanDto
    */
   @Patch(Routes.workoutPlan.patch.one)
@@ -193,14 +204,12 @@ export class WorkoutPlanController {
   )
   async updateWorkoutPlanForUser(
     @AuthUser() authUser,
-    @Owner() owner: PublicUserDto,
-    @WorkoutPlan() workoutPlan: PublicWorkoutPlanDto,
+    @WorkoutPlanId() workoutPlanId: string,
     @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
   ) {
     return await this.workoutPlanService.update(
       updateWorkoutPlanDto,
-      workoutPlan.id,
-      owner.id,
+      workoutPlanId,
     );
   }
 
@@ -210,18 +219,16 @@ export class WorkoutPlanController {
    *
    * The authenticated user has to be the owner of the workout plan
    *
-   * @param authUser
-   * @param params
+   * @param workoutPlanId
    */
   @Delete(Routes.workoutPlan.delete.one)
   @HttpCode(204)
-  @UseGuards(JwtAuthGuard)
-  async deleteWorkoutPlanForUser(@AuthUser() authUser, @Param() params) {
-    const { ownerName, workoutPlanName } = params;
-    const { username } = authUser;
-    if (ownerName !== username) {
-      throw new UnauthorizedException();
-    }
-    await this.workoutPlanService.delete({ name: workoutPlanName });
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
+  async deleteWorkoutPlanForUser(@WorkoutPlanId() workoutPlanId: string) {
+    await this.workoutPlanService.delete({ id: workoutPlanId });
   }
 }

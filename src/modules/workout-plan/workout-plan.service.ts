@@ -101,7 +101,7 @@ export class WorkoutPlanService {
     );
     return new Pagination(
       res.items.map((elem) => {
-        return elem.createPrivateWorkoutDto();
+        return elem.createPublicWorkoutDto();
       }),
       res.meta,
       res.links,
@@ -133,46 +133,13 @@ export class WorkoutPlanService {
   }
 
   /**
-   * Finds the workout plan according to plan name and returns it
-   *
-   * @param workoutPlanName
-   */
-  async findOneByName(workoutPlanName: string) {
-    const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ name: workoutPlanName }],
-      relations: ['owner'],
-    });
-    if (!workoutPlan) {
-      throw new NotFoundException();
-    }
-    return workoutPlan.createPublicWorkoutDto();
-  }
-
-  /**
-   * Finds a workout plan with the given id
+   * Finds the workout plan according to id and returns it
    *
    * @param workoutPlanId
    */
   async findOneById(workoutPlanId: string) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
       where: [{ id: workoutPlanId }],
-      relations: ['owner'],
-    });
-    if (!workoutPlan) {
-      throw new NotFoundException();
-    }
-    return workoutPlan.createPublicWorkoutDto();
-  }
-
-  /**
-   * Finds the workout plan according to plan name and user id and returns it
-   *
-   * @param workoutPlanName
-   * @param userId
-   */
-  async findOneByNameAndUserId(workoutPlanName: string, userId: string) {
-    const workoutPlan = await this.workoutPlanRepository.findOne({
-      where: [{ name: workoutPlanName, userId: userId }],
       relations: ['owner'],
     });
     if (!workoutPlan) {
@@ -203,18 +170,16 @@ export class WorkoutPlanService {
    *
    * @param updateWorkoutPlanDto
    * @param workoutPlanId
-   * @param userId
    */
   async update(
     updateWorkoutPlanDto: UpdateWorkoutPlanDto,
-    workoutPlanId: number,
-    userId: string,
+    workoutPlanId: string,
   ) {
     const queryRes = await this.workoutPlanRepository
       .createQueryBuilder()
       .update(WorkoutPlan)
       .set(updateWorkoutPlanDto)
-      .where({ id: workoutPlanId, userId: userId })
+      .where({ id: workoutPlanId })
       .execute();
     if (queryRes.affected === 0) {
       throw new NotFoundException('Could not find a workout plan');

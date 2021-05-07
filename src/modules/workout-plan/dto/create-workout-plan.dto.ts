@@ -1,20 +1,12 @@
-import {
-  IsBoolean,
-  IsDateString,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateWorkoutPlanDto {
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsString()
   description: string;
 
-  @IsBoolean()
-  @IsNotEmpty()
   isCompleted: boolean;
 
   @IsBoolean()

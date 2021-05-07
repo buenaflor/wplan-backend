@@ -14,10 +14,10 @@ import { WorkoutPlan } from '../../workout-plan/workout-plan.entity';
 @Entity({ name: 'workout_plan_collaborator_invitation' })
 export class WorkoutPlanCollaboratorInvitationEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ type: 'integer', name: 'workout_plan_id' })
-  workoutPlanId: number;
+  workoutPlanId: string;
 
   @Column({ name: 'invitee_user_id' })
   inviteeUserId: string;
@@ -26,10 +26,10 @@ export class WorkoutPlanCollaboratorInvitationEntity {
   inviterUserId: string;
 
   @Column({ type: 'smallint', name: 'role_id' })
-  roleId: number;
+  roleId: string;
 
   @Column({ type: 'smallint', name: 'permission_id' })
-  permissionId: number;
+  permissionId: string;
 
   @ManyToOne(() => WorkoutPlan, (wPlan) => wPlan.id)
   @JoinColumn({ name: 'workout_plan_id' })

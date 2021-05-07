@@ -5,7 +5,7 @@ import { PermissionEnum } from './permission.enum';
 @Entity({ name: 'permission' })
 export class PermissionEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ type: 'varchar', length: '32' })
   name: string;

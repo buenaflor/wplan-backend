@@ -5,7 +5,7 @@ import { RoleDto } from '../../role/dto/RoleDto';
 
 export class WorkoutPlanCollaboratorDto {
   constructor(
-    id: number,
+    id: string,
     role: RoleDto,
     user: PublicUserDto,
     permission: PermissionDto,
@@ -17,7 +17,7 @@ export class WorkoutPlanCollaboratorDto {
   }
 
   @IsNotEmpty()
-  readonly id: number;
+  readonly id: string;
 
   @IsNotEmpty()
   readonly user: PublicUserDto;

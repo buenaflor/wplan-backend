@@ -5,7 +5,9 @@ import {
   Request,
   Body,
   Put,
-} from '@nestjs/common';
+  Patch,
+  Param, ForbiddenException
+} from "@nestjs/common";
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
@@ -17,6 +19,7 @@ import { EmailConfirmationGuard } from '../../guards/email-confirmation.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Routes } from '../../config/constants';
 import { AuthUser } from '../../modules/auth-user/decorator/auth-user.decorator';
+import { BaseResponseDto } from '../../utils/base-response/base-response.dto';
 
 //TODO: limit exposure? -> client secret maybe
 @Controller(Routes.auth.controller)
@@ -27,6 +30,11 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
+  /**
+   * Logs in the user and returns a valid JWT
+   *
+   * @param authUser
+   */
   @Post(Routes.auth.post.login)
   @UseGuards(LocalAuthGuard)
   async login(@AuthUser() authUser) {
@@ -35,6 +43,7 @@ export class AuthController {
     return new LoginPayloadDto(authUser, accessToken);
   }
   // TODO: sign out -> revoke access token; refresh token
+
   /**
    * Post endpoint responsible for creating a user and sending an email verification
    * Creating a user also creates a user profile
@@ -52,7 +61,12 @@ export class AuthController {
     return user;
   }
 
-  @Post(Routes.auth.get.emailConfirmationToken)
+  /**
+   * Verifies the email and deletes the email verification from the table
+   *
+   * @param req
+   */
+  @Patch(Routes.auth.get.emailConfirmationToken)
   @UseGuards(EmailConfirmationGuard)
   async confirmMail(@Request() req) {
     const emailVerification = req.emailVerification;
@@ -64,31 +78,29 @@ export class AuthController {
     if (verified) {
       const userId = emailVerification.userId;
       await this.userService.updateEmailConfirmed(userId, true);
-      return {
-        message: 'Success, your account has been verified',
-      };
+      return new BaseResponseDto('Success, your account has been verified');
     }
-    return {
-      message: 'Token expired. Resend the email verification',
-    };
-    // TODO: return an email verification DTO
+    return new BaseResponseDto('Token expired. Resend the email verification');
   }
 
+  /**
+   * Resends the email verification link to the specified email
+   *
+   * @param authUser
+   */
   @UseGuards(JwtAuthGuard)
   @Put(Routes.auth.post.resendEmail)
-  async resendMail(@Request() req) {
-    const userId = req.user.userId;
-    const resendEmailUserDto = req.body;
+  async resendMail(@AuthUser() authUser) {
+    const userId = authUser.userId;
+    const user = await this.userService.findOnePrivateUserById(userId);
+    if (user.isEmailConfirmed) {
+      throw new ForbiddenException('Email is already verified');
+    }
     await this.emailVerificationService.deleteByUserId(userId);
     const emailVerification = await this.authService.createEmailVerification(
-      resendEmailUserDto.id,
+      userId,
     );
-    await this.authService.sendMail(
-      resendEmailUserDto.email,
-      emailVerification,
-    );
-    return 'email resend succ';
-    // TODO: only resend a limited number of times -> danger of DOS attacks
-    // TODO: prevent resend, if the email is already confirmed, maybe with guard
+    await this.authService.sendMail(user.email, emailVerification);
+    return new BaseResponseDto('Resending email was successful');
   }
 }

@@ -1,8 +1,6 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
-import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
-import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
 
@@ -19,54 +17,40 @@ export class UserController {
     private workoutPlanService: WorkoutPlanService,
   ) {}
 
+  /**
+   * Returns a list of users with public information
+   *
+   * @param paginated
+   */
   @Get()
   async findAllUsers(@Paginated() paginated) {
     return await this.userService.findAllUsers(paginated);
   }
 
   /**
-   * Returns the publicly or privately available information of a user
+   * Returns the publicly available information of a user
    *
    * @param params
-   * @param authUser
    */
   @Get(Routes.user.get.one)
-  @UseGuards(AllowAnonymousJwtGuard)
-  async findUserByUsername(@Param() params, @AuthUser() authUser) {
+  async findUserByUsername(@Param() params) {
     const { username } = params;
-    if (authUser.username === username) {
-      return await this.userService.findOnePrivateUserByUsername(username);
-    } else {
-      return await this.userService.findOnePublicUserByUsername(username);
-    }
+    return await this.userService.findOnePublicUserByUsername(username);
   }
 
   /**
-   * Finds all workout plans associated with an owner.
+   * Finds all public workout plans associated with an owner.
    *
    * @param params
-   * @param authUser
    * @param paginated
    */
   @Get(Routes.user.get.workoutPlansByOne)
-  @UseGuards(AllowAnonymousJwtGuard)
-  async findWorkoutPlansForUser(
-    @Param() params,
-    @AuthUser() authUser,
-    @Paginated() paginated,
-  ) {
+  async findWorkoutPlansForUser(@Param() params, @Paginated() paginated) {
     const { username } = params;
-    if (authUser && authUser.username === username) {
-      return await this.workoutPlanService.findAllAccessibleByUser(
-        authUser.userId,
-        paginated,
-      );
-    } else {
-      const user = await this.userService.findOnePublicUserByUsername(username);
-      return await this.workoutPlanService.findAllPublicByUser(
-        user.id,
-        paginated,
-      );
-    }
+    const user = await this.userService.findOnePublicUserByUsername(username);
+    return await this.workoutPlanService.findAllPublicByUser(
+      user.id,
+      paginated,
+    );
   }
 }

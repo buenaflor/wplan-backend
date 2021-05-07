@@ -13,7 +13,6 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { databaseConfig } from './shared/database/database.config';
 import { EmailVerificationModule } from './shared/mail/verification/email-verification.module';
-import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { AuthUserModule } from './modules/auth-user/auth-user.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
@@ -44,7 +43,6 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
     AuthModule,
     EmailVerificationModule,
-    UserProfileModule,
     AuthUserModule,
     PermissionModule,
     RoleModule,
