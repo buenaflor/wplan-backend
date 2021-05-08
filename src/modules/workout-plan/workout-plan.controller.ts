@@ -12,14 +12,14 @@ import {
   Put,
   Res,
   HttpStatus,
-  Post, UnprocessableEntityException
-} from "@nestjs/common";
+  Post,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from '../auth-user/decorator/auth-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { UpdateWorkoutPlanDto } from './dto/update-workout-plan.dto';
 import { Routes } from '../../config/constants';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
@@ -34,17 +34,25 @@ import { WorkoutPlanCollaboratorReadAccessGuard } from '../../guards/workout-pla
 import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
-import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
+import { WorkoutDayService } from '../workout-day/workout-day.service';
+import { CreateWorkoutDayDto } from '../workout-day/dto/create-workout-day.dto';
+import { WorkoutDayId } from '../workout-day/decorator/workout-day-id.decorator';
+import { UpdateWorkoutDayDto } from '../workout-day/dto/update-workout-day.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
   constructor(
     private readonly workoutPlanService: WorkoutPlanService,
     private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
+    private readonly workoutDayService: WorkoutDayService,
     private readonly userService: UserService,
     private readonly roleService: RoleService,
     private readonly permissionService: PermissionService,
   ) {}
+
+  //================================================================================
+  // Workout Plan
+  //================================================================================
 
   /**
    * Returns all public workout plans
@@ -95,6 +103,10 @@ export class WorkoutPlanController {
     }
   }
 
+  //================================================================================
+  // Collaborator
+  //================================================================================
+
   /**
    * Returns a list of open invitations of the workout plan
    *
@@ -112,7 +124,7 @@ export class WorkoutPlanController {
   ) {
     return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
       workoutPlanId,
-      paginated
+      paginated,
     );
   }
 
@@ -173,7 +185,9 @@ export class WorkoutPlanController {
       inviteeUsername,
     );
     if (invitee.id === inviterUserId) {
-      throw new UnprocessableEntityException('Cannot send invitation to oneself')
+      throw new UnprocessableEntityException(
+        'Cannot send invitation to oneself',
+      );
     }
     const role = await this.roleService.findOneByName(
       inviteCollaboratorDto.role,
@@ -195,64 +209,48 @@ export class WorkoutPlanController {
     }
   }
 
-  /**
-   * Creates a workout plan where the authenticated user is the owner
-   *
-   * @param authUser
-   * @param createWorkoutPlanDTO
-   */
-  @Post(Routes.workoutPlan.controller)
-  @HttpCode(204)
-  @UseGuards(JwtAuthGuard)
-  async createWorkoutPlanForUser(
-    @AuthUser() authUser,
-    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
-  ) {
-    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
-  }
+  //================================================================================
+  // Workout Day
+  //================================================================================
 
   /**
-   * Updates the workout plan according to updateWorkoutPlanDto and
-   * the given params. An authenticated user and a valid workout plan name
-   * is required.
+   * Creates a workout day for a workout plan
+   * Requester needs to be a collaborator with write access
    *
-   * @param authUser
+   * @param createWorkoutDayDto
    * @param workoutPlanId
-   * @param updateWorkoutPlanDto
    */
-  @Patch(Routes.workoutPlan.patch.one)
+  @Post(Routes.workoutPlan.post.workoutDays)
   @UseGuards(
     JwtAuthGuard,
     WorkoutPlanCollaboratorGuard,
     WorkoutPlanCollaboratorWriteAccessGuard,
   )
-  async updateWorkoutPlanForUser(
-    @AuthUser() authUser,
+  async createWorkoutDay(
+    @Body() createWorkoutDayDto: CreateWorkoutDayDto,
     @WorkoutPlanId() workoutPlanId: string,
-    @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
   ) {
-    return await this.workoutPlanService.update(
-      updateWorkoutPlanDto,
-      workoutPlanId,
-    );
+    createWorkoutDayDto.workoutPlanId = workoutPlanId;
+    return this.workoutDayService.save(createWorkoutDayDto);
   }
 
   /**
-   * Deletes the workout plan according to the given params
-   * An authenticated user and a valid workout plan name is required
-   *
-   * The authenticated user has to be the owner of the workout plan
+   * Fetches all workout days of a workout plan
+   * Requester needs to be a collaborator with at least read access
    *
    * @param workoutPlanId
+   * @param paginated
    */
-  @Delete(Routes.workoutPlan.delete.one)
-  @HttpCode(204)
+  @Get(Routes.workoutPlan.get.workoutDays)
   @UseGuards(
     JwtAuthGuard,
     WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
+    WorkoutPlanCollaboratorReadAccessGuard,
   )
-  async deleteWorkoutPlanForUser(@WorkoutPlanId() workoutPlanId: string) {
-    await this.workoutPlanService.delete({ id: workoutPlanId });
+  async getWorkoutDays(
+    @WorkoutPlanId() workoutPlanId: string,
+    @Paginated() paginated,
+  ) {
+    return this.workoutDayService.findAll(workoutPlanId, paginated);
   }
 }

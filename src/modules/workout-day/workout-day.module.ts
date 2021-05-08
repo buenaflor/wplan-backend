@@ -9,6 +9,6 @@ import { WorkoutDayController } from './workout-day.controller';
   imports: [TypeOrmModule.forFeature([WorkoutDay])],
   providers: [WorkoutDayService],
   controllers: [WorkoutDayController],
-  exports: [],
+  exports: [WorkoutDayService],
 })
 export class WorkoutDayModule {}

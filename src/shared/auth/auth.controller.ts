@@ -6,8 +6,9 @@ import {
   Body,
   Put,
   Patch,
-  Param, ForbiddenException
-} from "@nestjs/common";
+  Param,
+  ForbiddenException,
+} from '@nestjs/common';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';

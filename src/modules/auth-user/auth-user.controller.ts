@@ -19,6 +19,11 @@ import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dt
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
+import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
+import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
+import { WorkoutPlanId } from '../workout-plan/decorator/workout-plan-id.decorator';
+import { UpdateWorkoutPlanDto } from '../workout-plan/dto/update-workout-plan.dto';
+import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 
 /**
  * This controller is responsible for handling authenticated user requests
@@ -135,5 +140,66 @@ export class AuthUserController {
       invitationId,
       authUser.userId,
     );
+  }
+
+  /**
+   * Creates a workout plan where the authenticated user is the owner
+   *
+   * @param authUser
+   * @param createWorkoutPlanDTO
+   */
+  @Post(Routes.authUser.post.workoutPlans)
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async createWorkoutPlan(
+    @AuthUser() authUser,
+    @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
+  ) {
+    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
+  }
+
+  /**
+   * Updates the workout plan according to updateWorkoutPlanDto and
+   * the given params. An authenticated user and a valid workout plan name
+   * is required.
+   *
+   * @param authUser
+   * @param workoutPlanId
+   * @param updateWorkoutPlanDto
+   */
+  @Patch(Routes.authUser.patch.workoutPlan)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorWriteAccessGuard,
+  )
+  async updateWorkoutPlan(
+    @AuthUser() authUser,
+    @WorkoutPlanId() workoutPlanId: string,
+    @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
+  ) {
+    return await this.workoutPlanService.update(
+      updateWorkoutPlanDto,
+      workoutPlanId,
+    );
+  }
+
+  /**
+   * Deletes the workout plan according to the given params
+   * An authenticated user and a valid workout plan name is required
+   *
+   * The authenticated user has to be the owner of the workout plan
+   *
+   * @param workoutPlanId
+   */
+  @Delete(Routes.authUser.delete.workoutPlan)
+  @HttpCode(204)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
+  async deleteWorkoutPlanForUser(@WorkoutPlanId() workoutPlanId: string) {
+    await this.workoutPlanService.delete({ id: workoutPlanId });
   }
 }

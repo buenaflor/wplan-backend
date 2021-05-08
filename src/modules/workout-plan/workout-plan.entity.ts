@@ -6,6 +6,8 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { WorkoutDay } from '../workout-day/workout-day.entity';
 import { User } from '../user/user.entity';
@@ -52,10 +54,16 @@ export class WorkoutPlan {
   @Column({ type: 'date', name: 'end_date' })
   endDate: Date;
 
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
   @Column({ type: 'bigint', name: 'user_id' })
   userId: bigint;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { eager: true })
   @JoinColumn({ name: 'user_id' })
   owner: User;
 

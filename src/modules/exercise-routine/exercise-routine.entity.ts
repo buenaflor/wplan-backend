@@ -1,5 +1,11 @@
 // exercise-routine.entity.ts
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutDay } from '../workout-day/workout-day.entity';
