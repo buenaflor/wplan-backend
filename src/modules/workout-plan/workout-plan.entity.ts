@@ -63,7 +63,7 @@ export class WorkoutPlan {
   @Column({ type: 'bigint', name: 'user_id' })
   userId: bigint;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { eager: true })
   @JoinColumn({ name: 'user_id' })
   owner: User;
 

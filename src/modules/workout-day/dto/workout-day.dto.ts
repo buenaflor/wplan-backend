@@ -7,6 +7,7 @@ export class WorkoutDayDto {
     workoutPlanDto: PublicWorkoutPlanDto,
     name: string,
     description: string,
+    date: Date,
     totalExercises: number,
     createdAt: Date,
     updatedAt: Date,
@@ -15,6 +16,7 @@ export class WorkoutDayDto {
     this.workoutPlan = workoutPlanDto;
     this.name = name;
     this.description = description;
+    this.date = date;
     this.totalExercises = totalExercises;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -23,12 +25,12 @@ export class WorkoutDayDto {
   @IsNumber()
   id: string;
 
-  @IsObject()
-  workoutPlan: PublicWorkoutPlanDto;
-
   name: string;
 
   description: string;
+
+  @IsDate()
+  date: Date;
 
   @IsNumber()
   totalExercises: number;
@@ -38,4 +40,7 @@ export class WorkoutDayDto {
 
   @IsDate()
   updatedAt: Date;
+
+  @IsObject()
+  workoutPlan: PublicWorkoutPlanDto;
 }

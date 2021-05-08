@@ -16,11 +16,15 @@ import { WorkoutDayDto } from './dto/workout-day.dto';
 
 @Entity({ name: 'workout_day' })
 export class WorkoutDay {
+  constructor(partial: Partial<WorkoutDay>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
-  date: string;
+  date: Date;
 
   @Column({ length: 40 })
   name: string;
@@ -37,7 +41,12 @@ export class WorkoutDay {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => WorkoutPlan, (workoutPlan) => workoutPlan.id)
+  @Column({ name: 'workout_plan_id' })
+  workoutPlanId: string;
+
+  @ManyToOne(() => WorkoutPlan, (workoutPlan) => workoutPlan.id, {
+    eager: true,
+  })
   @JoinColumn({ name: 'workout_plan_id' })
   workoutPlan: WorkoutPlan;
 
@@ -53,6 +62,7 @@ export class WorkoutDay {
       this.workoutPlan.createPublicWorkoutDto(),
       this.name,
       this.description,
+      this.date,
       this.totalExercises,
       this.createdAt,
       this.updatedAt,

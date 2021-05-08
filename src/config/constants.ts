@@ -16,9 +16,11 @@ export const Routes = {
       workoutPlans: '/workout_plans',
     },
     patch: {
+      workoutPlan: '/workout_plans/:workoutPlanId',
       acceptWorkoutPlanInvitation: '/workout_plan_invitations/:invitationId',
     },
     delete: {
+      workoutPlan: '/workout_plans/:workoutPlanId',
       declineWorkoutPlanInvitation: '/workout_plan_invitations/:invitationId',
     },
   },
@@ -32,12 +34,28 @@ export const Routes = {
     },
     patch: {
       one: '/:workoutPlanId',
+      workoutDay: '/:workoutPlanId/workout_days/:workoutDayId',
     },
     delete: {
       one: '/:workoutPlanId',
     },
+    post: {
+      workoutDays: '/:workoutPlanId/workout_days',
+    },
     put: {
       inviteCollaborator: '/:workoutPlanId/collaborators/:inviteeUsername',
+    },
+  },
+  workoutDay: {
+    controller: 'workout_days',
+    get: {
+      one: '/:workoutDayId',
+    },
+    delete: {
+      one: '/:workoutDayId',
+    },
+    patch: {
+      one: '/:workoutDayId',
     },
   },
   auth: {
