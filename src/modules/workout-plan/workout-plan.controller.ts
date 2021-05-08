@@ -278,5 +278,7 @@ export class WorkoutPlanController {
   async getWorkoutDays(
     @WorkoutPlanId() workoutPlanId: string,
     @Paginated() paginated,
-  ) {}
+  ) {
+    return this.workoutDayService.findAll(workoutPlanId, paginated);
+  }
 }
