@@ -12,8 +12,9 @@ import {
   Put,
   Res,
   HttpStatus,
-  Post, UnprocessableEntityException
-} from "@nestjs/common";
+  Post,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
 import { AllowAnonymousJwtGuard } from '../../guards/allow-anonymous-jwt-guard.service';
@@ -35,16 +36,22 @@ import { SearchWorkoutPlanDto } from './dto/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
 import { CreateWorkoutPlanDto } from './dto/create-workout-plan.dto';
+import { WorkoutDayService } from '../workout-day/workout-day.service';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
   constructor(
     private readonly workoutPlanService: WorkoutPlanService,
     private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
+    private readonly workoutDayService: WorkoutDayService,
     private readonly userService: UserService,
     private readonly roleService: RoleService,
     private readonly permissionService: PermissionService,
   ) {}
+
+  //================================================================================
+  // Workout Plan
+  //================================================================================
 
   /**
    * Returns all public workout plans
@@ -92,106 +99,6 @@ export class WorkoutPlanController {
     }
     if (workoutPlanDto.isPrivate) {
       throw new NotFoundException();
-    }
-  }
-
-  /**
-   * Returns a list of open invitations of the workout plan
-   *
-   * @param workoutPlanId
-   * @param paginated
-   */
-  @Get(Routes.workoutPlan.get.openInvitations)
-  @UseGuards(
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
-  )
-  async getOpenInvitations(
-    @WorkoutPlanId() workoutPlanId: string,
-    @Paginated() paginated,
-  ) {
-    return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
-      workoutPlanId,
-      paginated
-    );
-  }
-
-  /**
-   * Returns the collaborators of a workout plan
-   * Requires an authenticated user and if the auth user is not
-   * a collaborator with at least read permission then deny access to the resource
-   *
-   * @param workoutPlanId
-   * @param authUser
-   * @param paginated
-   */
-  @Get(Routes.workoutPlan.get.collaborators)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorReadAccessGuard,
-  )
-  async getCollaborators(
-    @WorkoutPlanId() workoutPlanId: string,
-    @AuthUser() authUser,
-    @Paginated() paginated,
-  ) {
-    return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
-      workoutPlanId,
-      paginated,
-    );
-  }
-
-  /**
-   * Invites a user to be a collaborator to the workout plan
-   * A user can only have one invitation per workout plan
-   * Sending multiple invitations by multiple users will only replace
-   * the current invitation in the database
-   *
-   * @param authUser
-   * @param workoutPlanId
-   * @param inviteCollaboratorDto
-   * @param params
-   * @param res
-   */
-  @Put(Routes.workoutPlan.put.inviteCollaborator)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
-  )
-  async inviteCollaborator(
-    @AuthUser() authUser,
-    @WorkoutPlanId() workoutPlanId: string,
-    @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
-    @Param() params,
-    @Res() res: Response,
-  ) {
-    const { inviteeUsername } = params;
-    const inviterUserId = authUser.userId;
-    const invitee = await this.userService.findOnePublicUserByUsername(
-      inviteeUsername,
-    );
-    if (invitee.id === inviterUserId) {
-      throw new UnprocessableEntityException('Cannot send invitation to oneself')
-    }
-    const role = await this.roleService.findOneByName(
-      inviteCollaboratorDto.role,
-    );
-    const permission = await this.permissionService.findOneByName(
-      inviteCollaboratorDto.permission,
-    );
-    const invitation = await this.workoutPlanCollaboratorService.inviteCollaborator(
-      invitee.id,
-      workoutPlanId,
-      role.id,
-      permission.id,
-      inviterUserId,
-    );
-    if (invitation) {
-      res.status(HttpStatus.OK).send(invitation);
-    } else {
-      res.status(HttpStatus.NO_CONTENT).send();
     }
   }
 
@@ -255,4 +162,121 @@ export class WorkoutPlanController {
   async deleteWorkoutPlanForUser(@WorkoutPlanId() workoutPlanId: string) {
     await this.workoutPlanService.delete({ id: workoutPlanId });
   }
+
+  //================================================================================
+  // Collaborator
+  //================================================================================
+
+  /**
+   * Returns a list of open invitations of the workout plan
+   *
+   * @param workoutPlanId
+   * @param paginated
+   */
+  @Get(Routes.workoutPlan.get.openInvitations)
+  @UseGuards(
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
+  async getOpenInvitations(
+    @WorkoutPlanId() workoutPlanId: string,
+    @Paginated() paginated,
+  ) {
+    return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
+      workoutPlanId,
+      paginated,
+    );
+  }
+
+  /**
+   * Returns the collaborators of a workout plan
+   * Requires an authenticated user and if the auth user is not
+   * a collaborator with at least read permission then deny access to the resource
+   *
+   * @param workoutPlanId
+   * @param authUser
+   * @param paginated
+   */
+  @Get(Routes.workoutPlan.get.collaborators)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorReadAccessGuard,
+  )
+  async getCollaborators(
+    @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser,
+    @Paginated() paginated,
+  ) {
+    return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
+      workoutPlanId,
+      paginated,
+    );
+  }
+
+  /**
+   * Invites a user to be a collaborator to the workout plan
+   * A user can only have one invitation per workout plan
+   * Sending multiple invitations by multiple users will only replace
+   * the current invitation in the database
+   *
+   * @param authUser
+   * @param workoutPlanId
+   * @param inviteCollaboratorDto
+   * @param params
+   * @param res
+   */
+  @Put(Routes.workoutPlan.put.inviteCollaborator)
+  @UseGuards(
+    JwtAuthGuard,
+    WorkoutPlanCollaboratorGuard,
+    WorkoutPlanCollaboratorAdminAccessGuard,
+  )
+  async inviteCollaborator(
+    @AuthUser() authUser,
+    @WorkoutPlanId() workoutPlanId: string,
+    @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
+    @Param() params,
+    @Res() res: Response,
+  ) {
+    const { inviteeUsername } = params;
+    const inviterUserId = authUser.userId;
+    const invitee = await this.userService.findOnePublicUserByUsername(
+      inviteeUsername,
+    );
+    if (invitee.id === inviterUserId) {
+      throw new UnprocessableEntityException(
+        'Cannot send invitation to oneself',
+      );
+    }
+    const role = await this.roleService.findOneByName(
+      inviteCollaboratorDto.role,
+    );
+    const permission = await this.permissionService.findOneByName(
+      inviteCollaboratorDto.permission,
+    );
+    const invitation = await this.workoutPlanCollaboratorService.inviteCollaborator(
+      invitee.id,
+      workoutPlanId,
+      role.id,
+      permission.id,
+      inviterUserId,
+    );
+    if (invitation) {
+      res.status(HttpStatus.OK).send(invitation);
+    } else {
+      res.status(HttpStatus.NO_CONTENT).send();
+    }
+  }
+
+  //================================================================================
+  // Workout Day
+  //================================================================================
+
+  @Get(Routes.workoutPlan.get.workoutDays)
+  @UseGuards(JwtAuthGuard)
+  async getWorkoutDays(
+    @WorkoutPlanId() workoutPlanId: string,
+    @Paginated() paginated,
+  ) {}
 }

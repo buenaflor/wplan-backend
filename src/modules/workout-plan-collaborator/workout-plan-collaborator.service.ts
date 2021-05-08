@@ -77,7 +77,7 @@ export class WorkoutPlanCollaboratorService {
    */
   async getAllInvitationsByWorkoutPlanId(
     workoutPlanId: string,
-    options: IPaginationOptions
+    options: IPaginationOptions,
   ) {
     const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
       this.workoutPlanCollaboratorInvitationEntityRepository,

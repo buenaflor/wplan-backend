@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { User } from '../user.entity';
 import { PublicUserDto } from './public-user-dto';
-import { Column } from "typeorm";
+import { Column } from 'typeorm';
 
 /**
  * DTO that encapsulates user data that is privately available

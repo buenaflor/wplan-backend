@@ -28,6 +28,7 @@ export const Routes = {
       one: '/:workoutPlanId',
       openInvitations: ':workoutPlanId/invitations',
       collaborators: '/:workoutPlanId/collaborators',
+      workoutDays: '/:workoutPlanId/workout_days',
     },
     patch: {
       one: '/:workoutPlanId',
