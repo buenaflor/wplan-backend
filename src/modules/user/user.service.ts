@@ -6,15 +6,15 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrivateUserDto } from './dto/private-user.dto';
-import { PublicUserDto } from './dto/public-user-dto';
+import { UpdateUserDto } from './dto/request/update-user.dto';
+import { PrivateUserDto } from './dto/response/private-user.dto';
+import { PublicUserDto } from './dto/response/public-user-dto';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/request/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -38,7 +38,7 @@ export class UserService {
     const res = await paginate<User>(this.userRepository, options);
     return new Pagination(
       res.items.map((elem) => {
-        return elem.createPublicUserDto();
+        return elem.toPublicUserDto();
       }),
       res.meta,
       res.links,
@@ -55,7 +55,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('Could not find a user with id: ' + id);
     }
-    return user.createPrivateUserDto();
+    return user.toPrivateUserDto();
   }
 
   /**
@@ -70,7 +70,7 @@ export class UserService {
         'Could not find a user with username: ' + username,
       );
     }
-    return user.createPublicUserDto();
+    return user.toPublicUserDto();
   }
 
   async loginNameExists(login: string) {
@@ -160,6 +160,6 @@ export class UserService {
 
   async save(user: CreateUserDto) {
     const userFromDb = await this.userRepository.save(user);
-    return userFromDb.createPrivateUserDto();
+    return userFromDb.toPrivateUserDto();
   }
 }

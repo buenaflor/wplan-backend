@@ -11,18 +11,18 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { UpdateUserDto } from '../user/dto/request/update-user.dto';
 import { AuthUser } from './decorator/auth-user.decorator';
-import { PrivateUserDto } from '../user/dto/private-user.dto';
-import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
-import { CreateWorkoutPlanDto } from '../workout-plan/dto/create-workout-plan.dto';
+import { PrivateUserDto } from '../user/dto/response/private-user.dto';
+import { WorkoutPlanService } from '../workout/workout-plan/workout-plan.service';
+import { CreateWorkoutPlanDto } from '../workout/workout-plan/dto/request/create-workout-plan.dto';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
-import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
+import { WorkoutPlanCollaboratorService } from '../workout/workout-plan-collaborator/workout-plan-collaborator.service';
 import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
-import { WorkoutPlanId } from '../workout-plan/decorator/workout-plan-id.decorator';
-import { UpdateWorkoutPlanDto } from '../workout-plan/dto/update-workout-plan.dto';
+import { WorkoutPlanId } from '../workout/workout-plan/decorator/workout-plan-id.decorator';
+import { UpdateWorkoutPlanDto } from '../workout/workout-plan/dto/request/update-workout-plan.dto';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
 
 /**

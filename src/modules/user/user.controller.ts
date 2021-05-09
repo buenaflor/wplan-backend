@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
-import { WorkoutPlanService } from '../workout-plan/workout-plan.service';
+import { WorkoutPlanService } from '../workout/workout-plan/workout-plan.service';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
 

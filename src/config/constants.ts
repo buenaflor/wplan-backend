@@ -58,6 +58,12 @@ export const Routes = {
       one: '/:workoutDayId',
     },
   },
+  exerciseRoutine: {
+    controller: 'exercise_routines',
+    get: {
+      one: '/:exerciseRoutineId',
+    },
+  },
   auth: {
     controller: 'auth',
     post: {
