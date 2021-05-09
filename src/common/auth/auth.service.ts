@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   /**
-   * Updates the login date when a user logs in
+   * Updates the login date when a user logging in
    *
    * @param userId
    */

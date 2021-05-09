@@ -10,3 +10,4 @@ CREATE TABLE IF NOT EXISTS email_verification
     FOREIGN KEY (user_id) REFERENCES "user" (id),
     CONSTRAINT name_length_check CHECK (length(token) <= 128)
 );
+

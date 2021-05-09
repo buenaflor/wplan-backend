@@ -33,7 +33,7 @@ import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorato
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
 import { WorkoutDayService } from '../workout-day/workout-day.service';
 import { CreateWorkoutDayDto } from '../workout-day/dto/request/create-workout-day.dto';
-import { MyLogger } from '../../../log/my.logger';
+import { MyLogger } from '../../../logging/my.logger';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {

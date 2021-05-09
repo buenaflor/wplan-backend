@@ -10,6 +10,10 @@ export const databaseConfig = (configService: ConfigService) => {
     password: configService.get('DB_PASS'),
     database: configService.get('DB_NAME'),
     entities: ['dist/**/*.entity.js'],
+    migrations: ['dist/migrations/*.js'],
+    cli: {
+      migrationsDir: 'src/migrations',
+    },
     synchronize: false,
     extra: {
       ssl: true,
