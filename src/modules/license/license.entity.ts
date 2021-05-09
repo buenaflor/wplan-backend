@@ -1,6 +1,6 @@
 // license.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Exercise } from '../exercise/exercise.entity';
+import { Exercise } from '../workout/exercise/exercise.entity';
 
 @Entity({ name: 'license' })
 export class License {

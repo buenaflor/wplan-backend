@@ -1,48 +1,26 @@
 // user.entity.ts
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  BeforeInsert,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, BeforeInsert } from 'typeorm';
 import * as argon2 from 'argon2';
-import { PrivateUserDto } from './dto/private-user.dto';
-import { PublicUserDto } from './dto/public-user-dto';
-import { UserDto } from './dto/user.dto';
+import { PrivateUserDto } from './dto/response/private-user.dto';
+import { PublicUserDto } from './dto/response/public-user-dto';
+import { AbstractEntity } from '../../utils/abstract/abstract.entity';
+import { plainToClass } from 'class-transformer';
 
 @Entity({ name: 'user' })
-export class User {
-  constructor(
-    id?: string,
-    username?: string,
-    email?: string,
-    password?: string,
-  ) {
-    this.id = id;
-    this.login = username;
-    this.email = email;
-    this.password = password;
-    this.createdAt = new Date();
-  }
-
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column({ length: 40 })
+export class User extends AbstractEntity {
+  @Column()
   login: string;
 
-  @Column({ length: 40 })
+  @Column()
   name: string;
 
-  @Column({ length: 128 })
+  @Column()
   password: string;
 
   @Column()
   email: string;
 
-  @Column({ length: 160 })
+  @Column()
   bio: string;
 
   @Column({ name: 'public_workout_plans' })
@@ -51,16 +29,10 @@ export class User {
   @Column({ name: 'private_workout_plans' })
   privateWorkoutPlans: number;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
-
   @Column({ name: 'last_login_at' })
   lastLoginAt: Date;
 
-  @Column({ type: 'boolean', name: 'email_confirmed' })
+  @Column({ name: 'email_confirmed' })
   isEmailConfirmed: boolean;
 
   @BeforeInsert()
@@ -72,49 +44,11 @@ export class User {
   // DTO creation           //
   //**************************
 
-  createPrivateUserDto() {
-    return new PrivateUserDto(
-      this.id,
-      this.login,
-      this.name,
-      this.email,
-      this.bio,
-      this.createdAt,
-      this.updatedAt,
-      this.lastLoginAt,
-      this.isEmailConfirmed,
-      this.publicWorkoutPlans,
-      this.privateWorkoutPlans,
-    );
+  toPrivateUserDto() {
+    return plainToClass(PrivateUserDto, this);
   }
 
-  createPublicUserDto() {
-    return new PublicUserDto(
-      this.id,
-      this.login,
-      this.name,
-      this.email,
-      this.bio,
-      this.createdAt,
-      this.updatedAt,
-      this.lastLoginAt,
-    );
-  }
-
-  createInternalUserDto() {
-    return new UserDto(
-      this.id,
-      this.login,
-      this.name,
-      this.email,
-      this.bio,
-      this.password,
-      this.createdAt,
-      this.updatedAt,
-      this.lastLoginAt,
-      this.isEmailConfirmed,
-      this.publicWorkoutPlans,
-      this.privateWorkoutPlans,
-    );
+  toPublicUserDto() {
+    return plainToClass(PublicUserDto, this);
   }
 }

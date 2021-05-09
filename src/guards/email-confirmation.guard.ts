@@ -5,7 +5,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { EmailVerificationService } from '../shared/mail/verification/email-verification.service';
+import { EmailVerificationService } from '../common/mail/verification/email-verification.service';
 
 @Injectable()
 export class EmailConfirmationGuard implements CanActivate {

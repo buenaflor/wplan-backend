@@ -1,24 +1,25 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkoutPlanModule } from './modules/workout-plan/workout-plan.module';
-import { MuscleGroupModule } from './modules/muscle-group/muscle-group.module';
-import { ExerciseModule } from './modules/exercise/exercise.module';
+import { WorkoutPlanModule } from './modules/workout/workout-plan/workout-plan.module';
+import { MuscleGroupModule } from './modules/workout/muscle-group/muscle-group.module';
+import { ExerciseModule } from './modules/workout/exercise/exercise.module';
 import { LicenseModule } from './modules/license/license.module';
-import { WorkoutDayModule } from './modules/workout-day/workout-day.module';
-import { ExerciseRoutineModule } from './modules/exercise-routine/exercise-routine.module';
-import { ExerciseWlSetModule } from './modules/exercise-wl-set/exercise-wl-set.module';
+import { WorkoutDayModule } from './modules/workout/workout-day/workout-day.module';
+import { ExerciseRoutineModule } from './modules/workout/exercise-routine/exercise-routine.module';
+import { ExerciseWlSetModule } from './modules/workout/exercise-wl-set/exercise-wl-set.module';
 import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './shared/auth/auth.module';
+import { AuthModule } from './common/auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { databaseConfig } from './shared/database/database.config';
-import { EmailVerificationModule } from './shared/mail/verification/email-verification.module';
+import { databaseConfig } from './common/database/database.config';
+import { EmailVerificationModule } from './common/mail/verification/email-verification.module';
 import { AuthUserModule } from './modules/auth-user/auth-user.module';
 import { PermissionModule } from './modules/permission/permission.module';
-import { RoleModule } from './modules/role/role.module';
-import { WorkoutPlanCollaboratorModule } from './modules/workout-plan-collaborator/workout-plan-collaborator.module';
+import { RoleModule } from './modules/workout/role/role.module';
+import { WorkoutPlanCollaboratorModule } from './modules/workout/workout-plan-collaborator/workout-plan-collaborator.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CaslModule } from './common/casl/casl.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { APP_GUARD } from '@nestjs/core';
     PermissionModule,
     RoleModule,
     WorkoutPlanCollaboratorModule,
+    CaslModule,
   ],
   providers: [
     {
