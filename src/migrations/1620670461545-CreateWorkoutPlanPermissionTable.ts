@@ -13,9 +13,9 @@ export class CreateWorkoutPlanPermissionTable1620670461545 implements MigrationI
             PRIMARY KEY (id),
             CONSTRAINT name_length_check CHECK (length(name) <= 32)
         );
-        INSERT INTO workout_plan_permission (name) VALUES ('READ');
-        INSERT INTO workout_plan_permission (name) VALUES ('WRITE');
-        INSERT INTO workout_plan_permission (name) VALUES ('ADMIN');
+        INSERT INTO workout_plan_permission (name) VALUES ('read');
+        INSERT INTO workout_plan_permission (name) VALUES ('write');
+        INSERT INTO workout_plan_permission (name) VALUES ('admin');
     `);
   }
 

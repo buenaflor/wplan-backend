@@ -7,8 +7,8 @@ import {
   Put,
   Patch,
   Param,
-  ForbiddenException,
-} from '@nestjs/common';
+  ForbiddenException, HttpCode
+} from "@nestjs/common";
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
@@ -52,6 +52,7 @@ export class AuthController {
    * @param createUserDto
    */
   @Post(Routes.auth.post.register)
+  @HttpCode(204)
   @UseGuards(UserRegistrationGuard)
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.save(createUserDto);
@@ -59,7 +60,6 @@ export class AuthController {
       user.id,
     );
     await this.authService.sendMail(user.email, emailVerification);
-    return user;
   }
 
   /**

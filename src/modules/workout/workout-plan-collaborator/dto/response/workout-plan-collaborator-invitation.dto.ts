@@ -1,8 +1,8 @@
-import { RoleDto } from '../../role/dto/RoleDto';
-import { PublicUserDto } from '../../../user/dto/response/public-user-dto';
-import { PermissionDto } from '../../../permission/dto/permission.dto';
+import { RoleDto } from '../../../role/dto/RoleDto';
+import { PublicUserDto } from '../../../../user/dto/response/public-user-dto';
+import { PermissionDto } from '../../../../permission/dto/permission.dto';
 import { IsNotEmpty } from 'class-validator';
-import { PublicWorkoutPlanDto } from '../../workout-plan/dto/response/public-workout-plan.dto';
+import { PublicWorkoutPlanDto } from '../../../workout-plan/dto/response/public-workout-plan.dto';
 
 export class WorkoutPlanCollaboratorInvitationDto {
   constructor(

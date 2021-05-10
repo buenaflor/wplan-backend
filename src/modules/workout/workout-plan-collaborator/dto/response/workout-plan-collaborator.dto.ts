@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
-import { PublicUserDto } from '../../../user/dto/response/public-user-dto';
-import { PermissionDto } from '../../../permission/dto/permission.dto';
-import { RoleDto } from '../../role/dto/RoleDto';
+import { PublicUserDto } from '../../../../user/dto/response/public-user-dto';
+import { PermissionDto } from '../../../../permission/dto/permission.dto';
+import { RoleDto } from '../../../role/dto/RoleDto';
 
 export class WorkoutPlanCollaboratorDto {
   constructor(
