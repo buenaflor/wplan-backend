@@ -21,7 +21,7 @@ import { Routes } from '../../../config/constants';
 import { Paginated } from '../../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 import { UserService } from '../../user/user.service';
-import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/invite-collaborator-request.dto';
+import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/request/invite-collaborator-request.dto';
 import { RoleService } from '../role/role.service';
 import { PermissionService } from '../../permission/permission.service';
 import { WorkoutPlanCollaboratorGuard } from '../../../guards/workout-plan-collaborator.guard';

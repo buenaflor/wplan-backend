@@ -1,5 +1,5 @@
-import { RoleEnum } from '../../role/role.enum';
-import { PermissionEnum } from '../../../permission/permission.enum';
+import { RoleEnum } from '../../../role/role.enum';
+import { PermissionEnum } from '../../../../permission/permission.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class InviteCollaboratorRequestDto {

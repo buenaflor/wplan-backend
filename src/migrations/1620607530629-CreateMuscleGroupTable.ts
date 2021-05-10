@@ -1,13 +1,15 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateMuscleGroupTable1620607530629 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         CREATE TABLE muscle_group
         (
-            id          uuid NOT NULL DEFAULT uuid_generate_v4(),
-            name        TEXT NOT NULL,
+            id          uuid        NOT NULL DEFAULT uuid_generate_v4(),
+            name        TEXT        NOT NULL,
             description TEXT,
+            created_at  timestamptz NOT NULL DEFAULT current_timestamp,
+            updated_at  timestamptz NOT NULL DEFAULT current_timestamp,
             CHECK ( length(name) < 64 ),
             CHECK ( length(description) < 500),
             PRIMARY KEY (id)

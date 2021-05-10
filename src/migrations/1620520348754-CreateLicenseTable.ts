@@ -1,14 +1,16 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateLicenseTable1620520348754 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         CREATE TABLE license
         (
-            id         uuid NOT NULL DEFAULT uuid_generate_v4(),
-            full_name  TEXT NOT NULL,
-            short_name TEXT NOT NULL,
-            url        TEXT NOT NULL,
+            id         uuid        NOT NULL DEFAULT uuid_generate_v4(),
+            full_name  TEXT        NOT NULL,
+            short_name TEXT        NOT NULL,
+            url        TEXT        NOT NULL,
+            created_at timestamptz NOT NULL DEFAULT current_timestamp,
+            updated_at timestamptz NOT NULL DEFAULT current_timestamp,
             CHECK ( length(full_name) < 128 ),
             CHECK ( length(short_name) < 64 ),
             CHECK ( length(url) < 255 ),

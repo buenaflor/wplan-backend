@@ -8,7 +8,7 @@ import {
 import { User } from '../../user/user.entity';
 import { RoleEntity } from '../role/role.entity';
 import { PermissionEntity } from '../../permission/permission.entity';
-import { WorkoutPlanCollaboratorDto } from './dto/workout-plan-collaborator.dto';
+import { WorkoutPlanCollaboratorDto } from './dto/response/workout-plan-collaborator.dto';
 import { WorkoutPlan } from '../workout-plan/workout-plan.entity';
 
 @Entity({ name: 'workout_plan_collaborator' })
