@@ -16,6 +16,8 @@
 
 Currently, the PostgreSQL test development database "wplan_dev" is hosted on Microsoft Azure.
 
+For development, a local postgres database should be used due to costs with azure.
+
 ## Environment
 
 ### Development
