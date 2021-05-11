@@ -37,7 +37,7 @@ EMAIL_PORT=
   
 # Database  
 DB_TYPE=pg
-DB_HOST=wplan-test-dev.postgres.database.azure.com
+DB_HOST=localhost
 DB_PORT=5432
 DB_USER=
 DB_PASS=
