@@ -9,7 +9,7 @@
 - PostgreSQL 
 - Redis caching
 - NestJS with Typescript
-- JSON Web Tokens for authentication and authorization
+- JSON Web Tokens for authentication
 - Docker for containerization
 
 ## Database
