@@ -1,6 +1,5 @@
-export enum PermissionEnum {
+export enum WorkoutPlanPermissionEnum {
   read = 'read',
   write = 'write',
   admin = 'admin',
-  none = 'none',
 }

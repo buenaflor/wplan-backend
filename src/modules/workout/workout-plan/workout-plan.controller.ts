@@ -22,8 +22,8 @@ import { Paginated } from '../../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 import { UserService } from '../../user/user.service';
 import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/request/invite-collaborator-request.dto';
-import { RoleService } from '../role/role.service';
-import { PermissionService } from '../../permission/permission.service';
+import { WorkoutPlanRoleService } from '../workout-plan-role/workout-plan-role.service';
+import { WorkoutPlanPermissionService } from '../workout-plan-permission/workout-plan-permission.service';
 import { WorkoutPlanCollaboratorGuard } from '../../../guards/workout-plan-collaborator.guard';
 import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../../guards/workout-plan-collaborator-admin-access.guard';
@@ -42,8 +42,8 @@ export class WorkoutPlanController {
     private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
     private readonly workoutDayService: WorkoutDayService,
     private readonly userService: UserService,
-    private readonly roleService: RoleService,
-    private readonly permissionService: PermissionService,
+    private readonly roleService: WorkoutPlanRoleService,
+    private readonly permissionService: WorkoutPlanPermissionService,
   ) {}
 
   private readonly logger = new MyLogger(WorkoutPlanController.name);
@@ -130,7 +130,7 @@ export class WorkoutPlanController {
   /**
    * Returns the collaborators of a workout plan
    * Requires an authenticated user and if the auth user is not
-   * a collaborator with at least read permission then deny access to the resource
+   * a collaborator with at least read workout-plan-permission then deny access to the resource
    *
    * @param workoutPlanId
    * @param authUser

@@ -1,13 +1,13 @@
-import { RoleEnum } from '../../../role/role.enum';
-import { PermissionEnum } from '../../../../permission/permission.enum';
+import { WorkoutPlanRoleEnum } from '../../../workout-plan-role/workout-plan-role.enum';
+import { WorkoutPlanPermissionEnum } from '../../../workout-plan-permission/workout-plan-permission.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class InviteCollaboratorRequestDto {
   @IsNotEmpty()
-  @IsEnum(PermissionEnum)
-  readonly permission: PermissionEnum;
+  @IsEnum(WorkoutPlanPermissionEnum)
+  readonly permission: WorkoutPlanPermissionEnum;
 
   @IsNotEmpty()
-  @IsEnum(RoleEnum)
-  readonly role: RoleEnum;
+  @IsEnum(WorkoutPlanRoleEnum)
+  readonly role: WorkoutPlanRoleEnum;
 }

@@ -3,22 +3,22 @@
 -- https://www.mockaroo.com/schemas/312130
 -- https://www.mockaroo.com/2bdd3100
 
-insert into workout_plan (name, user_id, description) values ('Bjorn', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Burn of second degree of toe(s) (nail)');
-insert into workout_plan (name, user_id, description) values ('Peggie', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Poisoning by other psychotropic drugs, accidental (unintentional)');
-insert into workout_plan (name, user_id, description) values ('Tomaso', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Other dislocation of unspecified knee, subsequent encounter');
-insert into workout_plan (name, user_id, description) values ('Madison', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Unspecified physeal fracture of lower end of radius, right arm, subsequent encounter for fracture with nonunion');
-insert into workout_plan (name, user_id, description) values ('Annetta', '2f85c0ce-bc15-4e93-b105-71b995deda02', 'Nondisplaced fracture of trapezium [larger multangular], right wrist, initial encounter for closed fracture');
-insert into workout_plan (name, user_id, description) values ('Ernest', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Nondisplaced articular fracture of head of right femur, initial encounter for open fracture type I or II');
-insert into workout_plan (name, user_id, description) values ('Delmar', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Other injury due to other accident to other unpowered watercraft, subsequent encounter');
-insert into workout_plan (name, user_id, description) values ('Denney', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Burn of second degree of scalp [any part]');
-insert into workout_plan (name, user_id, description) values ('Tiffi', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Nondisplaced oblique fracture of shaft of unspecified radius, sequela');
-insert into workout_plan (name, user_id, description) values ('Rock', '2ac8aa7e-efae-452b-ad4d-0acb79ed53cb', 'Greenstick fracture of shaft of unspecified ulna, subsequent encounter for fracture with nonunion');
-insert into workout_plan (name, user_id, description) values ('Nikki', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Laceration with foreign body of unspecified hand, subsequent encounter');
-insert into workout_plan (name, user_id, description) values ('Annadiana', '2f85c0ce-bc15-4e93-b105-71b995deda02', 'Valgus deformity, not elsewhere classified, left elbow');
-insert into workout_plan (name, user_id, description) values ('Homere', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Unspecified disorder of vestibular function, left ear');
-insert into workout_plan (name, user_id, description) values ('Saul', '2ac8aa7e-efae-452b-ad4d-0acb79ed53cb', 'Toxic effect of unspecified organic solvent, assault, sequela');
-insert into workout_plan (name, user_id, description) values ('Salvidor', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Person injured in collision between other motor vehicle and two- or three-wheeled motor vehicle, nontraffic');
-insert into workout_plan (name, user_id, description) values ('Addy', '2f85c0ce-bc15-4e93-b105-71b995deda02', 'Complete traumatic metacarpophalangeal amputation of other finger, subsequent encounter');
+insert into workout_plan (name, user_id, description) values ('Bjorn', 'c8a49175-5cd9-4633-8f8a-1bb6c5ceb99c', 'Burn of second degree of toe(s) (nail)');
+insert into workout_plan (name, user_id, description) values ('Peggie', 'c8a49175-5cd9-4633-8f8a-1bb6c5ceb99c', 'Poisoning by other psychotropic drugs, accidental (unintentional)');
+insert into workout_plan (name, user_id, description) values ('Tomaso', 'c8a49175-5cd9-4633-8f8a-1bb6c5ceb99c', 'Other dislocation of unspecified knee, subsequent encounter');
+insert into workout_plan (name, user_id, description) values ('Madison', 'c8a49175-5cd9-4633-8f8a-1bb6c5ceb99c', 'Unspecified physeal fracture of lower end of radius, right arm, subsequent encounter for fracture with nonunion');
+insert into workout_plan (name, user_id, description) values ('Annetta', 'cff0f19f-48e0-493c-b97a-f13d93b990ac', 'Nondisplaced fracture of trapezium [larger multangular], right wrist, initial encounter for closed fracture');
+insert into workout_plan (name, user_id, description) values ('Ernest', 'cff0f19f-48e0-493c-b97a-f13d93b990ac', 'Nondisplaced articular fracture of head of right femur, initial encounter for open fracture type I or II');
+insert into workout_plan (name, user_id, description) values ('Delmar', 'cff0f19f-48e0-493c-b97a-f13d93b990ac', 'Other injury due to other accident to other unpowered watercraft, subsequent encounter');
+insert into workout_plan (name, user_id, description) values ('Denney', 'cff0f19f-48e0-493c-b97a-f13d93b990ac', 'Burn of second degree of scalp [any part]');
+insert into workout_plan (name, user_id, description) values ('Tiffi', 'd426562b-944a-4ebd-8a96-0950548fc731', 'Nondisplaced oblique fracture of shaft of unspecified radius, sequela');
+insert into workout_plan (name, user_id, description) values ('Rock', 'd426562b-944a-4ebd-8a96-0950548fc731', 'Greenstick fracture of shaft of unspecified ulna, subsequent encounter for fracture with nonunion');
+insert into workout_plan (name, user_id, description) values ('Nikki', 'd426562b-944a-4ebd-8a96-0950548fc731', 'Laceration with foreign body of unspecified hand, subsequent encounter');
+insert into workout_plan (name, user_id, description) values ('Annadiana', 'd426562b-944a-4ebd-8a96-0950548fc731', 'Valgus deformity, not elsewhere classified, left elbow');
+insert into workout_plan (name, user_id, description) values ('Homere', '55ab29c9-1237-432c-b1c1-b2feb547c1bf', 'Unspecified disorder of vestibular function, left ear');
+insert into workout_plan (name, user_id, description) values ('Saul', '55ab29c9-1237-432c-b1c1-b2feb547c1bf', 'Toxic effect of unspecified organic solvent, assault, sequela');
+insert into workout_plan (name, user_id, description) values ('Salvidor', '55ab29c9-1237-432c-b1c1-b2feb547c1bf', 'Person injured in collision between other motor vehicle and two- or three-wheeled motor vehicle, nontraffic');
+insert into workout_plan (name, user_id, description) values ('Addy', '55ab29c9-1237-432c-b1c1-b2feb547c1bf', 'Complete traumatic metacarpophalangeal amputation of other finger, subsequent encounter');
 insert into workout_plan (name, user_id, description) values ('Shauna', '81b4c969-01b2-41af-bcd9-6ea1c7a04eb6', 'Mittelschmerz');
 insert into workout_plan (name, user_id, description) values ('Salvatore', '2f85c0ce-bc15-4e93-b105-71b995deda02', 'Poisoning by carbonic-anhydrase inhibitors, benzothiadiazides and other diuretics, assault, subsequent encounter');
 insert into workout_plan (name, user_id, description) values ('Adelbert', 'aebc95f3-c5cf-41af-82ad-6084f87c078e', 'Poisoning by pyrazolone derivatives, assault, sequela');

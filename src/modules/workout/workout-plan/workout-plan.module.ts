@@ -6,8 +6,8 @@ import { WorkoutPlanController } from './workout-plan.controller';
 import { WorkoutPlan } from './workout-plan.entity';
 import { UserModule } from '../../user/user.module';
 import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
-import { PermissionModule } from '../../permission/permission.module';
-import { RoleModule } from '../role/role.module';
+import { WorkoutPlanPermissionModule } from '../workout-plan-permission/workout-plan-permission.module';
+import { WorkoutPlanRoleModule } from '../workout-plan-role/workout-plan-role.module';
 import { WorkoutDayModule } from '../workout-day/workout-day.module';
 
 @Module({
@@ -16,8 +16,8 @@ import { WorkoutDayModule } from '../workout-day/workout-day.module';
     forwardRef(() => UserModule),
     WorkoutDayModule,
     WorkoutPlanCollaboratorModule,
-    PermissionModule,
-    RoleModule,
+    WorkoutPlanPermissionModule,
+    WorkoutPlanRoleModule,
   ],
   providers: [WorkoutPlanService],
   controllers: [WorkoutPlanController],

@@ -67,9 +67,9 @@ export class AuthUserController {
   }
 
   /**
-   * Finds all workout plans that the authenticated user has permission to access
+   * Finds all workout plans that the authenticated user has workout-plan-permission to access
    *
-   * The authenticated user has explicit permission to access workout plans they own or
+   * The authenticated user has explicit workout-plan-permission to access workout plans they own or
    * where they are a collaborator
    *
    * @param authUser

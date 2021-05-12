@@ -4,67 +4,62 @@ import {
   Delete,
   Get,
   HttpCode,
-  Patch,
+  ParseArrayPipe,
+  Put,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { Routes } from '../../../config/constants';
 import { WorkoutDayId } from './decorator/workout-day-id.decorator';
 import { UpdateWorkoutDayDto } from './dto/request/update-workout-day.dto';
 import { WorkoutDayService } from './workout-day.service';
-import { CaslAbilityFactory } from '../../../common/casl/casl-ability.factory';
-import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
-import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
-import { Action } from '../../../common/casl/actions';
 import { AllowAnonymousJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
+import { ReadWorkoutDayPolicyHandler } from './policies/read-workout-day-policy.handler';
+import { CheckPolicies } from '../../../common/policy/check-policies.decorator';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
+import { UpdateUserDto } from '../../user/dto/request/update-user.dto';
+import { UpdateWorkoutDayPolicyHandler } from './policies/update-workout-day-policy.handler';
+import {
+  WorkoutDayAction,
+  WorkoutDayPolicyFactory,
+} from './policies/workout-day-policy.factory';
+import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
+import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
 
 @Controller(Routes.workoutDay.controller)
 export class WorkoutDayController {
   constructor(
     private readonly workoutDayService: WorkoutDayService,
-    private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
-    private readonly caslAbilityFactory: CaslAbilityFactory,
+    private readonly workoutDayPolicyFactory: WorkoutDayPolicyFactory,
   ) {}
 
   /**
    * Returns one workout day by id
    *
-   * @param workoutDayId
-   * @param authUser
+   * @param req
    */
   @Get(Routes.workoutDay.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
-  async findOne(@WorkoutDayId() workoutDayId: string, @AuthUser() authUser) {
-    const workoutDay = await this.workoutDayService.findOneById(workoutDayId);
-    /*const workoutPlanId = workoutDay.workoutPlan.id;
-
-    const collaborator = await this.workoutPlanCollaboratorService.findOneRaw(
-      workoutPlanId,
-      authUser.userId,
-    );
-
-    const ability = this.caslAbilityFactory.createForWorkoutPlanCollaborator(
-      collaborator,
-    );
-    ability.can(Action.read, 'all');
-
-     */
-
-    return workoutDay;
+  async findOne(@Request() req: any) {
+    return req.workoutDay;
   }
 
   /**
    * Updates the workout day according to workout the passed in body
    *
-   * @param workoutDayId
-   * @param updateWorkoutDayDto
+   * @param updateWorkoutDayDtos
+   * @param authUser
    */
-  @Patch(Routes.workoutDay.patch.one)
-  async updateWorkoutDay(
-    @WorkoutDayId() workoutDayId: string,
-    @Body() updateWorkoutDayDto: UpdateWorkoutDayDto,
+  @Put(Routes.workoutDay.put.multiple)
+  @UseGuards(JwtAuthGuard)
+  @CheckPolicies(new UpdateWorkoutDayPolicyHandler())
+  async updateWorkoutDays(
+    @Body(new ParseArrayPipe({ items: UpdateUserDto }))
+    updateWorkoutDayDtos: [UpdateWorkoutDayDto],
+    @AuthUser() authUser: AuthUserDto,
   ) {
-    updateWorkoutDayDto.id = workoutDayId;
-    return this.workoutDayService.update(updateWorkoutDayDto);
+    await this.workoutDayService.updateMultiple(updateWorkoutDayDtos, authUser);
+    // TODO: validate if all available ids are the same
   }
 
   /**

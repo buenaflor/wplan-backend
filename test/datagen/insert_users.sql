@@ -2,14 +2,6 @@
 
 INSERT INTO public."user"(login, name, password, email)
 	VALUES (
-        'buenaflor',
-        'Giancarlo Buenaflor',
-        '$argon2i$v=19$m=4096,t=3,p=1$6+hC9n7HJmYosek17OfH9w$BwRklOoIWTCdQ6ONS/berkAA4+yO92AIeQM2tdZzfEc',
-        'gino1997@hotmail.de'
-    );
-
-INSERT INTO public."user"(login, name, password, email)
-	VALUES (
         'buenaflor1',
         'Giancarlo Buenaflor1',
         '$argon2i$v=19$m=4096,t=3,p=1$6+hC9n7HJmYosek17OfH9w$BwRklOoIWTCdQ6ONS/berkAA4+yO92AIeQM2tdZzfEc',

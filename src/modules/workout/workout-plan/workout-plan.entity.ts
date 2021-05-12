@@ -13,9 +13,10 @@ import { WorkoutDay } from '../workout-day/workout-day.entity';
 import { User } from '../../user/user.entity';
 import { PublicWorkoutPlanDto } from './dto/response/public-workout-plan.dto';
 import { plainToClass } from 'class-transformer';
+import { AbstractEntity } from "../../../utils/abstract/abstract.entity";
 
 @Entity({ name: 'workout_plan' })
-export class WorkoutPlan {
+export class WorkoutPlan extends AbstractEntity {
   constructor(
     name: string,
     description: string,
@@ -25,6 +26,7 @@ export class WorkoutPlan {
     endDate: Date,
     userId: bigint,
   ) {
+    super();
     this.name = name;
     this.description = description;
     this.isCompleted = isCompleted;
@@ -33,9 +35,6 @@ export class WorkoutPlan {
     this.endDate = endDate;
     this.userId = userId;
   }
-
-  @PrimaryGeneratedColumn()
-  id: string;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
@@ -54,12 +53,6 @@ export class WorkoutPlan {
 
   @Column({ type: 'date', name: 'end_date' })
   endDate: Date;
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
 
   @Column({ type: 'bigint', name: 'user_id' })
   userId: bigint;

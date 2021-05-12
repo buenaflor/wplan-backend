@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PermissionEnum } from '../modules/permission/permission.enum';
+import { WorkoutPlanPermissionEnum } from '../modules/workout/workout-plan-permission/workout-plan-permission.enum';
 import { WorkoutPlanCollaboratorService } from '../modules/workout/workout-plan-collaborator/workout-plan-collaborator.service';
 
 /**
@@ -28,6 +28,6 @@ export class WorkoutPlanCollaboratorAdminAccessGuard implements CanActivate {
     if (!collaborator) {
       throw new NotFoundException("Collaborator doesn't exist");
     }
-    return collaborator.permission.name === PermissionEnum.admin;
+    return collaborator.permission.name === WorkoutPlanPermissionEnum.admin;
   }
 }

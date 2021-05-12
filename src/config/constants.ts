@@ -54,8 +54,8 @@ export const Routes = {
     delete: {
       one: '/:workoutDayId',
     },
-    patch: {
-      one: '/:workoutDayId',
+    put: {
+      multiple: '',
     },
   },
   exerciseRoutine: {

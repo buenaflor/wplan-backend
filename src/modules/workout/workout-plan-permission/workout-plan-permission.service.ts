@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { PermissionEntity } from './permission.entity';
+import { WorkoutPlanPermissionEntity } from './workout-plan-permission.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class PermissionService {
+export class WorkoutPlanPermissionService {
   constructor(
-    @InjectRepository(PermissionEntity)
-    private permissionRepository: Repository<PermissionEntity>,
+    @InjectRepository(WorkoutPlanPermissionEntity)
+    private permissionRepository: Repository<WorkoutPlanPermissionEntity>,
   ) {}
 
   async findOneById(id: string) {

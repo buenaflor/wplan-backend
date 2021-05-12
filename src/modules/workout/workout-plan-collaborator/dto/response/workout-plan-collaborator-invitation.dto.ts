@@ -1,6 +1,6 @@
-import { RoleDto } from '../../../role/dto/RoleDto';
+import { WorkoutPlanRoleDto } from '../../../workout-plan-role/dto/workout-plan-role.dto';
 import { PublicUserDto } from '../../../../user/dto/response/public-user-dto';
-import { PermissionDto } from '../../../../permission/dto/permission.dto';
+import { WorkoutPlanPermissionDto } from '../../../workout-plan-permission/dto/workout-plan-permission.dto';
 import { IsNotEmpty } from 'class-validator';
 import { PublicWorkoutPlanDto } from '../../../workout-plan/dto/response/public-workout-plan.dto';
 
@@ -10,8 +10,8 @@ export class WorkoutPlanCollaboratorInvitationDto {
     workoutPlan: PublicWorkoutPlanDto,
     invitee: PublicUserDto,
     inviter: PublicUserDto,
-    role: RoleDto,
-    permission: PermissionDto,
+    role: WorkoutPlanRoleDto,
+    permission: WorkoutPlanPermissionDto,
   ) {
     this.id = id;
     this.workoutPlan = workoutPlan;
@@ -34,8 +34,8 @@ export class WorkoutPlanCollaboratorInvitationDto {
   readonly inviter: PublicUserDto;
 
   @IsNotEmpty()
-  readonly role: RoleDto;
+  readonly role: WorkoutPlanRoleDto;
 
   @IsNotEmpty()
-  readonly permission: PermissionDto;
+  readonly permission: WorkoutPlanPermissionDto;
 }
