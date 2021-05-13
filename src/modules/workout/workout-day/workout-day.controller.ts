@@ -4,34 +4,22 @@ import {
   Delete,
   Get,
   HttpCode,
-  ParseArrayPipe,
   Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { Routes } from '../../../config/constants';
 import { WorkoutDayId } from './decorator/workout-day-id.decorator';
-import { UpdateWorkoutDayDto } from './dto/request/update-workout-day.dto';
-import { WorkoutDayService } from './workout-day.service';
+import { UpdateMultipleWorkoutDayDto } from './dto/request/update-workout-day.dto';
+import { WorkoutDayService } from './service/workout-day.service';
 import { AllowAnonymousJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
-import { ReadWorkoutDayPolicyHandler } from './policies/read-workout-day-policy.handler';
-import { CheckPolicies } from '../../../common/policy/check-policies.decorator';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
-import { UpdateUserDto } from '../../user/dto/request/update-user.dto';
-import { UpdateWorkoutDayPolicyHandler } from './policies/update-workout-day-policy.handler';
-import {
-  WorkoutDayAction,
-  WorkoutDayPolicyFactory,
-} from './policies/workout-day-policy.factory';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
 
 @Controller(Routes.workoutDay.controller)
 export class WorkoutDayController {
-  constructor(
-    private readonly workoutDayService: WorkoutDayService,
-    private readonly workoutDayPolicyFactory: WorkoutDayPolicyFactory,
-  ) {}
+  constructor(private readonly workoutDayService: WorkoutDayService) {}
 
   /**
    * Returns one workout day by id
@@ -41,35 +29,40 @@ export class WorkoutDayController {
   @Get(Routes.workoutDay.get.one)
   @UseGuards(AllowAnonymousJwtGuard)
   async findOne(@Request() req: any) {
-    return req.workoutDay;
+    return 'das';
   }
 
   /**
    * Updates the workout day according to workout the passed in body
    *
-   * @param updateWorkoutDayDtos
+   * @param updateMultipleWorkoutDayDto
    * @param authUser
    */
   @Put(Routes.workoutDay.put.multiple)
   @UseGuards(JwtAuthGuard)
-  @CheckPolicies(new UpdateWorkoutDayPolicyHandler())
   async updateWorkoutDays(
-    @Body(new ParseArrayPipe({ items: UpdateUserDto }))
-    updateWorkoutDayDtos: [UpdateWorkoutDayDto],
+    @Body()
+    updateMultipleWorkoutDayDto: UpdateMultipleWorkoutDayDto,
     @AuthUser() authUser: AuthUserDto,
   ) {
-    await this.workoutDayService.updateMultiple(updateWorkoutDayDtos, authUser);
-    // TODO: validate if all available ids are the same
+    return await this.workoutDayService.updateMultiple(
+      updateMultipleWorkoutDayDto.workoutDays,
+      authUser,
+    );
   }
 
   /**
    * Finds the workout day with id and deletes it
    *
    * @param workoutDayId
+   * @param authUser
    */
   @Delete(Routes.workoutDay.delete.one)
   @HttpCode(204)
-  async deleteWorkoutDay(@WorkoutDayId() workoutDayId: string) {
-    return this.workoutDayService.delete(workoutDayId);
+  async deleteWorkoutDay(
+    @WorkoutDayId() workoutDayId: string,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
+    return this.workoutDayService.delete(workoutDayId, authUser);
   }
 }

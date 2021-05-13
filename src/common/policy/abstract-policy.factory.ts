@@ -19,6 +19,4 @@ export abstract class AbstractPolicyFactory {
     const handler = this.handlers.get(key) as IPolicyHandler;
     return handler.handle(ability);
   }
-
-  abstract configureForClass();
 }

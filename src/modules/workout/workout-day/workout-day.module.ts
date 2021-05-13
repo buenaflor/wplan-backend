@@ -2,11 +2,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutDay } from './workout-day.entity';
-import { WorkoutDayService } from './workout-day.service';
+import { WorkoutDayService } from './service/workout-day.service';
 import { WorkoutDayController } from './workout-day.controller';
 import { CaslModule } from '../../../common/casl/casl.module';
 import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
-import { WorkoutDayPolicyModule } from './policies/workout-day-policy,module';
+import { WorkoutDayPolicyModule } from './policies/workout-day-policy.module';
+import { WorkoutDayAuthorizationService } from './service/workout-day-authorization.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { WorkoutDayPolicyModule } from './policies/workout-day-policy,module';
     WorkoutPlanCollaboratorModule,
     WorkoutDayPolicyModule,
   ],
-  providers: [WorkoutDayService],
+  providers: [WorkoutDayService, WorkoutDayAuthorizationService],
   controllers: [WorkoutDayController],
   exports: [WorkoutDayService],
 })

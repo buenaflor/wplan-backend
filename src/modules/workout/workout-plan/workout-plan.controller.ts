@@ -31,9 +31,10 @@ import { WorkoutPlanCollaboratorReadAccessGuard } from '../../../guards/workout-
 import { SearchWorkoutPlanDto } from './dto/request/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
-import { WorkoutDayService } from '../workout-day/workout-day.service';
+import { WorkoutDayService } from '../workout-day/service/workout-day.service';
 import { CreateWorkoutDayDto } from '../workout-day/dto/request/create-workout-day.dto';
 import { MyLogger } from '../../../logging/my.logger';
+import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -218,6 +219,7 @@ export class WorkoutPlanController {
    *
    * @param createWorkoutDayDto
    * @param workoutPlanId
+   * @param authUser
    */
   @Post(Routes.workoutPlan.post.workoutDays)
   @UseGuards(
@@ -228,9 +230,10 @@ export class WorkoutPlanController {
   async createWorkoutDay(
     @Body() createWorkoutDayDto: CreateWorkoutDayDto,
     @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser: AuthUserDto,
   ) {
     createWorkoutDayDto.workoutPlanId = workoutPlanId;
-    return this.workoutDayService.save(createWorkoutDayDto);
+    return this.workoutDayService.save(createWorkoutDayDto, authUser);
   }
 
   /**
@@ -239,6 +242,7 @@ export class WorkoutPlanController {
    *
    * @param workoutPlanId
    * @param paginated
+   * @param authUser
    */
   @Get(Routes.workoutPlan.get.workoutDays)
   @UseGuards(
@@ -249,7 +253,8 @@ export class WorkoutPlanController {
   async getWorkoutDays(
     @WorkoutPlanId() workoutPlanId: string,
     @Paginated() paginated,
+    @AuthUser() authUser: AuthUserDto,
   ) {
-    return this.workoutDayService.findAll(workoutPlanId, paginated);
+    return this.workoutDayService.findAll(workoutPlanId, paginated, authUser);
   }
 }

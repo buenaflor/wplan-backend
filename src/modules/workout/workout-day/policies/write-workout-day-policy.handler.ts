@@ -3,8 +3,11 @@ import { AppAbility } from '../../../../common/casl/casl-ability.factory';
 import { Action } from '../../../../common/casl/actions';
 import { WorkoutDay } from '../workout-day.entity';
 
-export class UpdateWorkoutDayPolicyHandler implements IPolicyHandler {
+export class WriteWorkoutDayPolicyHandler implements IPolicyHandler {
   handle(ability: AppAbility) {
-    return ability.can(Action.update, WorkoutDay);
+    return (
+      ability.can(Action.update, WorkoutDay) &&
+      ability.can(Action.create, WorkoutDay)
+    );
   }
 }

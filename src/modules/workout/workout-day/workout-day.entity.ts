@@ -14,7 +14,7 @@ import { WorkoutPlan } from '../workout-plan/workout-plan.entity';
 import { ExerciseRoutine } from '../exercise-routine/exercise-routine.entity';
 import { WorkoutDayDto } from './dto/response/workout-day.dto';
 import { plainToClass } from 'class-transformer';
-import { AbstractEntity } from "../../../utils/abstract/abstract.entity";
+import { AbstractEntity } from '../../../utils/abstract/abstract.entity';
 
 @Entity({ name: 'workout_day' })
 export class WorkoutDay extends AbstractEntity {
@@ -38,9 +38,7 @@ export class WorkoutDay extends AbstractEntity {
   @Column({ name: 'workout_plan_id' })
   workoutPlanId: string;
 
-  @ManyToOne(() => WorkoutPlan, (workoutPlan) => workoutPlan.id, {
-    eager: true,
-  })
+  @ManyToOne(() => WorkoutPlan, (workoutPlan) => workoutPlan.id)
   @JoinColumn({ name: 'workout_plan_id' })
   workoutPlan: WorkoutPlan;
 
