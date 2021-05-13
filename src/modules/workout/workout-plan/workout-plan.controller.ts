@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './workout-plan.service';
-import { AllowAnonymousJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
+import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { Routes } from '../../../config/constants';
@@ -83,7 +83,7 @@ export class WorkoutPlanController {
    * @param authUser
    */
   @Get(Routes.workoutPlan.get.one)
-  @UseGuards(AllowAnonymousJwtGuard)
+  @UseGuards(OptionalJwtGuard)
   async getOne(@WorkoutPlanId() workoutPlanId: string, @AuthUser() authUser) {
     const workoutPlanDto = await this.workoutPlanService.findOneById(
       workoutPlanId,

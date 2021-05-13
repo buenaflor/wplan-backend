@@ -12,7 +12,7 @@ import { Routes } from '../../../config/constants';
 import { WorkoutDayId } from './decorator/workout-day-id.decorator';
 import { UpdateMultipleWorkoutDayDto } from './dto/request/update-workout-day.dto';
 import { WorkoutDayService } from './service/workout-day.service';
-import { AllowAnonymousJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
+import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
@@ -27,7 +27,7 @@ export class WorkoutDayController {
    * @param req
    */
   @Get(Routes.workoutDay.get.one)
-  @UseGuards(AllowAnonymousJwtGuard)
+  @UseGuards(OptionalJwtGuard)
   async findOne(@Request() req: any) {
     return 'das';
   }
