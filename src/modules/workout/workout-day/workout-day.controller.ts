@@ -13,10 +13,13 @@ import { WorkoutDayService } from './service/workout-day.service';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
+import { MyLogger } from "../../../logging/my.logger";
 
 @Controller(Routes.workoutDay.controller)
 export class WorkoutDayController {
   constructor(private readonly workoutDayService: WorkoutDayService) {}
+
+  private readonly logger = new MyLogger(WorkoutDayController.name);
 
   /**
    * Updates the workout day according to workout the passed in body
@@ -31,6 +34,7 @@ export class WorkoutDayController {
     updateMultipleWorkoutDayDto: UpdateMultipleWorkoutDayDto,
     @AuthUser() authUser: AuthUserDto,
   ) {
+    this.logger.log(`updateWorkoutDays(${authUser.username})`);
     return await this.workoutDayService.updateMultiple(
       updateMultipleWorkoutDayDto.workoutDays,
       authUser,
@@ -49,6 +53,7 @@ export class WorkoutDayController {
     @WorkoutDayId() workoutDayId: string,
     @AuthUser() authUser: AuthUserDto,
   ) {
+    this.logger.log(`deleteWorkoutDay(${workoutDayId}, ${authUser.username})`);
     return this.workoutDayService.delete(workoutDayId, authUser);
   }
 }

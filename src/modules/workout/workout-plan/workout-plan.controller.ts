@@ -59,7 +59,7 @@ export class WorkoutPlanController {
     @SearchWorkoutPlanQuery() searchWorkoutPlanQuery: SearchWorkoutPlanDto,
     @Paginated() paginated,
   ) {
-    this.logger.log(`findAllPublic()`);
+    this.logger.log(`findAllPublic(${searchWorkoutPlanQuery.ownerName}, ${searchWorkoutPlanQuery.workoutPlanName})`);
     return await this.workoutPlanService.findAllPublic(
       paginated,
       searchWorkoutPlanQuery,
@@ -79,8 +79,11 @@ export class WorkoutPlanController {
    */
   @Get(Routes.workoutPlan.get.one)
   @UseGuards(OptionalJwtGuard)
-  async findOne(@WorkoutPlanId() workoutPlanId: string, @AuthUser() authUser) {
-    this.logger.log(`findOne() by user: ${authUser.username}`);
+  async findOne(
+    @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser: AuthUserDto
+  ) {
+    this.logger.log(`findOne(${workoutPlanId}, ${authUser.username})`);
     return await this.workoutPlanService.findOneById(workoutPlanId, authUser);
   }
 
@@ -102,6 +105,7 @@ export class WorkoutPlanController {
     @AuthUser() authUser: AuthUserDto,
     @Paginated() paginated,
   ) {
+    this.logger.log(`getOpenInvitations(${workoutPlanId}, ${authUser.username})`);
     return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
       workoutPlanId,
       authUser,
@@ -125,6 +129,7 @@ export class WorkoutPlanController {
     @AuthUser() authUser,
     @Paginated() paginated,
   ) {
+    this.logger.log(`getCollaborators(${workoutPlanId}, ${authUser.username})`);
     return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
       workoutPlanId,
       authUser,
@@ -147,13 +152,15 @@ export class WorkoutPlanController {
   @Put(Routes.workoutPlan.put.inviteCollaborator)
   @UseGuards(JwtAuthGuard)
   async inviteCollaborator(
-    @AuthUser() authUser,
     @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser,
     @Body() inviteCollaboratorDto: InviteCollaboratorRequestDto,
     @Param() params,
     @Res() res: Response,
   ) {
     const { inviteeUsername } = params;
+    // ToDo: decorator
+    this.logger.log(`inviteCollaborator(${workoutPlanId}, ${authUser.username}) invites ${inviteeUsername}`);
     const inviterUserId = authUser.userId;
     const invitee = await this.userService.findOnePublicUserByUsername(
       inviteeUsername,
@@ -198,10 +205,12 @@ export class WorkoutPlanController {
   @Post(Routes.workoutPlan.post.workoutDays)
   @UseGuards(JwtAuthGuard)
   async createWorkoutDay(
-    @Body() createWorkoutDayDto: CreateWorkoutDayDto,
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser: AuthUserDto,
+    @Body() createWorkoutDayDto: CreateWorkoutDayDto,
   ) {
+    // ToDo: multiple also
+    this.logger.log(`createWorkoutDay(${workoutPlanId}, ${authUser.username})`);
     createWorkoutDayDto.workoutPlanId = workoutPlanId;
     return this.workoutDayService.save(createWorkoutDayDto, authUser);
   }
@@ -218,9 +227,10 @@ export class WorkoutPlanController {
   @UseGuards(JwtAuthGuard)
   async getWorkoutDays(
     @WorkoutPlanId() workoutPlanId: string,
-    @Paginated() paginated,
     @AuthUser() authUser: AuthUserDto,
+    @Paginated() paginated,
   ) {
+    this.logger.log(`getWorkoutDays(${workoutPlanId}, ${authUser.username})`);
     return this.workoutDayService.findAll(workoutPlanId, paginated, authUser);
   }
 }

@@ -206,6 +206,6 @@ export class AuthUserController {
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser: AuthUserDto,
   ) {
-    await this.workoutPlanService.delete({ id: workoutPlanId }, authUser);
+    await this.workoutPlanService.delete(workoutPlanId, authUser);
   }
 }
