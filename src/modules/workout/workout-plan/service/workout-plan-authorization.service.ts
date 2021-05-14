@@ -1,30 +1,36 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { WorkoutAbilityFactory } from '../../../../common/casl/workout-ability-factory.service';
-import { WriteWorkoutDayPolicyHandler } from '../policy/write-workout-day-policy.handler';
 import { WorkoutPlanCollaboratorService } from '../../workout-plan-collaborator/workout-plan-collaborator.service';
-import { ReadWorkoutDayPolicyHandler } from '../policy/read-workout-day-policy.handler';
-import { DeleteWorkoutDayPolicyHandler } from '../policy/delete-workout-day-policy.handler';
+import { ReadWorkoutPlanPolicyHandler } from '../policy/read-workout-plan-policy.handler';
+import { AdminWorkoutPlanPolicyHandler } from '../policy/admin-workout-plan-policy.handler';
+import { WriteWorkoutPlanPolicyHandler } from '../policy/write-workout-plan-policy.handler';
+import { AuthUserDto } from '../../../auth-user/dto/auth-user.dto';
+import { WorkoutPlan } from '../workout-plan.entity';
 
 @Injectable()
-export class WorkoutDayAuthorizationService {
+export class WorkoutPlanAuthorizationService {
   constructor(
     private workoutAbilityFactory: WorkoutAbilityFactory,
     private workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
   ) {}
 
-  async authorizeRead(workoutPlanId: string, userId: string) {
-    const collaborator = await this.workoutPlanCollaboratorService.findOneRaw(
-      workoutPlanId,
-      userId,
-    );
-    if (!collaborator) {
-      throw new UnauthorizedException();
+  async authorizeRead(workoutPlan: WorkoutPlan, authUser: AuthUserDto) {
+    if (!workoutPlan.isPrivate) return true;
+    if (authUser) {
+      const collaborator = await this.workoutPlanCollaboratorService.findOneRaw(
+        workoutPlan.id,
+        authUser.userId,
+      );
+      if (!collaborator) {
+        throw new UnauthorizedException();
+      }
+      const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
+        collaborator,
+      );
+      const handler = new ReadWorkoutPlanPolicyHandler();
+      return handler.handle(ability);
     }
-    const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
-      collaborator,
-    );
-    const handler = new ReadWorkoutDayPolicyHandler();
-    return handler.handle(ability);
+    return false;
   }
 
   async authorizeWrite(workoutPlanId: string, userId: string) {
@@ -38,7 +44,7 @@ export class WorkoutDayAuthorizationService {
     const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
       collaborator,
     );
-    const handler = new WriteWorkoutDayPolicyHandler();
+    const handler = new WriteWorkoutPlanPolicyHandler();
     return handler.handle(ability);
   }
 
@@ -50,7 +56,7 @@ export class WorkoutDayAuthorizationService {
     const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
       collaborator,
     );
-    const handler = new DeleteWorkoutDayPolicyHandler();
+    const handler = new AdminWorkoutPlanPolicyHandler();
     return handler.handle(ability);
   }
 }

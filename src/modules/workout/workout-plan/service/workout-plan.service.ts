@@ -1,9 +1,10 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { WorkoutPlan } from './workout-plan.entity';
+import { WorkoutPlan } from '../workout-plan.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -11,11 +12,13 @@ import {
   IPaginationOptions,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { CreateWorkoutPlanDto } from './dto/request/create-workout-plan.dto';
-import { UpdateWorkoutPlanDto } from './dto/request/update-workout-plan.dto';
+import { CreateWorkoutPlanDto } from '../dto/request/create-workout-plan.dto';
+import { UpdateWorkoutPlanDto } from '../dto/request/update-workout-plan.dto';
 import { FindConditions } from 'typeorm/find-options/FindConditions';
-import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
-import { SearchWorkoutPlanDto } from './dto/request/search-workout-plan.dto';
+import { WorkoutPlanCollaboratorService } from '../../workout-plan-collaborator/workout-plan-collaborator.service';
+import { SearchWorkoutPlanDto } from '../dto/request/search-workout-plan.dto';
+import { AuthUserDto } from '../../../auth-user/dto/auth-user.dto';
+import { WorkoutPlanAuthorizationService } from './workout-plan-authorization.service';
 
 @Injectable()
 export class WorkoutPlanService {
@@ -23,6 +26,7 @@ export class WorkoutPlanService {
     @InjectRepository(WorkoutPlan)
     private workoutPlanRepository: Repository<WorkoutPlan>,
     private workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
+    private workoutPlanAuthorizationService: WorkoutPlanAuthorizationService,
   ) {}
 
   /**
@@ -80,16 +84,44 @@ export class WorkoutPlanService {
   }
 
   /**
+   * Finds all public workout plans where the user id is the owner
+   *
+   * @param options
+   * @param userId
+   */
+  async findAllPublicByUser(options: IPaginationOptions, userId: string) {
+    const res = await paginate<WorkoutPlan>(
+      this.workoutPlanRepository,
+      options,
+      {
+        where: [{ userId, isPrivate: false }],
+        relations: ['owner'],
+      },
+    );
+    return new Pagination(
+      res.items.map((elem) => {
+        return elem.createPublicWorkoutDto();
+      }),
+      res.meta,
+      res.links,
+    );
+  }
+
+  /**
    * Finds all private and public workout plans of an authenticated user or
    * workout plans that the user has explicit access to.
    * Only call this service function if the user has been successfully authenticated
    *
-   * @param userId
+   * @param authUser
    * @param options
    */
-  async findAllAccessibleByUser(userId: string, options: IPaginationOptions) {
+  async findAllAccessibleByUser(
+    authUser: AuthUserDto,
+    options: IPaginationOptions,
+  ) {
+    const userId = authUser.userId;
     const collabWorkoutPlanIds = await this.workoutPlanCollaboratorService.findAllWorkoutPlanIdsForCollaborator(
-      userId,
+      authUser,
     );
     const res = await paginate<WorkoutPlan>(
       this.workoutPlanRepository,
@@ -109,39 +141,21 @@ export class WorkoutPlanService {
   }
 
   /**
-   * Finds all public workout plans where the user id is the owner
-   *
-   * @param userId
-   * @param options
-   */
-  async findAllPublicByUser(userId: string, options: IPaginationOptions) {
-    const res = await paginate<WorkoutPlan>(
-      this.workoutPlanRepository,
-      options,
-      {
-        where: [{ userId, isPrivate: false }],
-        relations: ['owner'],
-      },
-    );
-    return new Pagination(
-      res.items.map((elem) => {
-        return elem.createPublicWorkoutDto();
-      }),
-      res.meta,
-      res.links,
-    );
-  }
-
-  /**
    * Finds the workout plan according to id and returns it
    *
    * @param workoutPlanId
+   * @param authUser
    */
-  async findOneById(workoutPlanId: string) {
+  async findOneById(workoutPlanId: string, authUser: AuthUserDto) {
     const workoutPlan = await this.workoutPlanRepository.findOne({
       where: [{ id: workoutPlanId }],
       relations: ['owner'],
     });
+    const authorized = await this.workoutPlanAuthorizationService.authorizeRead(
+      workoutPlan,
+      authUser,
+    );
+    if (!authorized) throw new ForbiddenException();
     if (!workoutPlan) {
       throw new NotFoundException();
     }
@@ -152,12 +166,16 @@ export class WorkoutPlanService {
    * Saves a workout plan with an owner to the database
    *
    * @param createWorkoutPlanDto
-   * @param userId
+   * @param authUser
    */
-  async save(createWorkoutPlanDto: CreateWorkoutPlanDto, userId: bigint) {
-    const user = this.workoutPlanRepository.create(createWorkoutPlanDto);
-    user.userId = userId;
-    await this.workoutPlanRepository.save(user);
+  async save(
+    createWorkoutPlanDto: CreateWorkoutPlanDto,
+    authUser: AuthUserDto,
+  ) {
+    const userId = authUser.userId;
+    const workoutPlan = this.workoutPlanRepository.create(createWorkoutPlanDto);
+    workoutPlan.userId = userId;
+    await this.workoutPlanRepository.save(workoutPlan);
   }
 
   /**
@@ -170,11 +188,19 @@ export class WorkoutPlanService {
    *
    * @param updateWorkoutPlanDto
    * @param workoutPlanId
+   * @param authUser
    */
   async update(
     updateWorkoutPlanDto: UpdateWorkoutPlanDto,
     workoutPlanId: string,
+    authUser: AuthUserDto,
   ) {
+    const userId = authUser.userId;
+    const authorized = await this.workoutPlanAuthorizationService.authorizeWrite(
+      workoutPlanId,
+      userId,
+    );
+    if (!authorized) throw new ForbiddenException();
     const queryRes = await this.workoutPlanRepository
       .createQueryBuilder()
       .update(WorkoutPlan)
@@ -197,8 +223,16 @@ export class WorkoutPlanService {
     return workoutPlan.createPublicWorkoutDto();
   }
 
-  async delete(criteria: FindConditions<WorkoutPlan>) {
-    const res = await this.workoutPlanRepository.delete(criteria);
+  async delete(workoutPlanId: string, authUser: AuthUserDto) {
+    const authorized = await this.workoutPlanAuthorizationService.authorizeDelete(
+      workoutPlanId,
+      authUser.userId,
+    );
+    if (!authorized)
+      throw new ForbiddenException(
+        'Must have admin rights to the workout plan',
+      );
+    const res = await this.workoutPlanRepository.delete(workoutPlanId);
     if (res.affected === 0) {
       throw new NotFoundException('Could not find workout plan');
     }

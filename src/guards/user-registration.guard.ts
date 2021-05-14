@@ -18,7 +18,6 @@ export class UserRegistrationGuard implements CanActivate {
       checkUser.login,
     );
     const emailExists = await this.userService.emailExists(checkUser.email);
-    console.log(loginNameExists);
     if (loginNameExists) {
       this.throwErr('Duplicate: username already exists.');
     }

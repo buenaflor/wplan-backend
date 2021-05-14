@@ -1,5 +1,5 @@
 import { IPolicyHandler } from '../../../../common/policy/policy.handler';
-import { AppAbility } from '../../../../common/casl/casl-ability.factory';
+import { AppAbility } from '../../../../common/casl/workout-ability-factory.service';
 import { Action } from '../../../../common/casl/actions';
 import { WorkoutDay } from '../workout-day.entity';
 

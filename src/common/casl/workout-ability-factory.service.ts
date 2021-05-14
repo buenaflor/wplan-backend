@@ -22,7 +22,7 @@ type Subjects =
 export type AppAbility = Ability<[Action, Subjects]>;
 
 @Injectable()
-export class CaslAbilityFactory {
+export class WorkoutAbilityFactory {
   createForWorkoutPlanCollaborator(
     collaborator: WorkoutPlanCollaboratorEntity,
   ) {
@@ -49,29 +49,6 @@ export class CaslAbilityFactory {
       }
     }
 
-    return build({
-      detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
-    });
-  }
-
-  createForPublicWorkoutPlan() {
-    const { can, build } = new AbilityBuilder<Ability<[Action, Subjects]>>(
-      Ability as AbilityClass<AppAbility>,
-    );
-
-    can(Action.read, 'all');
-
-    return build({
-      detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
-    });
-  }
-
-  createForNoAccess() {
-    const { build } = new AbilityBuilder<Ability<[Action, Subjects]>>(
-      Ability as AbilityClass<AppAbility>,
-    );
     return build({
       detectSubjectType: (item) =>
         item.constructor as ExtractSubjectType<Subjects>,

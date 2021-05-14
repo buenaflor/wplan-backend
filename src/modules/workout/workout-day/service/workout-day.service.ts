@@ -157,6 +157,6 @@ export class WorkoutDayService {
     if (!authorized) throw new ForbiddenException();
     const entity = new WorkoutDay(createWorkoutDayDto);
     const res = await this.workoutDayRepository.save(entity);
-    return this.findOneById(res.id, authUser);
+    return await this.findOneById(res.id, authUser);
   }
 }

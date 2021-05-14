@@ -1,8 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { WorkoutPlanService } from '../workout/workout-plan/workout-plan.service';
+import { WorkoutPlanService } from '../workout/workout-plan/service/workout-plan.service';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 /**
  * This controller provides endpoints for handling
@@ -49,8 +50,8 @@ export class UserController {
     const { username } = params;
     const user = await this.userService.findOnePublicUserByUsername(username);
     return await this.workoutPlanService.findAllPublicByUser(
-      user.id,
       paginated,
+      user.id,
     );
   }
 }

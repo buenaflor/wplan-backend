@@ -6,7 +6,6 @@ import { WorkoutDayService } from './service/workout-day.service';
 import { WorkoutDayController } from './workout-day.controller';
 import { CaslModule } from '../../../common/casl/casl.module';
 import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
-import { WorkoutDayPolicyModule } from './policies/workout-day-policy.module';
 import { WorkoutDayAuthorizationService } from './service/workout-day-authorization.service';
 
 @Module({
@@ -14,7 +13,6 @@ import { WorkoutDayAuthorizationService } from './service/workout-day-authorizat
     TypeOrmModule.forFeature([WorkoutDay]),
     CaslModule,
     WorkoutPlanCollaboratorModule,
-    WorkoutDayPolicyModule,
   ],
   providers: [WorkoutDayService, WorkoutDayAuthorizationService],
   controllers: [WorkoutDayController],
