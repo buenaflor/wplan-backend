@@ -14,8 +14,8 @@ import { ConfigService } from './config/config.service';
 import { databaseConfig } from './common/database/database.config';
 import { EmailVerificationModule } from './common/mail/verification/email-verification.module';
 import { AuthUserModule } from './modules/auth-user/auth-user.module';
-import { PermissionModule } from './modules/permission/permission.module';
-import { RoleModule } from './modules/workout/role/role.module';
+import { WorkoutPlanPermissionModule } from './modules/workout/workout-plan-permission/workout-plan-permission.module';
+import { WorkoutPlanRoleModule } from './modules/workout/workout-plan-role/workout-plan-role.module';
 import { WorkoutPlanCollaboratorModule } from './modules/workout/workout-plan-collaborator/workout-plan-collaborator.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -45,8 +45,8 @@ import { CaslModule } from './common/casl/casl.module';
     AuthModule,
     EmailVerificationModule,
     AuthUserModule,
-    PermissionModule,
-    RoleModule,
+    WorkoutPlanPermissionModule,
+    WorkoutPlanRoleModule,
     WorkoutPlanCollaboratorModule,
     CaslModule,
   ],

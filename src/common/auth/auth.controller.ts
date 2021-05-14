@@ -7,8 +7,9 @@ import {
   Put,
   Patch,
   Param,
-  ForbiddenException, HttpCode
-} from "@nestjs/common";
+  ForbiddenException,
+  HttpCode,
+} from '@nestjs/common';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Routes } from '../../config/constants';
 import { AuthUser } from '../../modules/auth-user/decorator/auth-user.decorator';
 import { BaseResponseDto } from '../../utils/base-response/base-response.dto';
+import { AuthUserDto } from '../../modules/auth-user/dto/auth-user.dto';
 
 //TODO: limit exposure? -> client secret maybe
 @Controller(Routes.auth.controller)
@@ -91,9 +93,9 @@ export class AuthController {
    */
   @UseGuards(JwtAuthGuard)
   @Put(Routes.auth.post.resendEmail)
-  async resendMail(@AuthUser() authUser) {
+  async resendMail(@AuthUser() authUser: AuthUserDto) {
     const userId = authUser.userId;
-    const user = await this.userService.findOnePrivateUserById(userId);
+    const user = await this.userService.findOnePrivateUser(authUser);
     if (user.isEmailConfirmed) {
       throw new ForbiddenException('Email is already verified');
     }

@@ -10,11 +10,10 @@ import {
   HttpStatus,
   Post,
   UnprocessableEntityException,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { WorkoutPlanService } from './workout-plan.service';
-import { AllowAnonymousJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
+import { WorkoutPlanService } from './service/workout-plan.service';
+import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { Routes } from '../../../config/constants';
@@ -22,18 +21,15 @@ import { Paginated } from '../../../utils/decorators/paginated.decorator';
 import { WorkoutPlanCollaboratorService } from '../workout-plan-collaborator/workout-plan-collaborator.service';
 import { UserService } from '../../user/user.service';
 import { InviteCollaboratorRequestDto } from '../workout-plan-collaborator/dto/request/invite-collaborator-request.dto';
-import { RoleService } from '../role/role.service';
-import { PermissionService } from '../../permission/permission.service';
-import { WorkoutPlanCollaboratorGuard } from '../../../guards/workout-plan-collaborator.guard';
-import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../../guards/workout-plan-collaborator-write-access.guard';
-import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../../guards/workout-plan-collaborator-admin-access.guard';
-import { WorkoutPlanCollaboratorReadAccessGuard } from '../../../guards/workout-plan-collaborator-read-access.guard';
+import { WorkoutPlanRoleService } from '../workout-plan-role/workout-plan-role.service';
+import { WorkoutPlanPermissionService } from '../workout-plan-permission/workout-plan-permission.service';
 import { SearchWorkoutPlanDto } from './dto/request/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
-import { WorkoutDayService } from '../workout-day/workout-day.service';
+import { WorkoutDayService } from '../workout-day/service/workout-day.service';
 import { CreateWorkoutDayDto } from '../workout-day/dto/request/create-workout-day.dto';
 import { MyLogger } from '../../../logging/my.logger';
+import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -42,8 +38,8 @@ export class WorkoutPlanController {
     private readonly workoutPlanCollaboratorService: WorkoutPlanCollaboratorService,
     private readonly workoutDayService: WorkoutDayService,
     private readonly userService: UserService,
-    private readonly roleService: RoleService,
-    private readonly permissionService: PermissionService,
+    private readonly roleService: WorkoutPlanRoleService,
+    private readonly permissionService: WorkoutPlanPermissionService,
   ) {}
 
   private readonly logger = new MyLogger(WorkoutPlanController.name);
@@ -63,7 +59,7 @@ export class WorkoutPlanController {
     @SearchWorkoutPlanQuery() searchWorkoutPlanQuery: SearchWorkoutPlanDto,
     @Paginated() paginated,
   ) {
-    this.logger.log('findAllPublic()');
+    this.logger.log(`findAllPublic()`);
     return await this.workoutPlanService.findAllPublic(
       paginated,
       searchWorkoutPlanQuery,
@@ -82,24 +78,10 @@ export class WorkoutPlanController {
    * @param authUser
    */
   @Get(Routes.workoutPlan.get.one)
-  @UseGuards(AllowAnonymousJwtGuard)
-  async getOne(@WorkoutPlanId() workoutPlanId: string, @AuthUser() authUser) {
-    const workoutPlanDto = await this.workoutPlanService.findOneById(
-      workoutPlanId,
-    );
-    if (authUser && authUser.userId === workoutPlanDto.owner.id) {
-      return workoutPlanDto;
-    }
-    if (authUser) {
-      const isCollaborator = await this.workoutPlanCollaboratorService.isCollaborator(
-        workoutPlanId,
-        authUser.userId,
-      );
-      if (isCollaborator) return workoutPlanDto;
-    }
-    if (workoutPlanDto.isPrivate) {
-      throw new NotFoundException();
-    }
+  @UseGuards(OptionalJwtGuard)
+  async findOne(@WorkoutPlanId() workoutPlanId: string, @AuthUser() authUser) {
+    this.logger.log(`findOne() by user: ${authUser.username}`);
+    return await this.workoutPlanService.findOneById(workoutPlanId, authUser);
   }
 
   //================================================================================
@@ -110,19 +92,19 @@ export class WorkoutPlanController {
    * Returns a list of open invitations of the workout plan
    *
    * @param workoutPlanId
+   * @param authUser
    * @param paginated
    */
   @Get(Routes.workoutPlan.get.openInvitations)
-  @UseGuards(
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async getOpenInvitations(
     @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser: AuthUserDto,
     @Paginated() paginated,
   ) {
     return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
       workoutPlanId,
+      authUser,
       paginated,
     );
   }
@@ -130,18 +112,14 @@ export class WorkoutPlanController {
   /**
    * Returns the collaborators of a workout plan
    * Requires an authenticated user and if the auth user is not
-   * a collaborator with at least read permission then deny access to the resource
+   * a collaborator with at least read workout-plan-permission then deny access to the resource
    *
    * @param workoutPlanId
    * @param authUser
    * @param paginated
    */
   @Get(Routes.workoutPlan.get.collaborators)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorReadAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async getCollaborators(
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser,
@@ -149,6 +127,7 @@ export class WorkoutPlanController {
   ) {
     return await this.workoutPlanCollaboratorService.findAllCollaboratorsByWorkoutPlanId(
       workoutPlanId,
+      authUser,
       paginated,
     );
   }
@@ -166,11 +145,7 @@ export class WorkoutPlanController {
    * @param res
    */
   @Put(Routes.workoutPlan.put.inviteCollaborator)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async inviteCollaborator(
     @AuthUser() authUser,
     @WorkoutPlanId() workoutPlanId: string,
@@ -218,19 +193,17 @@ export class WorkoutPlanController {
    *
    * @param createWorkoutDayDto
    * @param workoutPlanId
+   * @param authUser
    */
   @Post(Routes.workoutPlan.post.workoutDays)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorWriteAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async createWorkoutDay(
     @Body() createWorkoutDayDto: CreateWorkoutDayDto,
     @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser: AuthUserDto,
   ) {
     createWorkoutDayDto.workoutPlanId = workoutPlanId;
-    return this.workoutDayService.save(createWorkoutDayDto);
+    return this.workoutDayService.save(createWorkoutDayDto, authUser);
   }
 
   /**
@@ -239,17 +212,15 @@ export class WorkoutPlanController {
    *
    * @param workoutPlanId
    * @param paginated
+   * @param authUser
    */
   @Get(Routes.workoutPlan.get.workoutDays)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorReadAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async getWorkoutDays(
     @WorkoutPlanId() workoutPlanId: string,
     @Paginated() paginated,
+    @AuthUser() authUser: AuthUserDto,
   ) {
-    return this.workoutDayService.findAll(workoutPlanId, paginated);
+    return this.workoutDayService.findAll(workoutPlanId, paginated, authUser);
   }
 }

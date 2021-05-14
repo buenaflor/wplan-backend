@@ -10,20 +10,15 @@ import {
 } from 'typeorm';
 import { License } from '../../license/license.entity';
 import { MuscleGroup } from '../muscle-group/muscle-group.entity';
+import { AbstractEntity } from "../../../utils/abstract/abstract.entity";
 
 @Entity({ name: 'exercise' })
-export class Exercise {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Exercise extends AbstractEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
   @Column({ type: 'varchar', length: 500 })
   description: string;
-
-  @Column({ type: 'date', name: 'created_at' })
-  createdAt: Date;
 
   @Column({ type: 'varchar', length: 255, name: 'license_author' })
   licenseAuthor: string;

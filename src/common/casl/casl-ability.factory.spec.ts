@@ -1,7 +1,7 @@
-import { CaslAbilityFactory } from './casl-ability.factory';
+import { WorkoutAbilityFactory } from './workout-ability-factory.service';
 
 describe('CaslAbilityFactory', () => {
   it('should be defined', () => {
-    expect(new CaslAbilityFactory()).toBeDefined();
+    expect(new WorkoutAbilityFactory()).toBeDefined();
   });
 });

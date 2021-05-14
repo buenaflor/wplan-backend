@@ -15,6 +15,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { CreateUserDto } from './dto/request/create-user.dto';
+import { AuthUserDto } from '../auth-user/dto/auth-user.dto';
 
 @Injectable()
 export class UserService {
@@ -48,12 +49,14 @@ export class UserService {
   /**
    * Finds a user and returns the publicly and privately available info of that user
    *
-   * @param id
+   * @param authUser
    */
-  async findOnePrivateUserById(id: string): Promise<PrivateUserDto> {
-    const user = await this.userRepository.findOne(id);
+  async findOnePrivateUser(authUser: AuthUserDto): Promise<PrivateUserDto> {
+    const user = await this.userRepository.findOne(authUser.userId);
     if (!user) {
-      throw new NotFoundException('Could not find a user with id: ' + id);
+      throw new NotFoundException(
+        'Could not find a user with id: ' + authUser.userId,
+      );
     }
     return user.toPrivateUserDto();
   }
@@ -107,14 +110,14 @@ export class UserService {
    * Updates the user information
    *
    * @param updateUserDto
-   * @param userId
+   * @param authUser
    */
-  async update(updateUserDto: UpdateUserDto, userId: string) {
+  async update(updateUserDto: UpdateUserDto, authUser: AuthUserDto) {
     const queryRes = await this.userRepository
       .createQueryBuilder()
       .update(User)
       .set(updateUserDto)
-      .where({ id: userId })
+      .where({ id: authUser.userId })
       .returning('*')
       .execute();
     // ToDo: raw query will not parse snake case
@@ -132,6 +135,7 @@ export class UserService {
    * @param userId
    */
   updateLoginDate(userId: string) {
+    // ToDo: use a subscriber to update the login date
     const dateToday = new Date(
       Date.now() + 1000 * 60 * -new Date().getTimezoneOffset(),
     )

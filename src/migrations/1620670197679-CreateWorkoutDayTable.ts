@@ -10,7 +10,7 @@ export class CreateWorkoutDayTable1620670197679 implements MigrationInterface {
             workout_plan_id uuid        NOT NULL,
             name            text,
             description     text,
-            date            date        NOT NULL,
+            date            date        NOT NULL UNIQUE,
             total_exercises smallint    NOT NULL DEFAULT 0,
             created_at      timestamptz NOT NULL DEFAULT current_timestamp,
             updated_at      timestamptz NOT NULL DEFAULT current_timestamp,

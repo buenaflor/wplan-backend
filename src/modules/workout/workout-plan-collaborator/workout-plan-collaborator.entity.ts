@@ -1,21 +1,13 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from '../../user/user.entity';
-import { RoleEntity } from '../role/role.entity';
-import { PermissionEntity } from '../../permission/permission.entity';
+import { WorkoutPlanRoleEntity } from '../workout-plan-role/workout-plan-role.entity';
+import { WorkoutPlanPermissionEntity } from '../workout-plan-permission/workout-plan-permission.entity';
 import { WorkoutPlanCollaboratorDto } from './dto/response/workout-plan-collaborator.dto';
 import { WorkoutPlan } from '../workout-plan/workout-plan.entity';
+import { AbstractEntity } from '../../../utils/abstract/abstract.entity';
 
 @Entity({ name: 'workout_plan_collaborator' })
-export class WorkoutPlanCollaboratorEntity {
-  @PrimaryGeneratedColumn()
-  id: string;
-
+export class WorkoutPlanCollaboratorEntity extends AbstractEntity {
   @Column({ type: 'integer', name: 'workout_plan_id' })
   workoutPlanId: string;
 
@@ -36,13 +28,13 @@ export class WorkoutPlanCollaboratorEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => RoleEntity, (role) => role.id)
+  @ManyToOne(() => WorkoutPlanRoleEntity, (role) => role.id)
   @JoinColumn({ name: 'role_id' })
-  role: RoleEntity;
+  role: WorkoutPlanRoleEntity;
 
-  @ManyToOne(() => PermissionEntity, (permission) => permission.id)
+  @ManyToOne(() => WorkoutPlanPermissionEntity, (permission) => permission.id)
   @JoinColumn({ name: 'permission_id' })
-  permission: PermissionEntity;
+  permission: WorkoutPlanPermissionEntity;
 
   createWorkoutPlanCollaboratorDto() {
     return new WorkoutPlanCollaboratorDto(

@@ -14,16 +14,14 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { UpdateUserDto } from '../user/dto/request/update-user.dto';
 import { AuthUser } from './decorator/auth-user.decorator';
 import { PrivateUserDto } from '../user/dto/response/private-user.dto';
-import { WorkoutPlanService } from '../workout/workout-plan/workout-plan.service';
+import { WorkoutPlanService } from '../workout/workout-plan/service/workout-plan.service';
 import { CreateWorkoutPlanDto } from '../workout/workout-plan/dto/request/create-workout-plan.dto';
 import { Paginated } from '../../utils/decorators/paginated.decorator';
 import { Routes } from '../../config/constants';
 import { WorkoutPlanCollaboratorService } from '../workout/workout-plan-collaborator/workout-plan-collaborator.service';
-import { WorkoutPlanCollaboratorGuard } from '../../guards/workout-plan-collaborator.guard';
-import { WorkoutPlanCollaboratorWriteAccessGuard } from '../../guards/workout-plan-collaborator-write-access.guard';
 import { WorkoutPlanId } from '../workout/workout-plan/decorator/workout-plan-id.decorator';
 import { UpdateWorkoutPlanDto } from '../workout/workout-plan/dto/request/update-workout-plan.dto';
-import { WorkoutPlanCollaboratorAdminAccessGuard } from '../../guards/workout-plan-collaborator-admin-access.guard';
+import { AuthUserDto } from './dto/auth-user.dto';
 
 /**
  * This controller is responsible for handling authenticated user requests
@@ -45,8 +43,10 @@ export class AuthUserController {
    */
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getAuthenticatedUser(@AuthUser() authUser): Promise<PrivateUserDto> {
-    return await this.userService.findOnePrivateUserById(authUser.userId);
+  async getAuthenticatedUser(
+    @AuthUser() authUser: AuthUserDto,
+  ): Promise<PrivateUserDto> {
+    return await this.userService.findOnePrivateUser(authUser);
   }
 
   /**
@@ -59,17 +59,17 @@ export class AuthUserController {
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async updateAuthenticatedUser(
-    @AuthUser() authUser,
+    @AuthUser() authUser: AuthUserDto,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    await this.userService.update(updateUserDto, authUser.userId);
+    await this.userService.update(updateUserDto, authUser);
     // TODO: if changing email, verified changes to false, maybe with trigger?
   }
 
   /**
-   * Finds all workout plans that the authenticated user has permission to access
+   * Finds all workout plans that the authenticated user has workout-plan-permission to access
    *
-   * The authenticated user has explicit permission to access workout plans they own or
+   * The authenticated user has explicit workout-plan-permission to access workout plans they own or
    * where they are a collaborator
    *
    * @param authUser
@@ -77,9 +77,12 @@ export class AuthUserController {
    */
   @Get(Routes.authUser.get.workoutPlans)
   @UseGuards(JwtAuthGuard)
-  async getWorkoutPlans(@AuthUser() authUser, @Paginated() paginated) {
+  async getWorkoutPlans(
+    @AuthUser() authUser: AuthUserDto,
+    @Paginated() paginated,
+  ) {
     return await this.workoutPlanService.findAllAccessibleByUser(
-      authUser.userId,
+      authUser,
       paginated,
     );
   }
@@ -94,10 +97,10 @@ export class AuthUserController {
   @UseGuards(JwtAuthGuard)
   async getWorkoutPlanInvitations(
     @Paginated() paginated,
-    @AuthUser() authUser,
+    @AuthUser() authUser: AuthUserDto,
   ) {
-    return await this.workoutPlanCollaboratorService.getAllInvitationsByUserId(
-      authUser.userId,
+    return await this.workoutPlanCollaboratorService.getAllInvitationsByUser(
+      authUser,
       paginated,
     );
   }
@@ -115,11 +118,14 @@ export class AuthUserController {
   @Patch(Routes.authUser.patch.acceptWorkoutPlanInvitation)
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
-  async acceptWorkoutPlanInvitation(@Param() params, @AuthUser() authUser) {
+  async acceptWorkoutPlanInvitation(
+    @Param() params,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
     const { invitationId } = params;
     return await this.workoutPlanCollaboratorService.acceptInvitation(
       invitationId,
-      authUser.userId,
+      authUser,
     );
   }
 
@@ -134,11 +140,14 @@ export class AuthUserController {
   @Delete(Routes.authUser.delete.declineWorkoutPlanInvitation)
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
-  async declineWorkoutPlanInvitation(@Param() params, @AuthUser() authUser) {
+  async declineWorkoutPlanInvitation(
+    @Param() params,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
     const { invitationId } = params;
     return this.workoutPlanCollaboratorService.declineInvitation(
       invitationId,
-      authUser.userId,
+      authUser,
     );
   }
 
@@ -152,10 +161,10 @@ export class AuthUserController {
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async createWorkoutPlan(
-    @AuthUser() authUser,
+    @AuthUser() authUser: AuthUserDto,
     @Body() createWorkoutPlanDTO: CreateWorkoutPlanDto,
   ) {
-    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser.userId);
+    await this.workoutPlanService.save(createWorkoutPlanDTO, authUser);
   }
 
   /**
@@ -168,19 +177,16 @@ export class AuthUserController {
    * @param updateWorkoutPlanDto
    */
   @Patch(Routes.authUser.patch.workoutPlan)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorWriteAccessGuard,
-  )
+  @UseGuards(JwtAuthGuard)
   async updateWorkoutPlan(
-    @AuthUser() authUser,
+    @AuthUser() authUser: AuthUserDto,
     @WorkoutPlanId() workoutPlanId: string,
     @Body() updateWorkoutPlanDto: UpdateWorkoutPlanDto,
   ) {
     return await this.workoutPlanService.update(
       updateWorkoutPlanDto,
       workoutPlanId,
+      authUser,
     );
   }
 
@@ -191,15 +197,15 @@ export class AuthUserController {
    * The authenticated user has to be the owner of the workout plan
    *
    * @param workoutPlanId
+   * @param authUser
    */
   @Delete(Routes.authUser.delete.workoutPlan)
   @HttpCode(204)
-  @UseGuards(
-    JwtAuthGuard,
-    WorkoutPlanCollaboratorGuard,
-    WorkoutPlanCollaboratorAdminAccessGuard,
-  )
-  async deleteWorkoutPlanForUser(@WorkoutPlanId() workoutPlanId: string) {
-    await this.workoutPlanService.delete({ id: workoutPlanId });
+  @UseGuards(JwtAuthGuard)
+  async deleteWorkoutPlanForUser(
+    @WorkoutPlanId() workoutPlanId: string,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
+    await this.workoutPlanService.delete({ id: workoutPlanId }, authUser);
   }
 }

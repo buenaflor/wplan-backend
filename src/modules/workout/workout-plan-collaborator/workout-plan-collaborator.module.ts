@@ -3,6 +3,7 @@ import { WorkoutPlanCollaboratorService } from './workout-plan-collaborator.serv
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutPlanCollaboratorEntity } from './workout-plan-collaborator.entity';
 import { WorkoutPlanCollaboratorInvitationEntity } from './invitation/workout-plan-collaborator-invitation.entity';
+import { CaslModule } from '../../../common/casl/casl.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { WorkoutPlanCollaboratorInvitationEntity } from './invitation/workout-pl
       WorkoutPlanCollaboratorEntity,
       WorkoutPlanCollaboratorInvitationEntity,
     ]),
+    CaslModule,
   ],
   providers: [WorkoutPlanCollaboratorService],
   exports: [WorkoutPlanCollaboratorService],

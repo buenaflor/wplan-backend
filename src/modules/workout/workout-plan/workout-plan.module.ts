@@ -1,14 +1,16 @@
 // workout-plan.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkoutPlanService } from './workout-plan.service';
+import { WorkoutPlanService } from './service/workout-plan.service';
 import { WorkoutPlanController } from './workout-plan.controller';
 import { WorkoutPlan } from './workout-plan.entity';
 import { UserModule } from '../../user/user.module';
 import { WorkoutPlanCollaboratorModule } from '../workout-plan-collaborator/workout-plan-collaborator.module';
-import { PermissionModule } from '../../permission/permission.module';
-import { RoleModule } from '../role/role.module';
+import { WorkoutPlanPermissionModule } from '../workout-plan-permission/workout-plan-permission.module';
+import { WorkoutPlanRoleModule } from '../workout-plan-role/workout-plan-role.module';
 import { WorkoutDayModule } from '../workout-day/workout-day.module';
+import { WorkoutPlanAuthorizationService } from './service/workout-plan-authorization.service';
+import { CaslModule } from '../../../common/casl/casl.module';
 
 @Module({
   imports: [
@@ -16,10 +18,11 @@ import { WorkoutDayModule } from '../workout-day/workout-day.module';
     forwardRef(() => UserModule),
     WorkoutDayModule,
     WorkoutPlanCollaboratorModule,
-    PermissionModule,
-    RoleModule,
+    WorkoutPlanPermissionModule,
+    WorkoutPlanRoleModule,
+    CaslModule,
   ],
-  providers: [WorkoutPlanService],
+  providers: [WorkoutPlanService, WorkoutPlanAuthorizationService],
   controllers: [WorkoutPlanController],
   exports: [WorkoutPlanService],
 })

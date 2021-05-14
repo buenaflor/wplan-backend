@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -12,25 +13,29 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { WorkoutPlanCollaboratorInvitationEntity } from './invitation/workout-plan-collaborator-invitation.entity';
+import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
+import { WorkoutAbilityFactory } from '../../../common/casl/workout-ability-factory.service';
+import { WriteWorkoutPlanPolicyHandler } from '../workout-plan/policy/write-workout-plan-policy.handler';
+import { AdminWorkoutPlanPolicyHandler } from '../workout-plan/policy/admin-workout-plan-policy.handler';
 
 @Injectable()
 export class WorkoutPlanCollaboratorService {
   constructor(
     @InjectRepository(WorkoutPlanCollaboratorEntity)
     private workoutPlanCollaboratorRepository: Repository<WorkoutPlanCollaboratorEntity>,
-
     @InjectRepository(WorkoutPlanCollaboratorInvitationEntity)
     private workoutPlanCollaboratorInvitationEntityRepository: Repository<WorkoutPlanCollaboratorInvitationEntity>,
+    private workoutAbilityFactory: WorkoutAbilityFactory,
   ) {}
 
   /**
    * Returns all workout plan ids where the given user id is a collaborator
    *
-   * @param collaboratorId
+   * @param authUser
    */
-  async findAllWorkoutPlanIdsForCollaborator(collaboratorId: string) {
+  async findAllWorkoutPlanIdsForCollaborator(authUser: AuthUserDto) {
     const res = await this.workoutPlanCollaboratorRepository.find({
-      userId: collaboratorId,
+      userId: authUser.userId,
     });
     return res.map((elem) => elem.workoutPlanId);
   }
@@ -39,12 +44,26 @@ export class WorkoutPlanCollaboratorService {
    * Finds and returns all collaborators of a specific workout plan
    *
    * @param workoutPlanId
+   * @param authUser
    * @param options
    */
   async findAllCollaboratorsByWorkoutPlanId(
     workoutPlanId: string,
+    authUser: AuthUserDto,
     options: IPaginationOptions,
   ) {
+    // Authorization
+    const collaborator = await this.findOneRaw(workoutPlanId, authUser.userId);
+    if (!collaborator) throw new ForbiddenException('Must be a collaborator');
+    const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
+      collaborator,
+    );
+    const handler = new WriteWorkoutPlanPolicyHandler();
+    if (!handler.handle(ability))
+      throw new ForbiddenException(
+        'Must have write access to the workout plan',
+      );
+
     const res = await paginate<WorkoutPlanCollaboratorEntity>(
       this.workoutPlanCollaboratorRepository,
       options,
@@ -73,12 +92,26 @@ export class WorkoutPlanCollaboratorService {
    * Returns a list of all invitations that a workout plan has
    *
    * @param workoutPlanId
+   * @param authUser
    * @param options
    */
   async getAllInvitationsByWorkoutPlanId(
     workoutPlanId: string,
+    authUser: AuthUserDto,
     options: IPaginationOptions,
   ) {
+    // Authorization
+    const collaborator = await this.findOneRaw(workoutPlanId, authUser.userId);
+    if (!collaborator) throw new ForbiddenException('Must be a collaborator');
+    const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
+      collaborator,
+    );
+    const handler = new AdminWorkoutPlanPolicyHandler();
+    if (!handler.handle(ability))
+      throw new ForbiddenException(
+        'Must have admin rights to the workout plan',
+      );
+
     const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
       this.workoutPlanCollaboratorInvitationEntityRepository,
       options,
@@ -104,17 +137,20 @@ export class WorkoutPlanCollaboratorService {
   }
 
   /**
-   * Returns a list of all invitations that the user id has
+   * Returns a list of all invitations that the authenticated user has
    *
-   * @param userId
+   * @param authUser
    * @param options
    */
-  async getAllInvitationsByUserId(userId: number, options: IPaginationOptions) {
+  async getAllInvitationsByUser(
+    authUser: AuthUserDto,
+    options: IPaginationOptions,
+  ) {
     const res = await paginate<WorkoutPlanCollaboratorInvitationEntity>(
       this.workoutPlanCollaboratorInvitationEntityRepository,
       options,
       {
-        where: [{ inviteeUserId: userId }],
+        where: [{ inviteeUserId: authUser.userId }],
         relations: [
           'workoutPlan',
           'workoutPlan.owner',
@@ -138,17 +174,17 @@ export class WorkoutPlanCollaboratorService {
    * Accepts a collaboration invitation
    *
    * @param invitationId
-   * @param userId
+   * @param authUser
    */
-  async acceptInvitation(invitationId: string, userId: string) {
+  async acceptInvitation(invitationId: string, authUser: AuthUserDto) {
     const invitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
       {
         id: invitationId,
-        inviteeUserId: userId,
+        inviteeUserId: authUser.userId,
       },
     );
     if (!invitation) {
-      throw new NotFoundException();
+      throw new NotFoundException('Cannot find invitation');
     }
     const collaborator = this.workoutPlanCollaboratorRepository.create();
     collaborator.userId = invitation.inviteeUserId;
@@ -159,7 +195,7 @@ export class WorkoutPlanCollaboratorService {
     const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
       {
         id: invitationId,
-        inviteeUserId: userId,
+        inviteeUserId: authUser.userId,
       },
     );
     if (deleteResult.affected === 0) {
@@ -170,11 +206,11 @@ export class WorkoutPlanCollaboratorService {
     }
   }
 
-  async declineInvitation(invitationId: string, userId: string) {
+  async declineInvitation(invitationId: string, authUser: AuthUserDto) {
     const deleteResult = await this.workoutPlanCollaboratorInvitationEntityRepository.delete(
       {
         id: invitationId,
-        inviteeUserId: userId,
+        inviteeUserId: authUser.userId,
       },
     );
     if (deleteResult.affected === 0) {
@@ -195,21 +231,36 @@ export class WorkoutPlanCollaboratorService {
    * @param workoutPlanId
    * @param roleId
    * @param permissionId
-   * @param inviterUserId
+   * @param inviterUser
    */
   async inviteCollaborator(
     inviteeUserId: string,
     workoutPlanId: string,
     roleId: string,
     permissionId: string,
-    inviterUserId: string,
+    inviterUser: AuthUserDto,
   ) {
+    // Authorization
+    const collaborator = await this.findOneRaw(
+      workoutPlanId,
+      inviterUser.userId,
+    );
+    if (!collaborator) throw new ForbiddenException('Must be a collaborator');
+    const ability = this.workoutAbilityFactory.createForWorkoutPlanCollaborator(
+      collaborator,
+    );
+    const handler = new AdminWorkoutPlanPolicyHandler();
+    if (!handler.handle(ability))
+      throw new ForbiddenException(
+        'Must have admin rights to the workout plan',
+      );
+
     const invitation = this.workoutPlanCollaboratorInvitationEntityRepository.create();
     invitation.workoutPlanId = workoutPlanId;
     invitation.inviteeUserId = inviteeUserId;
     invitation.roleId = roleId;
     invitation.permissionId = permissionId;
-    invitation.inviterUserId = inviterUserId;
+    invitation.inviterUserId = inviterUser.userId;
     const invitationInDb = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
       {
         workoutPlanId,
@@ -229,7 +280,9 @@ export class WorkoutPlanCollaboratorService {
     if (!invitationInDb) {
       const finalInvitation = await this.workoutPlanCollaboratorInvitationEntityRepository.findOne(
         {
-          where: [{ workoutPlanId, inviterUserId, inviteeUserId }],
+          where: [
+            { workoutPlanId, inviterUserId: inviterUser.userId, inviteeUserId },
+          ],
           relations: [
             'workoutPlan',
             'workoutPlan.owner',
@@ -242,17 +295,5 @@ export class WorkoutPlanCollaboratorService {
       );
       return finalInvitation.createWorkoutPlanInvitationDto();
     }
-  }
-
-  async isCollaborator(workoutPlanId: string, userId: string) {
-    const res = await this.workoutPlanCollaboratorRepository.findOne({
-      where: [
-        {
-          workoutPlanId,
-          userId,
-        },
-      ],
-    });
-    return !!res;
   }
 }
