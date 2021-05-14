@@ -44,6 +44,7 @@ export const Routes = {
     },
     put: {
       inviteCollaborator: '/:workoutPlanId/collaborators/:inviteeUsername',
+      workoutDays: '/:workoutPlanId/workout_days'
     },
   },
   workoutDay: {
@@ -53,9 +54,6 @@ export const Routes = {
     },
     delete: {
       one: '/:workoutDayId',
-    },
-    put: {
-      multiple: '',
     },
   },
   exerciseRoutine: {

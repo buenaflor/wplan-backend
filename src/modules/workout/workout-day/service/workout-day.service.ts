@@ -1,20 +1,18 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from "typeorm";
 import { WorkoutDay } from '../workout-day.entity';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { CreateWorkoutDayDto } from '../dto/request/create-workout-day.dto';
+import { CreateWorkoutDayBulkDto, CreateWorkoutDayDto } from "../dto/request/create-workout-day.dto";
 import { UpdateWorkoutDayDto } from '../dto/request/update-workout-day.dto';
 import { AuthUserDto } from '../../../auth-user/dto/auth-user.dto';
 import { WorkoutDayAuthorizationService } from './workout-day-authorization.service';
@@ -25,6 +23,7 @@ export class WorkoutDayService {
     @InjectRepository(WorkoutDay)
     private workoutDayRepository: Repository<WorkoutDay>,
     private workoutDayAuthorizationService: WorkoutDayAuthorizationService,
+    private connection: Connection,
   ) {}
 
   /**
@@ -144,19 +143,28 @@ export class WorkoutDayService {
   /**
    * Saves a create workout day dto to the database
    *
-   * @param createWorkoutDayDto
+   * @param workoutPlanId
+   * @param createWorkoutDayDtos
    * @param authUser
    */
-  async save(createWorkoutDayDto: CreateWorkoutDayDto, authUser: AuthUserDto) {
-    const workoutPlanId = createWorkoutDayDto.workoutPlanId;
+  async saveMultiple(
+    workoutPlanId: string,
+    createWorkoutDayDtos: [CreateWorkoutDayDto],
+    authUser: AuthUserDto,
+    ) {
     const userId = authUser.userId;
-    const authorized = await this.workoutDayAuthorizationService.authorizeRead(
+    const authorized = await this.workoutDayAuthorizationService.authorizeWrite(
       workoutPlanId,
       userId,
     );
     if (!authorized) throw new ForbiddenException();
-    const entity = new WorkoutDay(createWorkoutDayDto);
-    const res = await this.workoutDayRepository.save(entity);
-    return await this.findOneById(res.id, authUser);
+    const workoutDays = createWorkoutDayDtos.map((elem) => {
+      return new WorkoutDay(elem);
+    })
+    await this.connection.transaction(async manager => {
+      for (let workoutDay of workoutDays) {
+        await manager.save(workoutDay);
+      }
+    });
   }
 }

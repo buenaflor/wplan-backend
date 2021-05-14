@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class UpdateMultipleWorkoutDayDto {
+export class UpdateWorkoutDayBulkDto {
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested()

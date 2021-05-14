@@ -9,8 +9,8 @@ import {
   Res,
   HttpStatus,
   Post,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+  UnprocessableEntityException, HttpCode
+} from "@nestjs/common";
 import { Response } from 'express';
 import { WorkoutPlanService } from './service/workout-plan.service';
 import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
@@ -27,9 +27,10 @@ import { SearchWorkoutPlanDto } from './dto/request/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
 import { WorkoutDayService } from '../workout-day/service/workout-day.service';
-import { CreateWorkoutDayDto } from '../workout-day/dto/request/create-workout-day.dto';
+import { CreateWorkoutDayBulkDto, CreateWorkoutDayDto } from "../workout-day/dto/request/create-workout-day.dto";
 import { MyLogger } from '../../../logging/my.logger';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
+import { UpdateWorkoutDayBulkDto } from "../workout-day/dto/request/update-workout-day.dto";
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -198,21 +199,47 @@ export class WorkoutPlanController {
    * Creates a workout day for a workout plan
    * Requester needs to be a collaborator with write access
    *
-   * @param createWorkoutDayDto
    * @param workoutPlanId
    * @param authUser
+   * @param createWorkoutDayBulkDto
    */
   @Post(Routes.workoutPlan.post.workoutDays)
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard)
-  async createWorkoutDay(
+  async createWorkoutDays(
     @WorkoutPlanId() workoutPlanId: string,
     @AuthUser() authUser: AuthUserDto,
-    @Body() createWorkoutDayDto: CreateWorkoutDayDto,
+    @Body() createWorkoutDayBulkDto: CreateWorkoutDayBulkDto,
   ) {
-    // ToDo: multiple also
-    this.logger.log(`createWorkoutDay(${workoutPlanId}, ${authUser.username})`);
-    createWorkoutDayDto.workoutPlanId = workoutPlanId;
-    return this.workoutDayService.save(createWorkoutDayDto, authUser);
+    this.logger.log(`createWorkoutDays(${workoutPlanId}, ${authUser.username})`);
+    createWorkoutDayBulkDto.workoutDays.forEach(
+      (elem) => elem.workoutPlanId = workoutPlanId
+    );
+    await this.workoutDayService.saveMultiple(
+      workoutPlanId,
+      createWorkoutDayBulkDto.workoutDays,
+      authUser
+    );
+  }
+
+  /**
+   * Updates the workout day according to workout the passed in body
+   *
+   * @param updateMultipleWorkoutDayDto
+   * @param authUser
+   */
+  @Put(Routes.workoutPlan.put.workoutDays)
+  @UseGuards(JwtAuthGuard)
+  async updateWorkoutDays(
+    @Body()
+      updateMultipleWorkoutDayDto: UpdateWorkoutDayBulkDto,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
+    this.logger.log(`updateWorkoutDays(${authUser.username})`);
+    return await this.workoutDayService.updateMultiple(
+      updateMultipleWorkoutDayDto.workoutDays,
+      authUser,
+    );
   }
 
   /**
