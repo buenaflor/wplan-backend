@@ -4,6 +4,9 @@ import { AbstractDto } from '../../../../../utils/abstract/abstract.dto';
 @Exclude()
 export class WorkoutDayDto extends AbstractDto {
   @Expose()
+  workoutPlanId: string;
+
+  @Expose()
   name: string;
 
   @Expose()

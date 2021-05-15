@@ -82,7 +82,7 @@ export class WorkoutDayService {
       workoutPlanId,
       userId,
     );
-    if (!authorized) throw new ForbiddenException();
+    if (!authorized) throw new ForbiddenException('Must have read rights');
     if (!res) throw new NotFoundException();
     return res.toDto();
   }
@@ -90,27 +90,18 @@ export class WorkoutDayService {
   /**
    * Updates multiple workout dtos
    *
-   * @param updateWorkoutDayDtos
+   * @param updateWorkoutDayDto
    * @param user
    */
-  async updateMultiple(
-    updateWorkoutDayDtos: [UpdateWorkoutDayDto],
-    user: AuthUserDto,
-  ) {
+  async update(updateWorkoutDayDto: UpdateWorkoutDayDto, user: AuthUserDto) {
     const userId = user.userId;
-    const workoutPlanId = updateWorkoutDayDtos[0].workoutPlanId;
+    const workoutPlanId = updateWorkoutDayDto.workoutPlanId;
     const authorized = await this.workoutDayAuthorizationService.authorizeWrite(
       workoutPlanId,
       userId,
     );
-    if (!authorized) throw new ForbiddenException();
-    const workoutDays = updateWorkoutDayDtos.map((elem) =>
-      this.workoutDayRepository.create(elem),
-    );
-    const savedWorkoutDays = await this.workoutDayRepository.save(workoutDays);
-    return savedWorkoutDays.map((elem) => {
-      return elem.toDto();
-    });
+    if (!authorized) throw new ForbiddenException('Must have write rights');
+    await this.workoutDayRepository.save(updateWorkoutDayDto);
   }
 
   /**
@@ -134,7 +125,7 @@ export class WorkoutDayService {
     if (!authorized) throw new ForbiddenException();
     const res = await this.workoutDayRepository.delete(workoutDayId);
     if (res.affected === 0) {
-      throw new InternalServerErrorException('No entity was deleted');
+      throw new NotFoundException('No entity was deleted');
     }
     if (res.affected > 1) {
       throw new InternalServerErrorException('More than one deleted');
@@ -154,7 +145,7 @@ export class WorkoutDayService {
       workoutPlanId,
       userId,
     );
-    if (!authorized) throw new ForbiddenException();
+    if (!authorized) throw new ForbiddenException('Must have write rights');
     const entity = new WorkoutDay(createWorkoutDayDto);
     const res = await this.workoutDayRepository.save(entity);
     return await this.findOneById(res.id, authUser);
