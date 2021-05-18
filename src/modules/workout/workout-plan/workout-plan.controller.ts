@@ -9,8 +9,9 @@ import {
   Res,
   HttpStatus,
   Post,
-  UnprocessableEntityException, HttpCode
-} from "@nestjs/common";
+  UnprocessableEntityException,
+  HttpCode,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { WorkoutPlanService } from './service/workout-plan.service';
 import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
@@ -27,10 +28,13 @@ import { SearchWorkoutPlanDto } from './dto/request/search-workout-plan.dto';
 import { SearchWorkoutPlanQuery } from './decorator/search-workout-plan.decorator';
 import { WorkoutPlanId } from './decorator/workout-plan-id.decorator';
 import { WorkoutDayService } from '../workout-day/service/workout-day.service';
-import { CreateWorkoutDayBulkDto, CreateWorkoutDayDto } from "../workout-day/dto/request/create-workout-day.dto";
+import {
+  CreateWorkoutDayBulkDto,
+  CreateWorkoutDayDto,
+} from '../workout-day/dto/request/create-workout-day.dto';
 import { MyLogger } from '../../../logging/my.logger';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
-import { UpdateWorkoutDayBulkDto } from "../workout-day/dto/request/update-workout-day.dto";
+import { UpdateWorkoutDayBulkDto } from '../workout-day/dto/request/update-workout-day.dto';
 
 @Controller(Routes.workoutPlan.controller)
 export class WorkoutPlanController {
@@ -60,7 +64,9 @@ export class WorkoutPlanController {
     @SearchWorkoutPlanQuery() searchWorkoutPlanQuery: SearchWorkoutPlanDto,
     @Paginated() paginated,
   ) {
-    this.logger.log(`findAllPublic(${searchWorkoutPlanQuery.ownerName}, ${searchWorkoutPlanQuery.workoutPlanName})`);
+    this.logger.log(
+      `findAllPublic(${searchWorkoutPlanQuery.ownerName}, ${searchWorkoutPlanQuery.workoutPlanName})`,
+    );
     return await this.workoutPlanService.findAllPublic(
       paginated,
       searchWorkoutPlanQuery,
@@ -82,7 +88,7 @@ export class WorkoutPlanController {
   @UseGuards(OptionalJwtGuard)
   async findOne(
     @WorkoutPlanId() workoutPlanId: string,
-    @AuthUser() authUser: AuthUserDto
+    @AuthUser() authUser: AuthUserDto,
   ) {
     this.logger.log(`findOne(${workoutPlanId}, ${authUser.username})`);
     return await this.workoutPlanService.findOneById(workoutPlanId, authUser);
@@ -106,7 +112,9 @@ export class WorkoutPlanController {
     @AuthUser() authUser: AuthUserDto,
     @Paginated() paginated,
   ) {
-    this.logger.log(`getOpenInvitations(${workoutPlanId}, ${authUser.username})`);
+    this.logger.log(
+      `getOpenInvitations(${workoutPlanId}, ${authUser.username})`,
+    );
     return await this.workoutPlanCollaboratorService.getAllInvitationsByWorkoutPlanId(
       workoutPlanId,
       authUser,
@@ -161,7 +169,9 @@ export class WorkoutPlanController {
   ) {
     const { inviteeUsername } = params;
     // ToDo: decorator
-    this.logger.log(`inviteCollaborator(${workoutPlanId}, ${authUser.username}) invites ${inviteeUsername}`);
+    this.logger.log(
+      `inviteCollaborator(${workoutPlanId}, ${authUser.username}) invites ${inviteeUsername}`,
+    );
     const inviterUserId = authUser.userId;
     const invitee = await this.userService.findOnePublicUserByUsername(
       inviteeUsername,
@@ -211,14 +221,16 @@ export class WorkoutPlanController {
     @AuthUser() authUser: AuthUserDto,
     @Body() createWorkoutDayBulkDto: CreateWorkoutDayBulkDto,
   ) {
-    this.logger.log(`createWorkoutDays(${workoutPlanId}, ${authUser.username})`);
+    this.logger.log(
+      `createWorkoutDays(${workoutPlanId}, ${authUser.username})`,
+    );
     createWorkoutDayBulkDto.workoutDays.forEach(
-      (elem) => elem.workoutPlanId = workoutPlanId
+      (elem) => (elem.workoutPlanId = workoutPlanId),
     );
     await this.workoutDayService.saveMultiple(
       workoutPlanId,
       createWorkoutDayBulkDto.workoutDays,
-      authUser
+      authUser,
     );
   }
 
@@ -232,7 +244,7 @@ export class WorkoutPlanController {
   @UseGuards(JwtAuthGuard)
   async updateWorkoutDays(
     @Body()
-      updateMultipleWorkoutDayDto: UpdateWorkoutDayBulkDto,
+    updateMultipleWorkoutDayDto: UpdateWorkoutDayBulkDto,
     @AuthUser() authUser: AuthUserDto,
   ) {
     this.logger.log(`updateWorkoutDays(${authUser.username})`);

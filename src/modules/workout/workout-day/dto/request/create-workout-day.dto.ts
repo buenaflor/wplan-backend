@@ -3,6 +3,11 @@ import {
   IsArray,
   IsDateString,
   IsEmpty,
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsUUID,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
@@ -28,4 +33,28 @@ export class CreateWorkoutDayDto {
 
   @MaxLength(500)
   description: string;
+
+  @IsOptional()
+  @Type(() => CreateExerciseRoutineDto)
+  exerciseRoutines: [CreateExerciseRoutineDto];
+}
+
+class CreateExerciseRoutineDto {
+  @IsUUID()
+  exerciseId: string;
+
+  @IsArray()
+  @Type(() => CreateExerciseWlSetDto)
+  exerciseWlSets: [CreateExerciseWlSetDto];
+}
+
+class CreateExerciseWlSetDto {
+  @IsInt()
+  repetitions: number;
+
+  @IsNumber()
+  weight: number;
+
+  @IsIn(['kg', 'lbs'])
+  unit: string;
 }
