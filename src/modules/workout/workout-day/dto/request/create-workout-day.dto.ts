@@ -1,5 +1,12 @@
-import { ArrayMinSize, IsArray, IsDateString, IsEmpty, IsUUID, MaxLength, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import {
+  ArrayMinSize,
+  IsArray,
+  IsDateString,
+  IsEmpty,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateWorkoutDayBulkDto {
   @IsArray()
@@ -8,7 +15,6 @@ export class CreateWorkoutDayBulkDto {
   @Type(() => CreateWorkoutDayDto)
   workoutDays: [CreateWorkoutDayDto];
 }
-
 
 export class CreateWorkoutDayDto {
   @IsDateString()
