@@ -1,22 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateWorkoutDayDto } from './create-workout-day.dto';
-import {
-  ArrayMinSize,
-  IsArray,
-  IsDateString,
-  IsUUID,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-
-export class UpdateMultipleWorkoutDayDto {
-  @IsArray()
-  @ArrayMinSize(1)
-  @ValidateNested()
-  @Type(() => UpdateWorkoutDayDto)
-  workoutDays: [UpdateWorkoutDayDto];
-}
+import { IsDateString, IsUUID, MaxLength } from 'class-validator';
 
 export class UpdateWorkoutDayDto extends PartialType(CreateWorkoutDayDto) {
   @IsUUID()

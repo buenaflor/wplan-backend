@@ -1,10 +1,8 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -90,27 +88,21 @@ export class WorkoutDayService {
   /**
    * Updates multiple workout dtos
    *
-   * @param updateWorkoutDayDtos
+   * @param updateWorkoutDayDto
    * @param user
    */
-  async updateMultiple(
-    updateWorkoutDayDtos: [UpdateWorkoutDayDto],
-    user: AuthUserDto,
-  ) {
+  async update(updateWorkoutDayDto: UpdateWorkoutDayDto, user: AuthUserDto) {
     const userId = user.userId;
-    const workoutPlanId = updateWorkoutDayDtos[0].workoutPlanId;
+    const workoutPlanId = updateWorkoutDayDto.workoutPlanId;
     const authorized = await this.workoutDayAuthorizationService.authorizeWrite(
       workoutPlanId,
       userId,
     );
     if (!authorized) throw new ForbiddenException();
-    const workoutDays = updateWorkoutDayDtos.map((elem) =>
-      this.workoutDayRepository.create(elem),
+    const savedWorkoutDays = await this.workoutDayRepository.save(
+      updateWorkoutDayDto,
     );
-    const savedWorkoutDays = await this.workoutDayRepository.save(workoutDays);
-    return savedWorkoutDays.map((elem) => {
-      return elem.toDto();
-    });
+    return savedWorkoutDays.toDto();
   }
 
   /**
