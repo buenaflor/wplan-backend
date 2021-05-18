@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { ExerciseRoutine } from '../exercise-routine/exercise-routine.entity';
+import { ExerciseRoutine } from '../exercise-routine.entity';
 
 @Entity({ name: 'exercise_wl_set' })
 export class ExerciseWlSet {

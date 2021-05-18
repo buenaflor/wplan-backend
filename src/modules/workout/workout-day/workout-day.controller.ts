@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
+  Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +16,8 @@ import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { AuthUser } from '../../auth-user/decorator/auth-user.decorator';
 import { AuthUserDto } from '../../auth-user/dto/auth-user.dto';
 import { MyLogger } from '../../../logging/my.logger';
+import { OptionalJwtGuard } from '../../../guards/allow-anonymous-jwt-guard.service';
+import { CreateExerciseRoutineDto } from '../exercise-routine/dto/request/create-exercise-routine.dto';
 
 @Controller(Routes.workoutDay.controller)
 export class WorkoutDayController {
@@ -46,11 +50,36 @@ export class WorkoutDayController {
    */
   @Delete(Routes.workoutDay.delete.one)
   @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
   async deleteWorkoutDay(
     @WorkoutDayId() workoutDayId: string,
     @AuthUser() authUser: AuthUserDto,
   ) {
     this.logger.log(`deleteWorkoutDay(${workoutDayId}, ${authUser.username})`);
     return this.workoutDayService.delete(workoutDayId, authUser);
+  }
+
+  @UseGuards(OptionalJwtGuard)
+  @Get(Routes.workoutDay.exerciseRoutine.get.all)
+  async getExerciseRoutines(
+    @WorkoutDayId() workoutDayId: string,
+    @AuthUser() authUser: AuthUserDto,
+  ) {
+    this.logger.log(
+      `getExerciseRoutines(${workoutDayId}, ${authUser.username})`,
+    );
+  }
+
+  @Post(Routes.workoutDay.exerciseRoutine.post.one)
+  @UseGuards(JwtAuthGuard)
+  async createExerciseRoutines(
+    @WorkoutDayId() workoutDayId: string,
+    @AuthUser() authUser: AuthUserDto,
+    @Body() createExerciseRoutineDto: CreateExerciseRoutineDto,
+  ) {
+    this.logger.log(
+      `createExerciseRoutines(${workoutDayId}, ${authUser.username})`,
+    );
+    console.log(createExerciseRoutineDto);
   }
 }

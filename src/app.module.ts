@@ -6,7 +6,7 @@ import { ExerciseModule } from './modules/workout/exercise/exercise.module';
 import { LicenseModule } from './modules/license/license.module';
 import { WorkoutDayModule } from './modules/workout/workout-day/workout-day.module';
 import { ExerciseRoutineModule } from './modules/workout/exercise-routine/exercise-routine.module';
-import { ExerciseWlSetModule } from './modules/workout/exercise-wl-set/exercise-wl-set.module';
+import { ExerciseWlSetModule } from './modules/workout/exercise-routine/exercise-wl-set/exercise-wl-set.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './common/auth/auth.module';
 import { ConfigModule } from './config/config.module';

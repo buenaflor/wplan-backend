@@ -57,10 +57,24 @@ export const Routes = {
     put: {
       multiple: '',
     },
+    exerciseRoutine: {
+      get: {
+        all: '/:workoutDayId/exercise_routines',
+      },
+      post: {
+        one: '/:workoutDayId/exercise_routines',
+      },
+    },
   },
   exerciseRoutine: {
     controller: 'exercise_routines',
     get: {
+      one: '/:exerciseRoutineId',
+    },
+    put: {
+      one: '/:exerciseRoutineId',
+    },
+    delete: {
       one: '/:exerciseRoutineId',
     },
   },
