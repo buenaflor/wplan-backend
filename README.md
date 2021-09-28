@@ -7,10 +7,8 @@
 ## Tech Stack
 
 - PostgreSQL 
-- Redis caching
 - NestJS with Typescript
 - JSON Web Tokens for authentication
-- Docker for containerization
 
 ## Database
 
